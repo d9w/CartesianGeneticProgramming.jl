@@ -1,0 +1,233 @@
+functions:
+  f_scale:
+    - x
+    - scaled(x)
+  f_centered_filter:
+    - x
+    - scaled(imfilter(x,centered(x)))
+  f_maximum:
+    - x
+    - maximum(x)
+  f_minimum:
+    - x
+    - minimum(x)
+  f_mean:
+    - x
+    - mean(x)
+  f_std:
+    - x
+    - scaled(std(x))
+  f_middle:
+    - x
+    - middle(x)
+  f_median:
+    - x
+    - median(x)
+  f_ssdn:
+    - x
+    - x
+    - x
+    - ssdn(eqsize(x,y,c)...)
+  f_sadn:
+    - x
+    - x
+    - x
+    - sadn(eqsize(x,y,c)...)
+  f_cov:
+    - x
+    - x
+    - x
+    - scaled(cov(eqsize(x,y,c)...))
+  f_cor:
+    - x
+    - x
+    - x
+    - scaled(cor(eqsize(x,y,c)...))
+  f_index_y:
+    - x
+    - index_in(x, y)
+  f_index_c:
+    - x
+    - index_in(x, c)
+  f_restrict:
+    - x
+    - restrict(x)
+  f_dilate:
+    - x
+    - dilate(x)
+  f_erode:
+    - x
+    - erode(x)
+  f_opening:
+    - x
+    - opening(x)
+  f_closing:
+    - x
+    - closing(x)
+  f_tophat:
+    - x
+    - tophat(x)
+  f_bothat:
+    - x
+    - bothat(x)
+  f_morphogradient:
+    - x
+    - morphogradient(x)
+  f_morpholaplace:
+    - x
+    - scaled(morpholaplace(x))
+  f_integral_image:
+    - x
+    - scaled(integral_image(x))
+  f_eye:
+    - '1.0'
+    - eye(size(x)[1])
+  f_zeros:
+    - '0.0'
+    - zeros(size(x))
+  f_ones:
+    - '1.0'
+    - ones(size(x))
+  f_flipdim:
+    - x
+    - flipdim(x, index_in(collect(1:ndims(x)), y))
+  f_cumprod:
+    - x
+    - cumprod(x, index_in(collect(1:ndims(x)), y))
+  f_cumsum:
+    - x
+    - scaled(cumsum(x, index_in(collect(1:ndims(x)), y)))
+  f_cummax:
+    - x
+    - cummax(x, index_in(collect(1:ndims(x)), y))
+  f_not:
+    - Float64(~Bool(round(x)))
+    - Float64.(~(BitArray(round(x))))
+  f_and:
+    - Float64(Bool(round(x))&Bool(round(y)))
+    - Float64.(Bool(round(x))&BitArray(round(y)))
+    - Float64.(BitArray(round(x))&Bool(round(y)))
+    - Float64.(BitArray(round(eqsize(x,y,c)[1]))&BitArray(round(eqsize(x,y,c)[2])))
+  f_or:
+    - Float64(Bool(round(x))|Bool(round(y)))
+    - Float64.(Bool(round(x))|BitArray(round(y)))
+    - Float64.(BitArray(round(x))|Bool(round(y)))
+    - Float64.(BitArray(round(eqsize(x,y,c)[1]))|BitArray(round(eqsize(x,y,c)[2])))
+  f_xor:
+    - Float64(Bool(round(x))$Bool(round(y)))
+    - Float64.(Bool(round(x))$BitArray(round(y)))
+    - Float64.(BitArray(round(x))$Bool(round(y)))
+    - Float64.(BitArray(round(eqsize(x,y,c)[1]))$BitArray(round(eqsize(x,y,c)[2])))
+  f_min:
+    - min(x,y)
+    - min(x,y)
+    - min(x,y)
+    - min(eqsize(x, y, c)...)
+  f_max:
+    - max(x,y)
+    - max(x,y)
+    - max(x,y)
+    - max(eqsize(x, y, c)...)
+  f_round:
+    - round(x)
+  f_ceil:
+    - ceil(x)
+  f_floor:
+    - floor(x)
+  f_fftshift:
+    - x
+    - fftshift(x)
+  f_erf:
+    - erf(x)
+  f_dawson:
+    - dawson(x)
+  f_airyai:
+    - airyai(x)
+  f_eta:
+    - eta(x)
+  f_rfft:
+    - x
+    - scaled(real(rfft(x)))
+  f_dct:
+    - x
+    - scaled(dct(x))
+
+#TODO: add these functions
+  # f_deconv:
+  #   - x
+  #   - x
+  #   - x
+  #   - deconv.(x[:],y[:])
+
+  # f_circshift(x,shifts(y)):
+  #   - circshift(x,shifts(y))
+
+
+  # f_imresize(x, Tuple(Int64.(round(y*[size(x)...])))):
+  #   - imresize(x, Tuple(Int64.(round(y*[size(x)...]))))
+
+  # f_imresize(x, Tuple(Int64.(round(c*[size(x)...])))):
+  #   - imresize(x, Tuple(Int64.(round(c*[size(x)...]))))
+
+  # f_canny:
+  #   - Float64.(canny(x)) # TODO: n dimensions
+
+  # f_Float64.(imcorner(x, method=[harris, shi_tomasi, kitchen_rosenfeld])) TODO: n dimensions:
+  #   - Float64.(imcorner(x, method=[harris, shi_tomasi, kitchen_rosenfeld])) TODO: n dimensions
+  # f_xcorr:
+  #   - x
+  #   - x
+  #   - x
+  #   - scaled(xcorr(eqsize(x,y,c)...))
+  # f_scale:
+  #   - 0.0
+  #   - 0.0
+  #   - scaled(x)
+  #   - scaled(x)
+  # f_imfilter:
+  #   - ?
+  #   - ?
+  #   - scaled(imfilter(x, centered(x))
+  #   - scaled(imfilter(x, centered(x))
+  # f_Float64.(fastcorners(img)) TODO: n dimensions:
+  #   - Float64.(fastcorners(img)) TODO: n dimensions
+  # f_sobel_filter:
+  #   - x
+  #   - scaled(imfilter(x,KernelFactors.sobel((true,true,true),axis(y/c))))
+  # f_prewitt_filter:
+  #   - x
+  #   - scaled(imfilter(x,KernelFactors.prewitt((true,true,true),axis(y/c))))
+  # f_ando3_filter:
+  #   - x
+  #   - scaled(imfilter(x,KernelFactors.ando3((true,true,true),axis(y/c))))
+  # f_gaussian_filter:
+  #   - x
+  #   - scaled(imfilter(x,KernelFactors.gaussian(mean(y))))
+  # f_dog_filter:
+  #   - x
+  #   - scaled(imfilter(x,Kernel.DoG(mean(y))))
+  # f_log_filter:
+  #   - x
+  #   - scaled(imfilter(x,Kernel.LoG(mean(y))))
+  # f_laplacian_filter:
+  #   - x
+  #   - scaled(imfilter(x,Kernel.Laplacian((true,true))))
+  # f_sobel_gradient:
+  #   - x
+  #   - scaled(imgradients(x, "sobel")[y/c])
+  # f_prewitt_gradient:
+  #   - x
+  #   - scaled(imgradients(x, "prewitt")[y/c])
+  # f_ando3_gradient:
+  #   - x
+  #   - scaled(imgradients(x, "ando3")[y/c])
+  # f_sobel_edge:
+  #   - x
+  #   - imedge(x, "sobel")[3]
+  # f_prewitt_edge:
+  #   - x
+  #   - imedge(x, "prewitt")[3]
+  # f_ando3_edge:
+  #   - x
+  #   - imedge(x, "ando3")[3]
+# #TODO: (x,y,c)->warp(x,recenter(RotMatrix(y), center(x))) for n dimensional case

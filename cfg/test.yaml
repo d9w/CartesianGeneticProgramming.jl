@@ -1,0 +1,30 @@
+position_mutation_rate: 0.5
+connection_mutation_rate: 0.5
+function_mutation_rate: 0.5
+parameter_mutation_rate: 0.5
+num_generations: 10
+num_nodes: 10
+population_size: 5
+fitness_thresh: 0.1
+node_inputs: 2
+functions:
+  f_sum:
+    - (x+y)/2.0
+    - (x.+y)/2.0
+    - (x.+y)/2.0
+    - .+(eqsize(x,y,c)...)/2.0
+  f_aminus:
+    - abs(x-y)/2.0
+    - abs(x.-y)/2.0
+    - abs(x.-y)/2.0
+    - abs(.-(eqsize(x,y,c)...))/2.0
+  f_mult:
+    - x*y
+    - x.*y
+    - x.*y
+    - ".*(eqsize(x,y,c)...)"
+  f_bdiv:
+    - bdiv(x, y)
+    - (i->bdiv(x,i)).(y)
+    - (i->bdiv(i,y)).(x)
+    - "[bdiv(eqsize(x,y,c)[1][i], eqsize(x,y,c)[2][i]) for i in eachindex(eqsize(x,y,c)[1])]"

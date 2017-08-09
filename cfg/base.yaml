@@ -1,0 +1,9 @@
+position_mutation_rate: 0.0
+connection_mutation_rate: 0.02
+function_mutation_rate: 0.02
+parameter_mutation_rate: 0.02
+num_generations: 50000
+num_nodes: 100
+population_size: 5
+fitness_thresh: 0.001
+node_inputs: 2
