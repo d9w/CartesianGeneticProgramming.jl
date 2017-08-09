@@ -1,7 +1,7 @@
 import Base.show
 export Chromosome, mutate!, ccopy!, get_outputs, recur_eval!, process, input, recurc, decode
 
-type Chromosome{T}
+mutable struct Chromosome{T}
     n_inputs::Int64
     n_outputs::Int64
     nodes::Array{Node{T}}

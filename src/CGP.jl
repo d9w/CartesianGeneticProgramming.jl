@@ -4,8 +4,11 @@ using Images
 using Logging
 using PaddedViews
 
+Logging.configure(level=INFO)
+
     module Config
     using YAML
+    using Logging
     include("functions.jl")
     functions = []
     function init(file::String)
@@ -15,7 +18,7 @@ using PaddedViews
                 append!(functions, load_functions(config["functions"]))
             else
                 if isdefined(Config, parse(k))
-                    println("Loading $file: $k is already defined, skipping")
+                    debug("Loading $file: $k is already defined, skipping")
                 else
                     eval(parse(string("const ", k, "=", config[k])))
                 end
@@ -26,7 +29,6 @@ using PaddedViews
 
     end
 
-Logging.configure(level=INFO)
 include("node.jl")
 include("chromosome.jl")
 include("ea.jl")

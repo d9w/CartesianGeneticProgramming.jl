@@ -1,6 +1,6 @@
 functions:
   f_sqrt:
-    - sqrt(x)
+    - sqrt.(x)
   f_squared:
     - x.^2
   f_cpow:
@@ -11,16 +11,16 @@ functions:
     - x.^y
     - .^(eqsize(x,y,c)...)
   f_expx:
-    - (exp(x)-1.0)/(exp(1.0)-1.0)
+    - (exp.(x)-1.0)/(exp(1.0)-1.0)
   f_sinx:
-    - sin(x)
+    - sin.(x)
   f_cosx:
-    - cos(x)
+    - cos.(x)
   f_sqrtxy:
-    - sqrt(x*x+y*y)/sqrt(2.0)
-    - sqrt(x*x+y.*y)/sqrt(2.0)
-    - sqrt(x.*x+y*y)/sqrt(2.0)
-    - sqrt(.+(eqsize(x.*x, y.*y, c)...))/sqrt(2.0)
+    - sqrt.(x*x+y*y)/sqrt(2.0)
+    - sqrt.(x*x+y.*y)/sqrt(2.0)
+    - sqrt.(x.*x+y*y)/sqrt(2.0)
+    - sqrt.(.+(eqsize(x.*x, y.*y, c)...))/sqrt(2.0)
   f_sum:
     - (x+y)/2.0
     - (x.+y)/2.0
@@ -28,9 +28,9 @@ functions:
     - .+(eqsize(x,y,c)...)/2.0
   f_aminus:
     - abs(x-y)/2.0
-    - abs(x.-y)/2.0
-    - abs(x.-y)/2.0
-    - abs(.-(eqsize(x,y,c)...))/2.0
+    - abs.(x.-y)/2.0
+    - abs.(x.-y)/2.0
+    - abs.(.-(eqsize(x,y,c)...))/2.0
   f_mult:
     - x*y
     - x.*y
@@ -51,8 +51,8 @@ functions:
   f_const:
     - c
   f_acos:
-    - acos(x)/pi*2
+    - acos.(x)/pi*2
   f_asin:
-    - asin(x)/pi*2
+    - asin.(x)/pi*2
   f_atan:
-    - atan(x)/pi*4
+    - atan.(x)/pi*4

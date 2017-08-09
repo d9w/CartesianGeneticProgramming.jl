@@ -28,11 +28,6 @@ functions:
     - x
     - x
     - ssdn(eqsize(x,y,c)...)
-  f_sadn:
-    - x
-    - x
-    - x
-    - sadn(eqsize(x,y,c)...)
   f_cov:
     - x
     - x
@@ -99,52 +94,44 @@ functions:
     - scaled(cumsum(x, index_in(collect(1:ndims(x)), y)))
   f_cummax:
     - x
-    - cummax(x, index_in(collect(1:ndims(x)), y))
+    - accumulate(max, x, index_in(collect(1:ndims(x)), y))
   f_not:
     - Float64(~Bool(round(x)))
-    - Float64.(~(BitArray(round(x))))
+    - Float64.(.~(BitArray(round.(x))))
   f_and:
     - Float64(Bool(round(x))&Bool(round(y)))
-    - Float64.(Bool(round(x))&BitArray(round(y)))
-    - Float64.(BitArray(round(x))&Bool(round(y)))
-    - Float64.(BitArray(round(eqsize(x,y,c)[1]))&BitArray(round(eqsize(x,y,c)[2])))
+    - Float64.(Bool(round(x)).&BitArray(round.(y)))
+    - Float64.(BitArray(round.(x)).&Bool(round(y)))
+    - Float64.(BitArray(round.(eqsize(x,y,c)[1])).&BitArray(round.(eqsize(x,y,c)[2])))
   f_or:
     - Float64(Bool(round(x))|Bool(round(y)))
-    - Float64.(Bool(round(x))|BitArray(round(y)))
-    - Float64.(BitArray(round(x))|Bool(round(y)))
-    - Float64.(BitArray(round(eqsize(x,y,c)[1]))|BitArray(round(eqsize(x,y,c)[2])))
+    - Float64.(Bool(round(x)).|BitArray(round.(y)))
+    - Float64.(BitArray(round.(x)).|Bool(round(y)))
+    - Float64.(BitArray(round.(eqsize(x,y,c)[1])).|BitArray(round.(eqsize(x,y,c)[2])))
   f_xor:
-    - Float64(Bool(round(x))$Bool(round(y)))
-    - Float64.(Bool(round(x))$BitArray(round(y)))
-    - Float64.(BitArray(round(x))$Bool(round(y)))
-    - Float64.(BitArray(round(eqsize(x,y,c)[1]))$BitArray(round(eqsize(x,y,c)[2])))
+    - Float64(xor(Bool(round(x)),Bool(round(y))))
+    - Float64.(xor.(Bool(round(x)),BitArray(round.(y))))
+    - Float64.(xor.(BitArray(round.(x)),Bool(round(y))))
+    - Float64.(xor.(BitArray(round.(eqsize(x,y,c)[1])),BitArray(round.(eqsize(x,y,c)[2]))))
   f_min:
     - min(x,y)
-    - min(x,y)
-    - min(x,y)
-    - min(eqsize(x, y, c)...)
+    - min.(x,y)
+    - min.(x,y)
+    - min.(eqsize(x, y, c)...)
   f_max:
     - max(x,y)
-    - max(x,y)
-    - max(x,y)
-    - max(eqsize(x, y, c)...)
+    - max.(x,y)
+    - max.(x,y)
+    - max.(eqsize(x, y, c)...)
   f_round:
-    - round(x)
+    - round.(x)
   f_ceil:
-    - ceil(x)
+    - ceil.(x)
   f_floor:
-    - floor(x)
+    - floor.(x)
   f_fftshift:
     - x
     - fftshift(x)
-  f_erf:
-    - erf(x)
-  f_dawson:
-    - dawson(x)
-  f_airyai:
-    - airyai(x)
-  f_eta:
-    - eta(x)
   f_rfft:
     - x
     - scaled(real(rfft(x)))
@@ -158,22 +145,24 @@ functions:
   #   - x
   #   - x
   #   - deconv.(x[:],y[:])
-
+  # f_erf:
+  #   - erf(x)
+  # f_dawson:
+  #   - dawson(x)
+  # f_airyai:
+  #   - airyai(x)
+  # f_eta:
+  #   - eta(x)
   # f_circshift(x,shifts(y)):
   #   - circshift(x,shifts(y))
-
-
   # f_imresize(x, Tuple(Int64.(round(y*[size(x)...])))):
   #   - imresize(x, Tuple(Int64.(round(y*[size(x)...]))))
-
   # f_imresize(x, Tuple(Int64.(round(c*[size(x)...])))):
   #   - imresize(x, Tuple(Int64.(round(c*[size(x)...]))))
-
   # f_canny:
   #   - Float64.(canny(x)) # TODO: n dimensions
-
-  # f_Float64.(imcorner(x, method=[harris, shi_tomasi, kitchen_rosenfeld])) TODO: n dimensions:
-  #   - Float64.(imcorner(x, method=[harris, shi_tomasi, kitchen_rosenfeld])) TODO: n dimensions
+  # f_Float64.(imcorner(x, method=[harris, shi_tomasi, kitchen_rosenfeld]))
+  #   - Float64.(imcorner(x, method=[harris, shi_tomasi, kitchen_rosenfeld]))
   # f_xcorr:
   #   - x
   #   - x
@@ -230,4 +219,9 @@ functions:
   # f_ando3_edge:
   #   - x
   #   - imedge(x, "ando3")[3]
-# #TODO: (x,y,c)->warp(x,recenter(RotMatrix(y), center(x))) for n dimensional case
+  # f_sadn:
+  #   - x
+  #   - x
+  #   - x
+  #   - sadn(eqsize(x,y,c)...)
+  # (x,y,c)->warp(x,recenter(RotMatrix(y), center(x))) for n dimensional case

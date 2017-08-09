@@ -1,3 +1,6 @@
+using Images
+using PaddedViews
+
 function f_input(x::Any, y::Any, c::Any)
     x
 end
@@ -10,8 +13,12 @@ function f_output(x::Array{Float64}, y::Any, c::Any)
     mean(x)
 end
 
+function scaled(x::Float64)
+    return min(max(x, 0.0), 1.0)
+end
+
 function scaled(x::Array{Float64})
-    x[isnan(x)] = 0.0
+    x[isnan.(x)] = 0.0
     minx = minimum(x)
     maxx = maximum(x)
     if minx == maxx
@@ -22,11 +29,11 @@ function scaled(x::Array{Float64})
 end
 
 function index_in(list::Array, index::Float64)
-    list[Int64(ceil(index*length(list)))]
+    list[Int64(floor(abs(index)*(length(list)-1)))+1]
 end
 
 function index_in(list::Array, index::Array{Float64})
-    list[Int64(ceil(mean(index)*length(list)))]
+    index_in(list, mean(index))
 end
 
 function eqsize(x::Array{Float64}, y::Array{Float64}, c::Float64)
@@ -69,7 +76,7 @@ function load_functions(funs::Dict)
     newfuns = []
     for k in keys(funs)
         if isdefined(Config, parse(k))
-            println("Loading functions: $k is already defined, skipping")
+            debug("Loading functions: $k is already defined, skipping")
         else
             if length(funs[k])==1
                 sgen(k, funs[k][1], funs[k][1], funs[k][1], funs[k][1])

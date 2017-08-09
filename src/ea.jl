@@ -1,6 +1,6 @@
 export EA, step!
 
-type EA
+mutable struct EA
     nin::Int64
     nout::Int64
     fitness::Function
@@ -58,8 +58,8 @@ function step!(ea::EA)
     ea.iter += 1
 
     # log
-    logstr = @sprintf("O: %d %.2f %d %.2f %.2f", ea.iter, ea.max_fit,
-                      ea.max_i, mean(fits), std(fits))
+    logstr = @sprintf("O: %d %d %.2f %.2f %.2f", ea.iter, ea.max_i, ea.max_fit,
+                      mean(fits), std(fits))
     if ea.deterministic
         if ea.max_fit > current_fit
             info(logstr)

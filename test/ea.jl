@@ -38,7 +38,7 @@ end
         inps = rand(4)
         prog, plength = decode(best)
         @test abs(prog[1](inps)-rosenbrock(inps...)) < 1
-        println(best)
+        debug(@sprintf("best individual: %s", best))
     end
 end
 
@@ -46,30 +46,27 @@ end
     using TestImages
     using Colors
     function find_the_mandrill(c::Chromosome)
+        CGP.Config.init("cfg/matrix.yaml")
         mandrill = Float64.(Gray.(testimage("mandrill")))
-        diff = 0
-        for i=1:10
-            inps = [rand(size(mandrill)) for i in 1:5]
-            outs = zeros(5)
-            labeli = rand(1:5)
-            inps[labeli] = mandrill
-            outs[labeli] = 1.0
-            output = process(c, inps)
-            resout = [(output[i] - outs[i])^2 for i in 1:5]
-            diff += sum(resout)
-        end
-        -diff
+        inps = [rand(size(mandrill)) for i in 1:5]
+        outs = zeros(5)
+        labeli = rand(1:5)
+        inps[labeli] = mandrill
+        outs[labeli] = 1.0
+        output = process(c, inps)
+        resout = [(output[i] - outs[i])^2 for i in 1:5]
+        -sum(resout)
     end
     @testset "Classic" begin
         ea = EA(5, 5, find_the_mandrill)
         best = step!(ea)
         first = find_the_mandrill(best)
-        for i=1:50
+        for i=1:20
             best = step!(ea)
         end
         last = find_the_mandrill(best)
         @test last > first
-        println(best)
+        debug(@sprintf("best individual: %s", best))
     end
 end
 

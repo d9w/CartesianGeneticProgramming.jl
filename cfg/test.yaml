@@ -15,9 +15,9 @@ functions:
     - .+(eqsize(x,y,c)...)/2.0
   f_aminus:
     - abs(x-y)/2.0
-    - abs(x.-y)/2.0
-    - abs(x.-y)/2.0
-    - abs(.-(eqsize(x,y,c)...))/2.0
+    - abs.(x.-y)/2.0
+    - abs.(x.-y)/2.0
+    - abs.(.-(eqsize(x,y,c)...))/2.0
   f_mult:
     - x*y
     - x.*y
