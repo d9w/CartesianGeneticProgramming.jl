@@ -5,4 +5,5 @@ not ready for use by others, but if this interests
 you, [drop me a line.](mailto:dennis@d9w.xyz)
 
 [CartesianGP.jl](https://github.com/um-tech-evolution/CartesianGP.jl) is a more
-complete and ready-to-use package.
+complete and ready-to-use package, and resources in other languages
+are [here.](http://www.cartesiangp.co.uk/resources.html)
