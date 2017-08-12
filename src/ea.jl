@@ -50,9 +50,10 @@ function step!(ea::EA)
     # make new population
     for p in eachindex(ea.population)
         if p != ea.max_i
-          ccopy!(ea.population[p], ea.population[ea.max_i])
+          ea.population[p] = deepcopy(ea.population[ea.max_i])
           mutate!(ea.population[p])
         end
+        find_active!(ea.population[p])
     end
 
     ea.iter += 1
