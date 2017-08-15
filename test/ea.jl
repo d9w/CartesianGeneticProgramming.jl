@@ -71,12 +71,12 @@ end
         first = find_the_mandrill(best, inps, outs)
         current_fit = deepcopy(first)
         for i=1:50
-            best = step!(ea)
+            step!(ea)
             if ea.max_fit > current_fit
                 current_fit = ea.max_fit
             end
         end
-        @test current_fit > first
+        @test ea.max_fit > first
         debug(@sprintf("best individual: %s", best))
     end
 end

@@ -5,7 +5,7 @@ parameter_mutation_rate: 0.5
 num_generations: 10
 num_nodes: 10
 population_size: 5
-fitness_thresh: 0.1
+fitness_threshold: 0.1
 node_inputs: 2
 functions:
   f_sum:

@@ -6,9 +6,10 @@ mutable struct EA
     fitness::Function
     deterministic::Bool
     population::Array{Chromosome}
+    best::Chromosome
     max_fit::Float64
-    max_i::Int64
     iter::Int64
+    newbest::Bool
 end
 
 function EA(nin::Int64, nout::Int64, fitness::Function, deterministic=true)
@@ -16,61 +17,31 @@ function EA(nin::Int64, nout::Int64, fitness::Function, deterministic=true)
     for i in eachindex(population)
         population[i] = Chromosome(nin, nout)
     end
-    EA(nin, nout, fitness, deterministic, population, -Inf, 0, 0)
+    EA(nin, nout, fitness, deterministic, population, population[1], -Inf, 0, false)
 end
 
 function step!(ea::EA)
     # evaluate, select
-    fits = Array{Float64}(Config.population_size)
-
-    if ea.deterministic
-        current_fit = deepcopy(ea.max_fit)
-    else
+    if ~ea.deterministic
         ea.max_fit = -Inf
-        ea.max_i = 0
+        ea.best = nothing
     end
+    ea.newbest = false
 
     for p in eachindex(ea.population)
-        if p == ea.max_i
-            fits[p] = ea.max_fit
-        else
-            fit = ea.fitness(ea.population[p])
-            fits[p] = fit
-        end
-    end
-
-    for p in eachindex(ea.population)
-        fit = fits[p]
-        if ((fit > ea.max_fit) || (ea.max_fit - fit < Config.fitness_thresh))
+        fit = ea.fitness(ea.population[p])
+        if fit > ea.max_fit
             ea.max_fit = fit
-            ea.max_i = p
+            ea.best = deepcopy(ea.population[p])
+            ea.newbest = true
         end
     end
 
-    # make new population
     for p in eachindex(ea.population)
-        if p != ea.max_i
-          ea.population[p] = deepcopy(ea.population[ea.max_i])
-          mutate!(ea.population[p])
-        end
+        ea.population[p] = deepcopy(ea.best)
+        mutate!(ea.population[p])
         find_active!(ea.population[p])
     end
 
     ea.iter += 1
-
-    # log
-    logstr = @sprintf("O: %d %d %.2f %.2f %.2f", ea.iter, ea.max_i, ea.max_fit,
-                      mean(fits), std(fits))
-    if ea.deterministic
-        if ea.max_fit > current_fit
-            info(logstr)
-        else
-            debug(logstr)
-        end
-    else
-        info(string(fits))
-        info(logstr)
-    end
-
-    ea.population[ea.max_i]
 end

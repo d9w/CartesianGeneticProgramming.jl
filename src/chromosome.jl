@@ -123,8 +123,7 @@ function process(c::Chromosome{Int64}, inps::Array)::Array{Float64}
         end
     end
     for o in eachindex(out_nodes)
-        out_node = c.nodes[out_nodes[o]]
-        output[o] = c.nodes[out_nodes[o]].output
+        output[o] = Float64(c.nodes[out_nodes[o]].output)
     end
     output
 end
