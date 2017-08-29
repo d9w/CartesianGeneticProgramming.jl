@@ -11,13 +11,18 @@ function EA(nin::Int64, nout::Int64, fitness::Function)::Chromosome
 
     for i=1:CGP.Config.num_generations
         # evaluation
+        new_fit = false
         for p in eachindex(population)
             fit = fitness(population[p])
             if fit >= max_fit
                 max_fit = fit
                 best = population[p]
-                Logging.info(@sprintf("R: %d %0.2f", i, max_fit))
+                new_fit = true
             end
+        end
+
+        if new_fit
+            Logging.info(@sprintf("R: %d %0.2f", i, max_fit))
         end
 
         # selection

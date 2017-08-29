@@ -30,7 +30,7 @@ Logging.configure(level=INFO)
     end
 
 include("node.jl")
-include("chromosome.jl")
+include("chromosomes/rcgp.jl")
 include("ea.jl")
 
 end
