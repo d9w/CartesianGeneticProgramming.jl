@@ -15,7 +15,7 @@ do
     i=0
     for proc in $JOB_DIR/*
     do
-        cp $JOB_DIR/$proc/$EXPER.log $RESULTS_DIR/$EXPER/$i.log
+        cat $proc/$EXPER.log | grep 'R:' | rev | cut -d ':' -f 1 | rev > $RESULTS_DIR/$EXPER/$i.log
         echo $i $EXPER
         let i=i+1
     done
