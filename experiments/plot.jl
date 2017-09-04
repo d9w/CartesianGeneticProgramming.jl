@@ -14,19 +14,16 @@ colors = [colorant"#e41a1c", colorant"#377eb8", colorant"#4daf4a",
           colorant"#984ea3", colorant"#ff7f00", colorant"#ffff33",
           colorant"#a65628", colorant"#f781bf"]
 
-function get_results(logdirs::Array{String}, xmax::Int64=50000, nruns::Int64=20)
+function get_julia_results(logdirs::Array{String}, xmax::Int64=50000, nruns::Int64=1)
 
     nlogs = length(logdirs)
     trains = zeros(nlogs, xmax, nruns)
-    valids = zeros(trains)
-    tests = zeros(nlogs, nruns)
 
     for l in eachindex(logdirs)
         logdir = logdirs[l]
-
         for i=0:(nruns-1)
-            file = join([logdir, "/stats_", string(i), ".log"])
-            res = readcsv(file, skipstart=1)
+            file = join([logdir, "/", string(i), ".log"])
+            res = readdlm(file, skipstart=1, ' ')[:, 3:end]
             if res[1,1] != 1.0
                 println(file)
                 error(file)
@@ -38,20 +35,50 @@ function get_results(logdirs::Array{String}, xmax::Int64=50000, nruns::Int64=20)
                     break
                 end
                 trains[l, cmin:cur, i+1] = res[c,2]
-                valids[l, cmin:cur, i+1] = res[c,3]
                 cmin = cur + 1
             end
             trains[l, cmin:xmax, i+1] = res[size(res)[1],2]
-            valids[l, cmin:xmax, i+1] = res[size(res)[1],3]
-        end
-        for i=0:(nruns-1)
-            file = join([logdir, "/test_", string(i), ".log"])
-            res = readcsv(file)
-            tests[l, i+1, :] = res[1]
         end
     end
 
-    trains, valids, tests
+    trains
+end
+
+function get_cpp_results(logdirs::Array{String}, xmax::Int64=50000, nruns::Int64=20)
+
+    nlogs = length(logdirs)
+    trains = zeros(nlogs, xmax, nruns)
+    tests = zeros(nlogs, xmax, nruns)
+    sizes = zeros(nlogs, xmax, nruns)
+
+    for l in eachindex(logdirs)
+        logdir = logdirs[l]
+
+        for i=0:(nruns-1)
+            file = join([logdir, "/", string(i), ".log"])
+            res = readcsv(file)
+            if res[1,1] != 1.0
+                println(file)
+                error(file)
+            end
+            cmin = 1
+            for c=1:size(res)[1]
+                cur = Int(res[c,1])
+                if cur > xmax
+                    break
+                end
+                trains[l, cmin:cur, i+1] = res[c,2]
+                tests[l, cmin:cur, i+1] = res[c,3]
+                sizes[l, cmin:cur, i+1] = res[c,4]
+                cmin = cur + 1
+            end
+            trains[l, cmin:xmax, i+1] = res[size(res)[1],2]
+            tests[l, cmin:xmax, i+1] = res[size(res)[1],3]
+            sizes[l, cmin:xmax, i+1] = res[size(res)[1],4]
+        end
+    end
+
+    trains, tests, sizes
 end
 
 function plot_training(trains::Array{Float64}, valids::Array{Float64},
@@ -79,7 +106,7 @@ function plot_training(trains::Array{Float64}, valids::Array{Float64},
 
     plt = plot(layers..., Guide.title(title),
                Guide.xlabel("Generation"), Guide.ylabel("Fitness"),
-               Guide.yticks(ticks=[0:0.2:1.0;]),
+               # Guide.yticks(ticks=[0:0.2:1.0;]),
                # Scale.x_continuous(labels=x -> @sprintf("%de3", x/1e3)),
                Guide.manual_color_key(
                    "Legend", labels, colors[1:nlogs]));
