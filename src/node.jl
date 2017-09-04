@@ -1,7 +1,7 @@
 import Base.show
 export Node, process!, cmutate!, fmutate!, pmutate!
 
-mutable struct Node{T}
+type Node{T}
     position::T
     func::Function
     inputs::Array{T}
