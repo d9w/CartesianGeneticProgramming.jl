@@ -1,6 +1,6 @@
 using CGP
 using Logging
-using JLD
+#using JLD
 
 function read_data(dfile::String)
     df = open(dfile, "r")
