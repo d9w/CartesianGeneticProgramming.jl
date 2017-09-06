@@ -15,7 +15,7 @@ do
     i=0
     for proc in $JOB_DIR/*
     do
-        cp $proc/$EXPER.log > $RESULTS_DIR/$EXPER/$i.log
+        cp $proc/$EXPER.log $RESULTS_DIR/$EXPER/$i.log
         echo $i $EXPER
         let i=i+1
     done
