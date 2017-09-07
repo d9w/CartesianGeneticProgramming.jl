@@ -58,7 +58,9 @@ functions:
     - atan.(x)/pi*4
   f_not:
     - Float64(~Bool(round(x)))
-    - Float64.(.~(BitArray(round.(x))))
+    - Float64(~Bool(round(x)))
+    - Float64.(~(BitArray(round.(x))))
+    - Float64.(~(BitArray(round.(x))))
   f_and:
     - Float64(Bool(round(x))&Bool(round(y)))
     - Float64.(Bool(round(x)).&BitArray(round.(y)))
@@ -70,10 +72,10 @@ functions:
     - Float64.(BitArray(round.(x)).|Bool(round(y)))
     - Float64.(BitArray(round.(eqsize(x,y,c)[1])).|BitArray(round.(eqsize(x,y,c)[2])))
   f_xor:
-    - Float64(xor(Bool(round(x)),Bool(round(y))))
-    - Float64.(xor.(Bool(round(x)),BitArray(round.(y))))
-    - Float64.(xor.(BitArray(round.(x)),Bool(round(y))))
-    - Float64.(xor.(BitArray(round.(eqsize(x,y,c)[1])),BitArray(round.(eqsize(x,y,c)[2]))))
+    - Float64(Bool(round(x))$Bool(round(y)))
+    - Float64.(Bool(round(x)).$BitArray(round.(y)))
+    - Float64.(BitArray(round.(x)).$Bool(round(y)))
+    - Float64.(BitArray(round.(eqsize(x,y,c)[1])).$BitArray(round.(eqsize(x,y,c)[2])))
   f_min:
     - min(x,y)
     - min.(x,y)

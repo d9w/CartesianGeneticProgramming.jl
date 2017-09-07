@@ -9,5 +9,5 @@ cd $CGP
 for file in $DATA/*
 do
     EXPER=$(echo $file | rev | cut -d '/' -f 1 | rev | cut -d '.' -f 1)
-    julia $CGP/experiments/classify.jl $SLURM_TASK_PID $file $WORK_DIR/$EXPER.log
+    julia experiments/classify.jl $SLURM_TASK_PID $file $WORK_DIR/$EXPER.log
 done

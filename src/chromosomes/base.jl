@@ -1,6 +1,6 @@
 export Chromosome, decode, process
 
-struct Chromosome
+type Chromosome
     connections::Array{Int64}
     functions::Array{Function}
     outputs::Array{Int64}

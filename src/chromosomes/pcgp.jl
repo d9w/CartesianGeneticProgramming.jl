@@ -45,7 +45,7 @@ end
 
 function Chromosome(genes::Array{Float64}, nin::Int64, nout::Int64)::Chromosome
     nodes = Array{Node}(nin+Config.num_nodes)
-    rgenes = reshape(genes[(nin+nout+1):end], :, 5)
+    rgenes = reshape(genes[(nin+nout+1):end], (Config.num_nodes, 5))
     positions = [genes[1:nin]; rgenes[:, 1]]
     fc = [rgenes[:, 2]'; rgenes[:, 3]']
     connections = [zeros(Int64, 2, nin) snap(fc, positions)]

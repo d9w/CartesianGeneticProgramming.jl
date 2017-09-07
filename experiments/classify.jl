@@ -38,7 +38,7 @@ function regression(c::Chromosome, data::Array{Float64}, nin::Int64, nout::Int64
 end
 
 CGP.Config.init("cfg/base.yaml")
-CGP.Config.init("cfg/classic.yaml")
+CGP.Config.init("cfg/classify.yaml")
 
 seed = 0
 dfile = "data/glass.dt"
