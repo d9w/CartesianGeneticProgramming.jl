@@ -56,3 +56,37 @@ functions:
     - asin.(x)/pi*2
   f_atan:
     - atan.(x)/pi*4
+  f_not:
+    - Float64(~Bool(round(x)))
+    - Float64.(.~(BitArray(round.(x))))
+  f_and:
+    - Float64(Bool(round(x))&Bool(round(y)))
+    - Float64.(Bool(round(x)).&BitArray(round.(y)))
+    - Float64.(BitArray(round.(x)).&Bool(round(y)))
+    - Float64.(BitArray(round.(eqsize(x,y,c)[1])).&BitArray(round.(eqsize(x,y,c)[2])))
+  f_or:
+    - Float64(Bool(round(x))|Bool(round(y)))
+    - Float64.(Bool(round(x)).|BitArray(round.(y)))
+    - Float64.(BitArray(round.(x)).|Bool(round(y)))
+    - Float64.(BitArray(round.(eqsize(x,y,c)[1])).|BitArray(round.(eqsize(x,y,c)[2])))
+  f_xor:
+    - Float64(xor(Bool(round(x)),Bool(round(y))))
+    - Float64.(xor.(Bool(round(x)),BitArray(round.(y))))
+    - Float64.(xor.(BitArray(round.(x)),Bool(round(y))))
+    - Float64.(xor.(BitArray(round.(eqsize(x,y,c)[1])),BitArray(round.(eqsize(x,y,c)[2]))))
+  f_min:
+    - min(x,y)
+    - min.(x,y)
+    - min.(x,y)
+    - min.(eqsize(x, y, c)...)
+  f_max:
+    - max(x,y)
+    - max.(x,y)
+    - max.(x,y)
+    - max.(eqsize(x, y, c)...)
+  f_round:
+    - round.(x)
+  f_ceil:
+    - ceil.(x)
+  f_floor:
+    - floor.(x)

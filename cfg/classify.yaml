@@ -1,0 +1,41 @@
+functions:
+  f_abs:
+    - scaled(abs.(x))
+  f_sqrt:
+    - scaled(sqrt.(abs.(x)))
+  f_recip:
+    - "if (abs.(x) < 0.0001); return x; else; return 1.0/x; end"
+  f_sin:
+    - scaled(sin.(x))
+  f_cos:
+    - scaled(cos.(x))
+  f_tan:
+    - "if (cos.(x) < 0.0001); return x; else; return tan(x); end"
+  f_exp:
+    - scaled(exp.(x))
+  f_sinh:
+    - scaled(sinh.(x))
+  f_cosh:
+    - scaled(cosh.(x))
+  f_tanh:
+    - scaled(tanh.(x))
+  f_log:
+    - "if (x < 0.0001); return x; else; return log.(abs.(x)); end"
+  f_log10:
+    - "if (x < 0.0001); return x; else; return log10.(abs.(x)); end"
+  f_sinxy:
+    - scaled(sin(x+y))
+  f_cosxy:
+    - scaled(cos(x+y))
+  f_hypoteneuse:
+    - scaled(sqrt(x.*x+y.*y))
+  f_power:
+    - scaled(abs.(x).^y)
+  f_add:
+    - scaled(x+y)
+  f_sub:
+    - scaled(x-y)
+  f_mul:
+    - scaled(x*y)
+  f_div:
+    - "if (abs(y) < 0.0001); return x; else; return x/y; end"

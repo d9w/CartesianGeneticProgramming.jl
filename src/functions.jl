@@ -14,7 +14,7 @@ function f_output(x::Array{Float64}, y::Any, c::Any)
 end
 
 function scaled(x::Float64)
-    return min(max(x, 0.0), 1.0)
+    return min(max(x, -1.0), 1.0)
 end
 
 function scaled(x::Array{Float64})

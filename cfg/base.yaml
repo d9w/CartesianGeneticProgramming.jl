@@ -1,9 +1,10 @@
+mutation_rate: 0.1
 position_mutation_rate: 0.1
 connection_mutation_rate: 0.1
 function_mutation_rate: 0.1
 parameter_mutation_rate: 0.1
 output_mutation_rate: 0.1
-num_generations: 50000
+num_generations: 20000
 num_nodes: 100
 population_size: 5
 fitness_threshold: 0.001

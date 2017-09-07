@@ -29,8 +29,8 @@ Logging.configure(level=INFO)
 
     end
 
-include("node.jl")
-include("chromosomes/rcgp.jl")
+# include("node.jl")
+include("chromosomes/pcgp.jl")
 include("ea.jl")
 
 end
