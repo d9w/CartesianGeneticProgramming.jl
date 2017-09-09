@@ -25,12 +25,15 @@ Logging.configure(level=INFO)
             end
         end
     end
-    export init
-
+    function reset()
+        empty!(functions)
     end
 
-# include("node.jl")
+    export init, reset
+    end
+
+include("chromosomes/base.jl")
 include("chromosomes/pcgp.jl")
-include("ea.jl")
+include("EAs/oneplus.jl")
 
 end

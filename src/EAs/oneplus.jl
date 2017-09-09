@@ -1,15 +1,14 @@
-export EA
+export oneplus
 
-function EA(nin::Int64, nout::Int64, fitness::Function)::Chromosome
-    population = Array{Chromosome}(Config.population_size)
+function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
+    population = Array{ctype}(Config.population_size)
     for i in eachindex(population)
-        population[i] = Chromosome(nin, nout)
+        population[i] = ctype(nin, nout)
     end
     best = population[1]
-    # EA(nin, nout, fitness, population, population[1], -Inf, 0, false)
     max_fit = -Inf
 
-    for i=1:CGP.Config.num_generations
+    for i=1:Config.num_generations
         # evaluation
         new_fit = false
         for p in eachindex(population)
@@ -22,15 +21,14 @@ function EA(nin::Int64, nout::Int64, fitness::Function)::Chromosome
         end
 
         if new_fit
-            Logging.info(@sprintf("R: %d %0.2f", i, max_fit))
+            Logging.info(@sprintf("R: %d %0.2f", i*Config.population_size, max_fit))
         end
 
         # selection
         for p in eachindex(population)
-            population[p] = Chromosome(best)
-            # mutate!(population[p])
+            population[p] = ctype(best)
         end
     end
 
-    best
+    max_fit, best.genes
 end

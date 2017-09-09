@@ -1,4 +1,6 @@
-export Chromosome, process
+export PCGPChromo, process
+
+# PCGP with mutated positions and constant scalar inputs, no constants
 
 type Node
     connections::Array{Int64}
@@ -8,7 +10,7 @@ type Node
     output::Float64
 end
 
-type Chromosome
+type PCGPChromo <: Chromosome
     genes::Array{Float64}
     nodes::Array{Node}
     outputs::Array{Int64}
@@ -43,7 +45,7 @@ function find_active(nin::Int64, outputs::Array{Int64}, connections::Array{Int64
     active
 end
 
-function Chromosome(genes::Array{Float64}, nin::Int64, nout::Int64)::Chromosome
+function PCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::PCGPChromo
     nodes = Array{Node}(nin+Config.num_nodes)
     rgenes = reshape(genes[(nin+nout+1):end], (Config.num_nodes, 5))
     positions = [genes[1:nin]; rgenes[:, 1]]
@@ -57,21 +59,21 @@ function Chromosome(genes::Array{Float64}, nin::Int64, nout::Int64)::Chromosome
     for i in 1:(nin+Config.num_nodes)
         nodes[i] = Node(connections[:, i], functions[i], params[i], active[i])
     end
-    Chromosome(genes, nodes, outputs, nin, nout)
+    PCGPChromo(genes, nodes, outputs, nin, nout)
 end
 
-function Chromosome(nin::Int64, nout::Int64)::Chromosome
-    Chromosome(rand(nin+nout+5*Config.num_nodes), nin, nout)
+function PCGPChromo(nin::Int64, nout::Int64)::PCGPChromo
+    PCGPChromo(rand(nin+nout+5*Config.num_nodes), nin, nout)
 end
 
-function Chromosome(c::Chromosome)::Chromosome
-    genes = c.genes
+function PCGPChromo(c::PCGPChromo)::PCGPChromo
+    genes = deepcopy(c.genes)
     mutations = rand(size(genes)) .< Config.mutation_rate
     genes[mutations] = rand(sum(mutations))
-    Chromosome(genes, c.nin, c.nout)
+    PCGPChromo(genes, c.nin, c.nout)
 end
 
-function process(c::Chromosome, inps::Array{Float64})::Array{Float64}
+function process(c::PCGPChromo, inps::Array{Float64})::Array{Float64}
     for i in 1:c.nin
         c.nodes[i].output = inps[i]
     end
@@ -97,7 +99,7 @@ end
 #     end
 # end
 
-# function Chromosome(c::Chromosome)::Chromosome
+# function PCGPChromo(c::PCGPChromo)::PCGPChromo
 #     # return mutated copy, TODO: make this call a generator function
 #     connections = c.connections
 #     conn_mutation = rand(size(connections, 2)) .< Config.connection_mutation_rate
@@ -124,10 +126,10 @@ end
 #     end
 
 #     active = find_active(c.nin, outputs, connections)
-#     Chromosome(connections, functions, outputs, active, c.nin, c.nout)
+#     PCGPChromo(connections, functions, outputs, active, c.nin, c.nout)
 # end
 
-# function Chromosome(nin::Int64, nout::Int64)::Chromosome
+# function PCGPChromo(nin::Int64, nout::Int64)::PCGPChromo
 #     connections = Array{Int64}(2, nin+Config.num_nodes)
 #     for i in nin+(1:Config.num_nodes)
 #         connections[:, i] = rand(1:(nin+Config.num_nodes), 2)
@@ -137,10 +139,10 @@ end
 #     functions[1:nin] = Config.f_input
 #     outputs = rand(1:(nin+Config.num_nodes), nout)
 #     active = find_active(nin, outputs, connections)
-#     Chromosome(connections, functions, outputs, active, nin, nout)
+#     PCGPChromo(connections, functions, outputs, active, nin, nout)
 # end
 
-# function process(c::Chromosome, inps::Array{Float64})::Array{Float64}
+# function process(c::PCGPChromo, inps::Array{Float64})::Array{Float64}
 #     c.node_outputs[1:c.nin] = inps
 #     for i in c.nin+(1:Config.num_nodes)
 #         j = i - c.nin

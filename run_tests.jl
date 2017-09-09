@@ -4,8 +4,6 @@ using Logging
 CGP.Config.init("cfg/test.yaml")
 Logging.configure(level=INFO)
 
-info("Node tests")
-include("test/node.jl")
 info("Chromosome tests")
 include("test/chromosome.jl")
 info("Function tests")
