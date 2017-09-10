@@ -34,6 +34,7 @@ Logging.configure(level=INFO)
     end
 
 include("chromosomes/base.jl")
+include("chromosomes/cgp.jl")
 include("chromosomes/pcgp.jl")
 include("EAs/oneplus.jl")
 

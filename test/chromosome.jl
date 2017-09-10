@@ -2,7 +2,7 @@ using Base.Test
 using CGP
 CGP.Config.init("cfg/test.yaml")
 
-CTYPES = [PCGPChromo]
+CTYPES = [CGPChromo, PCGPChromo]
 
 @testset "Creation tests" begin
     for ct in CTYPES
