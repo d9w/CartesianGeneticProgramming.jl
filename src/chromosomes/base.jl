@@ -24,3 +24,11 @@ function find_active(nin::Int64, outputs::Array{Int64}, connections::Array{Int64
     active[1:nin] = false
     active
 end
+
+function find_active(outputs::Array{Int64}, connections::Array{Int64})::BitArray
+    active = BitArray(size(connections, 2))
+    for i in eachindex(outputs)
+        recur_active!(active, connections, outputs[i])
+    end
+    active
+end

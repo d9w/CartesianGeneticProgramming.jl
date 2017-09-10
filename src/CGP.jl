@@ -38,6 +38,7 @@ include("chromosomes/cgp.jl")
 include("chromosomes/pcgp.jl")
 include("chromosomes/hpcgp.jl")
 include("chromosomes/fpcgp.jl")
+include("chromosomes/eipcgp.jl")
 include("EAs/oneplus.jl")
 
 end
