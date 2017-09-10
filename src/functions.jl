@@ -11,18 +11,12 @@ function f_output(x::Array{Float64}, y::Any, c::Any)
 end
 
 function scaled(x::Float64)
-    return min(max(x, -1.0), 1.0)
+    min(max(x, -1.0), 1.0)
 end
 
 function scaled(x::Array{Float64})
     x[isnan.(x)] = 0.0
-    minx = minimum(x)
-    maxx = maximum(x)
-    if minx == maxx
-        return zeros(x)
-    else
-        return (x-minx)/(maxx-minx)
-    end
+    min.(max.(x, -1.0), 1.0)
 end
 
 function index_in(list::Array, index::Float64)

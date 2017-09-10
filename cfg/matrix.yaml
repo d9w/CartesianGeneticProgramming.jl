@@ -2,9 +2,6 @@ functions:
   f_scale:
     - x
     - scaled(x)
-  f_centered_filter:
-    - x
-    - scaled(imfilter(x,centered(x)))
   f_maximum:
     - x
     - maximum(x)
@@ -23,57 +20,12 @@ functions:
   f_median:
     - x
     - median(x)
-  f_ssdn:
-    - x
-    - x
-    - x
-    - ssdn(eqsize(x,y,c)...)
-  f_cov:
-    - x
-    - x
-    - x
-    - scaled(cov(eqsize(x,y,c)...))
-  f_cor:
-    - x
-    - x
-    - x
-    - scaled(cor(eqsize(x,y,c)...))
   f_index_y:
     - x
     - index_in(x, y)
   f_index_c:
     - x
     - index_in(x, c)
-  f_restrict:
-    - x
-    - restrict(x)
-  f_dilate:
-    - x
-    - dilate(x)
-  f_erode:
-    - x
-    - erode(x)
-  f_opening:
-    - x
-    - opening(x)
-  f_closing:
-    - x
-    - closing(x)
-  f_tophat:
-    - x
-    - tophat(x)
-  f_bothat:
-    - x
-    - bothat(x)
-  f_morphogradient:
-    - x
-    - morphogradient(x)
-  f_morpholaplace:
-    - x
-    - scaled(morpholaplace(x))
-  f_integral_image:
-    - x
-    - scaled(integral_image(x))
   f_eye:
     - '1.0'
     - eye(size(x)[1])
@@ -138,8 +90,55 @@ functions:
   f_dct:
     - x
     - scaled(dct(x))
-
 #TODO: add these functions
+  # f_ssdn:
+  #   - x
+  #   - x
+  #   - x
+  #   - ssdn(eqsize(x,y,c)...)
+  # f_cov:
+  #   - x
+  #   - x
+  #   - x
+  #   - scaled(cov(eqsize(x,y,c)...))
+  # f_cor:
+  #   - x
+  #   - x
+  #   - x
+  #   - scaled(cor(eqsize(x,y,c)...))
+  # f_centered_filter:
+  #   - x
+  #   - scaled(imfilter(x,centered(x)))
+  # f_restrict:
+  #   - x
+  #   - restrict(x)
+  # f_dilate:
+  #   - x
+  #   - dilate(x)
+  # f_erode:
+  #   - x
+  #   - erode(x)
+  # f_opening:
+  #   - x
+  #   - opening(x)
+  # f_closing:
+  #   - x
+  #   - closing(x)
+  # f_tophat:
+  #   - x
+  #   - tophat(x)
+  # f_bothat:
+  #   - x
+  #   - bothat(x)
+  # f_morphogradient:
+  #   - x
+  #   - morphogradient(x)
+  # f_morpholaplace:
+  #   - x
+  #   - scaled(morpholaplace(x))
+  # f_integral_image:
+  #   - x
+  #   - scaled(integral_image(x))
   # f_deconv:
   #   - x
   #   - x

@@ -9,6 +9,7 @@ Logging.configure(level=INFO)
     module Config
     using YAML
     using Logging
+    using PaddedViews
     include("functions.jl")
     functions = []
     function init(file::String)
