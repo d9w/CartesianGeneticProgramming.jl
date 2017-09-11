@@ -15,10 +15,10 @@ functions:
     - "x[2:end]"
   f_differences:
     - "x"
-    - "diff(x[:])"
+    - "scaled(diff(x[:]))"
   f_avgdifferences:
     - "x"
-    - "mean(diff(x[:]))"
+    - "scaled(mean(diff(x[:])))"
   f_rotate:
     - "x"
     - "circshift(x, ceil(c))"
