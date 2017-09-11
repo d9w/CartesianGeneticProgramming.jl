@@ -11,6 +11,9 @@ function f_output(x::Array{Float64}, y::Any, c::Any)
 end
 
 function scaled(x::Float64)
+    if isnan(x)
+        return 0.0
+    end
     min(max(x, -1.0), 1.0)
 end
 
@@ -28,7 +31,7 @@ function index_in(list::Array{Float64}, index::Array{Float64})
 end
 
 function range_in(list::Array{Float64}, xi::Float64, yi::Float64)
-    bounds = [min(x, y), max(x, y)]
+    bounds = [min(xi, yi), max(xi, yi)]
     bounds = Int64.(floor.(abs.(bounds)).*(length(list)-1)+1)
     if bounds[1] == bounds[2]
         return 0.0

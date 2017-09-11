@@ -5,14 +5,14 @@ CGP.Config.init("cfg/test.yaml")
 EAs = [oneplus]
 CTYPES = [CGPChromo, PCGPChromo, HPCGPChromo, FPCGPChromo, EIPCGPChromo, MTPCGPChromo]
 
-@testset "Basic EA" begin
+@testset "Simple fit" begin
     function simple_fit(c::Chromosome)
         process(c, [1.0])[1]
     end
     for ea in EAs
         for ct in CTYPES
             println(ea, ", ", ct)
-            @testset "Simple" begin
+            @testset "$ea $ct" begin
                 max_fit, genes = ea(ct, 1, 1, simple_fit)
                 @test max_fit == 1.0
                 c = ct(genes, 1, 1)
@@ -38,7 +38,7 @@ end
     for ea in EAs
         for ct in CTYPES
             println(ea, ", ", ct)
-            @testset "Rosenbrock" begin
+            @testset "$ea $ct" begin
                 randc = ct(4, 1)
                 randfit = rosenbrock_fit(randc)
                 max_fit, genes = ea(ct, 4, 1, rosenbrock_fit)

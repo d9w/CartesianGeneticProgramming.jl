@@ -1,6 +1,7 @@
 export Chromosome
 
-abstract type Chromosome end
+# abstract type Chromosome end
+abstract Chromosome
 
 function snap(fc::Array{Float64}, p::Array{Float64})::Array{Int64}
     map(x->indmin(abs.(p-x)), fc)
@@ -31,4 +32,21 @@ function find_active(outputs::Array{Int64}, connections::Array{Int64})::BitArray
         recur_active!(active, connections, outputs[i])
     end
     active
+end
+
+function distance(c1::Chromosome, c2::Chromosome)
+    # naive distance measure
+    abs(mean(c1.genes) - mean(c2.genes))
+end
+
+function add_node(c::Chromosome)
+    c
+end
+
+function del_node(c::Chromosome)
+    c
+end
+
+function mutate(c::Chromosome)
+    c
 end

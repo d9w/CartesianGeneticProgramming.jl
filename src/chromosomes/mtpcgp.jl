@@ -49,8 +49,8 @@ end
 function process(c::MTPCGPChromo, inps::Array{Float64})::Array{Float64}
     for n in c.nodes
         if n.active
-            if n.f == CGP.Config.f_input
-                n.output = range_in(inps,
+            if n.f == Config.f_input
+                n.output = Config.range_in(inps,
                                     mean(c.nodes[n.connections[1]].output),
                                     mean(c.nodes[n.connections[2]].output))
             else

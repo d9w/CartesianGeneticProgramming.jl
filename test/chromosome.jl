@@ -9,13 +9,13 @@ CTYPES = [CGPChromo, PCGPChromo, HPCGPChromo, FPCGPChromo, EIPCGPChromo, MTPCGPC
         println(ct)
         nin = rand(1:100); nout = rand(1:100)
         c = ct(nin, nout)
-        @testset "Simple" begin
+        @testset "Simple $ct" begin
             @test all(c.genes .<= 1.0)
             @test all(c.genes .>= -1.0)
             @test c.nin == nin
             @test c.nout == nout
         end
-        @testset "Genes" begin
+        @testset "Genes $ct" begin
             newgenes = rand(size(c.genes))
             d = ct(newgenes, nin, nout)
             @test c != d
@@ -30,7 +30,7 @@ end
         println(ct)
         nin = rand(1:100); nout = rand(1:100)
         c = ct(nin, nout)
-        @testset "Constructor" begin
+        @testset "Constructor $ct" begin
             copy = deepcopy(c)
             child = ct(c)
             @test copy.genes == c.genes
@@ -47,7 +47,7 @@ end
         println(ct)
         nin = rand(1:100); nout = rand(1:100)
         c = ct(nin, nout)
-        @testset "Process" begin
+        @testset "Process $ct" begin
             genecopy = deepcopy(c.genes)
             for i=1:10
                 out = process(c, rand(nin))
