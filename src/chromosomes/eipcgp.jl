@@ -39,19 +39,15 @@ function EIPCGPChromo(c::EIPCGPChromo)::EIPCGPChromo
 end
 
 function process(c::EIPCGPChromo, inps::Array{Float64})::Array{Float64}
-    ii = 1
     for n in c.nodes
         if n.active
             if n.f == CGP.Config.f_input
                 n.output = inps[Int64(ceil(n.param * length(inps)))]
+            else
+                n.output = n.f(c.nodes[n.connections[1]].output,
+                              c.nodes[n.connections[2]].output,
+                              n.param)
             end
-        end
-    end
-    for n in c.nodes
-        if n.active
-            n.output = n.f(c.nodes[n.connections[1]].output,
-                           c.nodes[n.connections[2]].output,
-                           n.param)
         end
     end
     map(x->c.nodes[x].output, c.outputs)

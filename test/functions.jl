@@ -3,7 +3,8 @@ using CGP
 
 const global D = 5
 
-files = ["cfg/test.yaml", "cfg/classic.yaml", "cfg/matrix.yaml"]
+# files = ["cfg/test.yaml", "cfg/classic.yaml", "cfg/matrix.yaml", "cfg/mtcgp.yaml"]
+files = ["cfg/test.yaml", "cfg/mtcgp.yaml"]
 
 @testset "Functions" begin
     for file in files

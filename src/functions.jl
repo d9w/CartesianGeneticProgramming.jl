@@ -19,12 +19,25 @@ function scaled(x::Array{Float64})
     min.(max.(x, -1.0), 1.0)
 end
 
-function index_in(list::Array, index::Float64)
+function index_in(list::Array{Float64}, index::Float64)
     list[Int64(floor(abs(index)*(length(list)-1)))+1]
 end
 
-function index_in(list::Array, index::Array{Float64})
+function index_in(list::Array{Float64}, index::Array{Float64})
     index_in(list, mean(index))
+end
+
+function range_in(list::Array{Float64}, xi::Float64, yi::Float64)
+    bounds = [min(x, y), max(x, y)]
+    bounds = Int64.(floor.(abs.(bounds)).*(length(list)-1)+1)
+    if bounds[1] == bounds[2]
+        return 0.0
+    end
+    list[bounds[1]:bounds[2]]
+end
+
+function range_in(list::Array{Float64}, xi::Array{Float64}, yi::Float64)
+    range_in(list, mean(xi), yi)
 end
 
 function eqsize(x::Array{Float64}, y::Array{Float64}, c::Float64)

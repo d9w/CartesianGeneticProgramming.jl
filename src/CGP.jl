@@ -3,6 +3,7 @@ module CGP
 # using Images
 using Logging
 using PaddedViews
+using Distributions
 
 Logging.configure(level=INFO)
 
@@ -10,6 +11,7 @@ Logging.configure(level=INFO)
     using YAML
     using Logging
     using PaddedViews
+    using Distributions
     include("functions.jl")
     functions = []
     function init(file::String)
@@ -39,6 +41,7 @@ include("chromosomes/pcgp.jl")
 include("chromosomes/hpcgp.jl")
 include("chromosomes/fpcgp.jl")
 include("chromosomes/eipcgp.jl")
+include("chromosomes/mtpcgp.jl")
 include("EAs/oneplus.jl")
 
 end

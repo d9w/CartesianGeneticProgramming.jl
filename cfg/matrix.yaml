@@ -20,6 +20,9 @@ functions:
   f_median:
     - x
     - median(x)
+  f_range_in:
+    - x
+    - range_in(x, y, p)
   f_index_y:
     - x
     - index_in(x, y)
@@ -60,11 +63,11 @@ functions:
     - Float64.(Bool(round(x)).|BitArray(round.(y)))
     - Float64.(BitArray(round.(x)).|Bool(round(y)))
     - Float64.(BitArray(round.(eqsize(x,y,c)[1])).|BitArray(round.(eqsize(x,y,c)[2])))
-  f_xor:
-    - Float64(xor(Bool(round(x)),Bool(round(y))))
-    - Float64.(xor.(Bool(round(x)),BitArray(round.(y))))
-    - Float64.(xor.(BitArray(round.(x)),Bool(round(y))))
-    - Float64.(xor.(BitArray(round.(eqsize(x,y,c)[1])),BitArray(round.(eqsize(x,y,c)[2]))))
+  # f_xor:
+  #   - Float64(Bool(round(x))$Bool(round(y)))
+  #   - Float64.(Bool(round(x)).$BitArray(round.(y)))
+  #   - Float64.(BitArray(round.(x)).$Bool(round(y)))
+  #   - Float64.(BitArray(round.(eqsize(x,y,c)[1])).$BitArray(round.(eqsize(x,y,c)[2])))
   f_min:
     - min(x,y)
     - min.(x,y)
