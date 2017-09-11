@@ -1,0 +1,153 @@
+functions:
+  f_vectorize:
+    - "x"
+    - "x[:]"
+  f_inv:
+    - "y"
+  f_head:
+    - "x"
+    - "x[1]"
+  f_last:
+    - "x"
+    - "x[end]"
+  f_tail:
+    - "x"
+    - "x[2:end]"
+  f_differences:
+    - "x"
+    - "diff(x[:])"
+  f_avgdifferences:
+    - "x"
+    - "mean(diff(x[:]))"
+  f_rotate:
+    - "x"
+    - "circshift(x, ceil(c))"
+  f_reverse:
+    - "x"
+    - "reverse(x[:])"
+  f_pushback:
+    - "[x; y]"
+    - "[x; y[:]]"
+    - "[x[:]; y]"
+    - "[x[:]; y[:]]"
+  f_pushfront:
+    - "[y; x]"
+    - "[y[:]; x]"
+    - "[y; x[:]]"
+    - "[y[:]; x[:]]"
+  f_set:
+    - "x"
+    - "x*ones(size(y))"
+    - "y*ones(size(x))"
+    - "mean(x)*ones(size(y))"
+  f_sum:
+    - "x"
+    - "sum(x)"
+  f_add:
+    - "(x+y)/2.0"
+    - "(x.+y)/2.0"
+    - "(x.+y)/2.0"
+    - ".+(eqsize(x,y,c)...)/2.0"
+  f_aminus:
+    - "abs(x-y)/2.0"
+    - "abs.(x.-y)/2.0"
+    - "abs.(x.-y)/2.0"
+    - "abs.(.-(eqsize(x,y,c)...))/2.0"
+  f_mult:
+    - "x*y"
+    - "x.*y"
+    - "x.*y"
+    - ".*(eqsize(x,y,c)...)"
+  f_bdiv:
+    - "bdiv(x, y)"
+    - "(i->bdiv(x,i)).(y)"
+    - "(i->bdiv(i,y)).(x)"
+    - "[bdiv(eqsize(x,y,c)[1][i], eqsize(x,y,c)[2][i]) for i in eachindex(eqsize(x,y,c)[1])]"
+  f_abs:
+    - "abs.(x)"
+  f_sqrt:
+    - "sqrt.(x)"
+  f_cpow:
+    - "x.^c"
+  f_ypow:
+    - "x^y"
+    - "x.^y"
+    - "x.^y"
+    - ".^(eqsize(x,y,c)...)"
+  f_expx:
+    - "(exp.(x)-1.0)/(exp(1.0)-1.0)"
+  f_sinx:
+    - "sin.(x)"
+  f_cosx:
+    - "cos.(x)"
+  f_lt:
+    - "Float64(x < y)"
+    - "Float64.(x.<y)"
+    - "Float64.(x.<y)"
+    - "Float64.(.<(eqsize(x,y,c)...))"
+  f_gt:
+    - "Float64(x > y)"
+    - "Float64.(x.>y)"
+    - "Float64.(x.>y)"
+    - "Float64.(.>(eqsize(x,y,c)...))"
+  f_standarddeviation:
+    - "0.0"
+    - "scaled(std(x[:]))"
+  f_skew:
+    - "x"
+    - "scaled(skewness(x[:]))"
+  f_kurtosis:
+    - "x"
+    - "scaled(kurtosis(x[:]))"
+  f_mean:
+    - "x"
+    - "mean(x)"
+  f_median:
+    - "x"
+    - "median(x)"
+  f_range:
+    - "x"
+    - "maximum(x)-minimum(x)"
+  f_max1:
+    - "x"
+    - "maximum(x)"
+  f_max2:
+    - "max(x,y)"
+    - "max.(x,y)"
+    - "max.(x,y)"
+    - "max.(eqsize(x, y, c)...)"
+  f_min1:
+    - "x"
+    - "minimum(x)"
+  f_min2:
+    - "min(x,y)"
+    - "min.(x,y)"
+    - "min.(x,y)"
+    - "min.(eqsize(x, y, c)...)"
+  f_vecfromdouble:
+    - "[x]"
+    - "x"
+  f_nop:
+    - "x"
+    - "x"
+  f_getinput:
+    - "0"
+    - "0"
+  f_getpreviousinput:
+    - "0"
+    - "0"
+  f_skipinput:
+    - "0"
+    - "0"
+  f_const:
+    - "c"
+    - "c"
+  f_constvectord:
+    - "c"
+    - "c.*ones(size(x))"
+  f_emptyvectord:
+    - "0"
+    - "zeros(size(x))"
+  f_output:
+    - "0"
+    - "0"
