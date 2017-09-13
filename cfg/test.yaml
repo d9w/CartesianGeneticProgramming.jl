@@ -4,6 +4,12 @@ num_nodes: 20
 population_size: 5
 fitness_threshold: 0.1
 node_inputs: 2
+neat_speciation_thresh: 0.02
+neat_population: 20
+neat_init_species: 4
+neat_num_generations: 20
+neat_crossover_rate: 0.80
+neat_mutation_rate: 0.80
 functions:
   f_sum:
     - (x+y)/2.0

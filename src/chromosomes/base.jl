@@ -39,14 +39,19 @@ function distance(c1::Chromosome, c2::Chromosome)
     abs(mean(c1.genes) - mean(c2.genes))
 end
 
-function add_node(c::Chromosome)
-    c
-end
-
-function del_node(c::Chromosome)
-    c
-end
-
 function mutate(c::Chromosome)
-    c
+    # call constructor mutate method
+    typeof(c)(c)
+end
+
+function clone(c::Chromosome)
+    # call gene constructor method
+    typeof(c)(deepcopy(c.genes), c.nin, c.nout)
+end
+
+function crossover(c1::Chromosome, c2::Chromosome)
+    # single point crossover
+    cpoint = rand(1:(min(length(c1.genes), length(c2.genes))-1))
+    ngenes = deepcopy([c1.genes[1:cpoint]; c2.genes[cpoint+1:end]])
+    typeof(c1)(ngenes, c1.nin, c1.nout)
 end

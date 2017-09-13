@@ -14,9 +14,11 @@ function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
         for p in eachindex(population)
             fit = fitness(population[p])
             if fit >= max_fit
-                max_fit = fit
                 best = population[p]
-                new_fit = true
+                if fit > max_fit
+                    max_fit = fit
+                    new_fit = true
+                end
             end
         end
 
