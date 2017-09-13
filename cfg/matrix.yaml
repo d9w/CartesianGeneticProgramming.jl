@@ -22,7 +22,7 @@ functions:
     - median(x)
   f_range_in:
     - x
-    - range_in(x, y, p)
+    - range_in(x, y, c)
   f_index_y:
     - x
     - index_in(x, y)

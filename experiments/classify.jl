@@ -37,24 +37,24 @@ function regression(c::Chromosome, data::Array{Float64}, nin::Int64, nout::Int64
     -error
 end
 
-CGP.Config.init("cfg/base.yaml")
-CGP.Config.init("cfg/classify.yaml")
-
 seed = 0
 dfile = "data/glass.dt"
 log = "log"
 fitness = classify
-if length(ARGS) > 0
-    seed = parse(Int64, ARGS[1])
-end
-if length(ARGS) > 1
-    dfile = ARGS[2]
-end
-if length(ARGS) > 2
-    log = ARGS[3]
-end
-if length(ARGS) > 3
-    fitness = parse(ARGS[4])
+ea = oneplus
+ctype = CGPChromo
+if length(ARGS) > 0; seed = parse(Int64, ARGS[1]); end
+if length(ARGS) > 1; dfile = ARGS[2]; end
+if length(ARGS) > 2; log = ARGS[3]; end
+if length(ARGS) > 3; fitness = eval(parse(ARGS[4])); end
+if length(ARGS) > 4; ea = eval(parse(ARGS[5])); end
+if length(ARGS) > 5; ctype = eval(parse(ARGS[6])); end
+
+CGP.Config.init("cfg/base.yaml")
+if ctype == MTPCGPChromo
+    CGP.Config.init("cfg/mtcgp.yaml")
+else
+    CGP.Config.init("cfg/classic.yaml")
 end
 
 Logging.configure(filename=log, level=INFO)
@@ -63,4 +63,4 @@ srand(seed)
 
 nin, nout, train, test = read_data(dfile)
 fit = x->fitness(x, train, nin, nout)
-best = EA(nin, nout, fit)
+maxfit, best = ea(ctype, nin, nout, fit)

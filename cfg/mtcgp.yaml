@@ -42,7 +42,7 @@ functions:
     - "mean(x)*ones(size(y))"
   f_sum:
     - "x"
-    - "sum(x)"
+    - "scaled(sum(x))"
   f_add:
     - "(x+y)/2.0"
     - "(x.+y)/2.0"
@@ -68,7 +68,7 @@ functions:
   f_sqrt:
     - "sqrt.(x)"
   f_cpow:
-    - "x.^c"
+    - "scaled(x.^c)"
   f_ypow:
     - "x^y"
     - "x.^y"
@@ -130,15 +130,15 @@ functions:
   f_nop:
     - "x"
     - "x"
-  f_getinput:
-    - "0"
-    - "0"
-  f_getpreviousinput:
-    - "0"
-    - "0"
-  f_skipinput:
-    - "0"
-    - "0"
+  # f_getinput:
+  #   - "0.0"
+  #   - "0.0"
+  # f_getpreviousinput:
+  #   - "0.0"
+  #   - "0"
+  # f_skipinput:
+  #   - "0"
+  #   - "0"
   f_const:
     - "c"
     - "c"
@@ -146,8 +146,8 @@ functions:
     - "c"
     - "c.*ones(size(x))"
   f_emptyvectord:
-    - "0"
+    - "0.0"
     - "zeros(size(x))"
-  f_output:
-    - "0"
-    - "0"
+  # f_output:
+  #   - "0"
+  #   - "0"

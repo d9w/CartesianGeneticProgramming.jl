@@ -37,9 +37,11 @@ end
 
 function species_sizes(fits::Array{Float64}, species::Array{Int64})
     nspecies = length(unique(species))
-    spec_fits = map(x->mean(fits[species.==x]), 1:nspecies)
+    spec_fits = map(x->mean(fits[species.==x])+minimum(fits), 1:nspecies)
     spec_sizes = map(x->spec_fits[x]/sum(spec_fits), 1:nspecies)
-    spec_sizes = Int64.(ceil.(spec_sizes./sum(spec_sizes).*Config.neat_population))
+    spec_sizes = spec_sizes./sum(spec_sizes).*Config.neat_population
+    spec_sizes[isnan.(spec_sizes)] = 0
+    spec_sizes = Int64.(round.(spec_sizes))
 
     while sum(spec_sizes) > Config.neat_population
         spec_sizes[indmax(spec_sizes)] -= 1
