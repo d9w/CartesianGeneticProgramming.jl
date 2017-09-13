@@ -44,5 +44,6 @@ include("chromosomes/eipcgp.jl")
 include("chromosomes/mtpcgp.jl")
 include("EAs/oneplus.jl")
 include("EAs/cgpneat.jl")
+include("EAs/cmaes.jl")
 
 end

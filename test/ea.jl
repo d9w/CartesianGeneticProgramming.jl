@@ -2,7 +2,7 @@ using Base.Test
 using CGP
 CGP.Config.init("cfg/test.yaml")
 
-EAs = [oneplus, cgpneat]
+EAs = [oneplus, cgpneat, cmaes]
 CTYPES = [CGPChromo, PCGPChromo, HPCGPChromo, FPCGPChromo, EIPCGPChromo, MTPCGPChromo]
 
 @testset "Simple fit" begin

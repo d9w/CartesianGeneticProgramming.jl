@@ -1,15 +1,17 @@
 mutation_rate: 0.1
 num_generations: 200
-num_nodes: 20
 population_size: 5
+num_nodes: 20
 fitness_threshold: 0.1
 node_inputs: 2
 neat_speciation_thresh: 0.02
 neat_population: 20
-neat_init_species: 4
 neat_num_generations: 20
+neat_init_species: 4
 neat_crossover_rate: 0.80
 neat_mutation_rate: 0.80
+cmaes_population: 5
+cmaes_stopeval: 1000
 functions:
   f_sum:
     - (x+y)/2.0
