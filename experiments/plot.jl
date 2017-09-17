@@ -24,10 +24,6 @@ function get_julia_results(logdirs::Array{String}, xmax::Int64=50000, nruns::Int
         for i=0:(nruns-1)
             file = join([logdir, "/", string(i), ".log"])
             res = readdlm(file, skipstart=1, ' ')[:, 3:end]
-            if res[1,1] != 1.0
-                println(file)
-                error(file)
-            end
             cmin = 1
             for c=1:size(res)[1]
                 cur = Int(res[c,1])
