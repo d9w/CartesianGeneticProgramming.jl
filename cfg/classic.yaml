@@ -56,21 +56,21 @@ functions:
     - asin.(x)/pi*2
   f_atan:
     - atan.(x)/pi*4
-  f_not:
-    - Float64(~Bool(round(x)))
-    - Float64(~Bool(round(x)))
-    - Float64.(.~(BitArray(round.(x))))
-    - Float64.(.~(BitArray(round.(x))))
-  f_and:
-    - Float64(Bool(round(x))&Bool(round(y)))
-    - Float64.(Bool(round(x)).&BitArray(round.(y)))
-    - Float64.(BitArray(round.(x)).&Bool(round(y)))
-    - Float64.(BitArray(round.(eqsize(x,y,c)[1])).&BitArray(round.(eqsize(x,y,c)[2])))
-  f_or:
-    - Float64(Bool(round(x))|Bool(round(y)))
-    - Float64.(Bool(round(x)).|BitArray(round.(y)))
-    - Float64.(BitArray(round.(x)).|Bool(round(y)))
-    - Float64.(BitArray(round.(eqsize(x,y,c)[1])).|BitArray(round.(eqsize(x,y,c)[2])))
+# f_not:
+#   - Float64(~Bool(round(x)))
+#   - Float64(~Bool(round(x)))
+#   - Float64.(.~(BitArray(round.(x))))
+#   - Float64.(.~(BitArray(round.(x))))
+# f_and:
+#   - Float64(Bool(round(x))&Bool(round(y)))
+#   - Float64.(Bool(round(x)).&BitArray(round.(y)))
+#   - Float64.(BitArray(round.(x)).&Bool(round(y)))
+#   - Float64.(BitArray(round.(eqsize(x,y,c)[1])).&BitArray(round.(eqsize(x,y,c)[2])))
+# f_or:
+#   - Float64(Bool(round(x))|Bool(round(y)))
+#   - Float64.(Bool(round(x)).|BitArray(round.(y)))
+#   - Float64.(BitArray(round.(x)).|Bool(round(y)))
+#   - Float64.(BitArray(round.(eqsize(x,y,c)[1])).|BitArray(round.(eqsize(x,y,c)[2])))
   # f_xor:
   #   - Float64(Bool(round(x))$Bool(round(y)))
   #   - Float64.(Bool(round(x)).$BitArray(round.(y)))

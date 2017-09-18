@@ -58,7 +58,7 @@ else
 end
 
 Logging.configure(filename=log, level=INFO)
-Logging.info("I: $seed $dfile")
+Logging.info("I: $seed $dfile $ea $ctype")
 srand(seed)
 
 nin, nout, train, test = read_data(dfile)
