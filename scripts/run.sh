@@ -11,10 +11,5 @@ cd $CGP
 
 for c in ${CTYPES[@]}
 do
-    mkdir $WORK_DIR/$c
-    for file in $DATA/*
-    do
-        EXPER=$(echo $file | rev | cut -d '/' -f 1 | rev | cut -d '.' -f 1)
-        julia experiments/classify.jl $SLURM_TASK_PID $file $WORK_DIR/$c/$EXPER.log classify $EA $c
-    done
+    julia experiments/atari.jl $SLURM_TASK_PID $WORK_DIR/$c.log $EA $c
 done

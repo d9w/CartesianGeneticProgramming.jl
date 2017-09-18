@@ -11,16 +11,12 @@ mkdir -p $RESULTS_DIR
 
 for c in ${CTYPES[@]}
 do
-    for file in $DATA/*
+    mkdir -p $RESULTS_DIR/$c
+    i=0
+    for proc in $JOB_DIR/*
     do
-        EXPER=$(echo $file | rev | cut -d '/' -f 1 | rev | cut -d '.' -f 1)
-        mkdir -p $RESULTS_DIR/$c/$EXPER
-        i=0
-        for proc in $JOB_DIR/*
-        do
-            cp $proc/$c/$EXPER.log $RESULTS_DIR/$c/$EXPER/$i.log
-            echo $i $c $EXPER
-            let i=i+1
-        done
+        cp $proc/$c.log $RESULTS_DIR/$c/$i.log
+        echo $i $c
+        let i=i+1
     done
 done

@@ -6,7 +6,7 @@ parameter_mutation_rate: 0.1
 output_mutation_rate: 0.1
 num_generations: 5000
 population_size: 5
-num_nodes: 100
+num_nodes: 500
 fitness_threshold: 0.001
 node_inputs: 2
 neat_speciation_thresh: 0.02
