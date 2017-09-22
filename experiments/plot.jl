@@ -14,7 +14,7 @@ colors = [colorant"#e41a1c", colorant"#377eb8", colorant"#4daf4a",
           colorant"#984ea3", colorant"#ff7f00", colorant"#ffff33",
           colorant"#a65628", colorant"#f781bf"]
 
-function get_julia_results(logdirs::Array{String}, xmax::Int64=50000, nruns::Int64=1)
+function get_julia_results(logdirs::Array{String}, xmax::Int64=25000, nruns::Int64=20)
 
     nlogs = length(logdirs)
     trains = zeros(nlogs, xmax, nruns)
@@ -77,27 +77,20 @@ function get_cpp_results(logdirs::Array{String}, xmax::Int64=50000, nruns::Int64
     trains, tests, sizes
 end
 
-function plot_training(trains::Array{Float64}, valids::Array{Float64},
-                      labels::Array{String}, title::String)
+function plot_training(trains::Array{Float64}, labels::Array{String},
+                       title::String)
 
     nlogs, xmax, nruns = size(trains)
-    layers = Array{Array{Gadfly.Layer,1}}(nlogs*2)
+    layers = Array{Array{Gadfly.Layer,1}}(nlogs)
 
     for l in 1:nlogs
         mtrain = mean(trains[l,:,:], 2)
         strain = std(trains[l,:,:], 2)
-        mvalid = mean(valids[l,:,:], 2)
-        svalid = std(valids[l,:,:], 2)
 
-        layers[l*2-1] = layer(x=1:xmax, y=mtrain,
-                              ymin=mtrain-0.5*strain, ymax=mtrain+0.5*strain,
-                              Geom.line, Geom.ribbon,
-                              style(default_color=colors[l], line_style=:solid))
-        layers[l*2] = layer(x=1:xmax, y=mvalid,
-                            ymin=mvalid-0.5*svalid, ymax=mvalid+0.5*svalid,
-                            Geom.line, Geom.ribbon,
-                            style(default_color=colors[l], line_style=:dash,
-                                  lowlight_color=c->RGBA{Float32}(c.r, c.g, c.b, 0.1)))
+        layers[l] = layer(x=1:xmax, y=mtrain,
+                          ymin=mtrain-0.5*strain, ymax=mtrain+0.5*strain,
+                          Geom.line, Geom.ribbon,
+                          style(default_color=colors[l], line_style=:solid))
     end
 
     plt = plot(layers..., Guide.title(title),
