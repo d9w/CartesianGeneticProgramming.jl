@@ -7,24 +7,25 @@ function play_atari(c::Chromosome, game::Game)
     reset_game(game.ale)
     reward = 0
     frames = 0
-    # breakout needs to "fire" to start
-    for i=1:5
-        act(game.ale, game.actions[2])
-    end
+    # # breakout needs to "fire" to start
+    # for i=1:5
+    #     act(game.ale, game.actions[2])
+    # end
     life = lives(game.ale)*1.0
     while (~game_over(game.ale) && frames < 1e4)
-        if lives(game.ale) < life
-            life = lives(game.ale)
-            for i=1:5
-                act(game.ale, game.actions[2])
-            end
-        end
+        # if lives(game.ale) < life
+        #     life = lives(game.ale)
+        #     for i=1:5
+        #         act(game.ale, game.actions[2])
+        #     end
+        # end
         output = process(c, get_inputs(game))
         reward += act(game.ale, game.actions[indmax(output)])
         frames += 1
         # save(@sprintf("breakout/frame_%05d.png", frames), draw(game))
     end
-    reward+(1e4-frames)/1e4
+    # reward+(1e4-frames)/1e4
+    reward
 end
 
 seed = 0
@@ -47,7 +48,7 @@ Logging.configure(filename=log, level=INFO)
 Logging.info("I: $seed $ea $ctype")
 srand(seed)
 
-game = Game("breakout")
+game = Game("space_invaders")
 nin = length(get_inputs(game))
 nout = length(game.actions)
 fit = x->play_atari(x, game)
