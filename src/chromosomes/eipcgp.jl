@@ -52,3 +52,7 @@ function process(c::EIPCGPChromo, inps::Array{Float64})::Array{Float64}
     end
     map(x->c.nodes[x].output, c.outputs)
 end
+
+function get_positions(c::EIPCGPChromo)
+    c.genes[(c.nin+c.nout+1):5:end]
+end

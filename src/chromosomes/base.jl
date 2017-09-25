@@ -34,9 +34,15 @@ function find_active(outputs::Array{Int64}, connections::Array{Int64})::BitArray
     active
 end
 
+function get_positions(c::Chromosome)
+    c.genes
+end
+
 function distance(c1::Chromosome, c2::Chromosome)
-    # naive distance measure
-    abs(mean(c1.genes) - mean(c2.genes))
+    # position distance measure
+    pc1 = get_positions(c1)
+    pc2 = get_positions(c2)
+    sum((pc1-pc2).^2)
 end
 
 function mutate(c::Chromosome)

@@ -38,6 +38,7 @@ end
             @test child.genes != c.genes
             @test child.nin == c.nin
             @test child.nout == c.nout
+            @test distance(c, child) > 0
         end
     end
 end

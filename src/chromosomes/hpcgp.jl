@@ -63,3 +63,7 @@ function process(c::HPCGPChromo, inps::Array{Float64})::Array{Float64}
     end
     map(x->c.nodes[x].output, c.outputs)
 end
+
+function get_positions(c::HPCGPChromo)
+    [c.genes[1:c.nin]; c.genes[(c.nin+c.nout+1):5:end]]
+end

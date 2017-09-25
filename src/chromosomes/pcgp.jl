@@ -61,3 +61,7 @@ function process(c::PCGPChromo, inps::Array{Float64})::Array{Float64}
     end
     map(x->c.nodes[x].output, c.outputs)
 end
+
+function get_positions(c::PCGPChromo)
+    [c.genes[1:c.nin]; c.genes[(c.nin+c.nout+1):4:end]]
+end
