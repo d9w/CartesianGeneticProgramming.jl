@@ -68,5 +68,5 @@ function process(c::MTPCGPChromo, inps::Array{Float64})::Array{Float64}
 end
 
 function get_positions(c::MTPCGPChromo)
-    c.genes[(c.nin+c.nout+1):5:end]
+    c.genes[(c.nout+1):5:end]
 end
