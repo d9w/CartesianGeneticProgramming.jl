@@ -14,6 +14,31 @@ colors = [colorant"#e41a1c", colorant"#377eb8", colorant"#4daf4a",
           colorant"#984ea3", colorant"#ff7f00", colorant"#ffff33",
           colorant"#a65628", colorant"#f781bf"]
 
+function get_raw_results(logdirs::Array{String}, nruns::Int64=20)
+    nlogs = length(logdirs)
+    trains = DataFrame()
+    xs = Array{Int64}(0)
+    fits = Array{Float64}(0)
+    logs = Array{String}(0)
+
+    for l in eachindex(logdirs)
+        logdir = logdirs[l]
+        lname = split(logdir, "/")[end]
+        for i=0:(nruns-1)
+            file = join([logdir, "/", string(i), ".log"])
+            res = readdlm(file, skipstart=1, ' ')
+            append!(xs, res[:, 3])
+            append!(fits, res[:, 4])
+            append!(logs, repeat([lname], inner=size(res,1)))
+        end
+    end
+
+    trains[:xs] = xs
+    trains[:fits] = fits
+    trains[:logs] = logs
+    trains
+end
+
 function get_julia_results(logdirs::Array{String}, xmax::Int64=25000, nruns::Int64=20)
 
     nlogs = length(logdirs)
@@ -76,6 +101,21 @@ function get_cpp_results(logdirs::Array{String}, xmax::Int64=50000, nruns::Int64
 
     trains, tests, sizes
 end
+
+function plot_points(results::DataFrame, logdirs::Array{String}, title::String)
+
+    nlogs = length(logdirs)
+    layers = Array{Array{Gadfly.Layer,1}}(nlogs)
+
+    plt = plot(results, x="xs", y="fits", color="logs",
+               Geom.point, Geom.smooth,
+               Guide.title(title),
+               Guide.xlabel("Generation"), Guide.ylabel("Fitness"))
+    draw(PDF("training.pdf", 8inch, 6inch), plt)
+    plt
+end
+
+
 
 function plot_training(trains::Array{Float64}, labels::Array{String},
                        title::String)
