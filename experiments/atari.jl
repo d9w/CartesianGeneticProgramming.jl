@@ -21,9 +21,12 @@ function play_atari(c::Chromosome, game::Game)
         #     end
         # end
         output = process(c, get_inputs(game))
-        reward += act(game.ale, game.actions[indmax(output)])
-        frames += 1
-        if frames > 1e9
+        action = game.actions[indmax(output)]
+        for i in 1:3
+            reward += act(game.ale, game.actions[indmax(output)])
+            frames += 1
+        end
+        if frames > 108000
             println("Termination due to frame count")
             break
         end
@@ -51,7 +54,7 @@ Logging.configure(filename=log, level=INFO)
 Logging.info("I: $seed $ea $ctype")
 srand(seed)
 
-game = Game("space_invaders")
+game = Game("qbert")
 nin = length(get_inputs(game))
 nout = length(game.actions)
 fit = x->play_atari(x, game)
