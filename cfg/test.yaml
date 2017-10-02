@@ -4,6 +4,7 @@ population_size: 5
 num_nodes: 20
 fitness_threshold: 0.1
 node_inputs: 2
+save_best: False
 neat_speciation_thresh: 0.02
 neat_population: 20
 neat_num_generations: 20

@@ -39,7 +39,9 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
                     max_fit = fit
                     best = population[p]
                     Logging.info(@sprintf("R: %d %0.2f", eval_count, max_fit))
-                    Logging.info(@sprintf("C: %s", string(best.genes)))
+                    if Config.save_best
+                        Logging.info(@sprintf("C: %s", string(best.genes)))
+                    end
                 end
             end
         end

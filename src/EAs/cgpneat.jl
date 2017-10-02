@@ -1,6 +1,6 @@
 export cgpneat
 
-function selection(fits::Array{Float64})
+function species_selection(fits::Array{Float64})
     # return the index of the winner of a n-way tournament
     if length(fits) == 1
         return 1
@@ -121,22 +121,22 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
 
             # crossover
             for i in 1:ncross
-                p1 = spec[selection(sfits)]
-                p2 = spec[selection(sfits)]
+                p1 = spec[species_selection(sfits)]
+                p2 = spec[species_selection(sfits)]
                 new_pop[popi] = crossover(p1, p2)
                 popi += 1
             end
 
             # mutation
             for i in 1:nmut
-                parent = spec[selection(sfits)]
+                parent = spec[species_selection(sfits)]
                 new_pop[popi] = mutate(parent)
                 popi += 1
             end
 
             # copy
             for i in 1:ncopy
-                new_pop[popi] = clone(spec[selection(sfits)])
+                new_pop[popi] = clone(spec[species_selection(sfits)])
                 new_fits[popi] = fits[popi]
                 popi += 1
             end
