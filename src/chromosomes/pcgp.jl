@@ -17,10 +17,6 @@ type PCGPChromo <: Chromosome
     nout::Int64
 end
 
-function PCGPNode(ins::Array{Int64}, f::Function, a::Bool)
-    PCGPNode(ins, f, a, 0.0)
-end
-
 function PCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::PCGPChromo
     nodes = Array{PCGPNode}(nin+Config.num_nodes)
     rgenes = reshape(genes[(nin+nout+1):end], (Config.num_nodes, 4))
@@ -32,7 +28,7 @@ function PCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::PCGPChromo
     functions = [[x->x[i] for i in 1:nin];f]
     active = find_active(nin, outputs, connections)
     for i in 1:(nin+Config.num_nodes)
-        nodes[i] = PCGPNode(connections[:, i], functions[i], active[i])
+        nodes[i] = PCGPNode(connections[:, i], functions[i], active[i], 0.0)
     end
     PCGPChromo(genes, nodes, outputs, nin, nout)
 end
@@ -49,6 +45,7 @@ function PCGPChromo(c::PCGPChromo)::PCGPChromo
 end
 
 function process(c::PCGPChromo, inps::Array{Float64})::Array{Float64}
+    # TODO: this should be process!
     for i in 1:c.nin
         c.nodes[i].output = inps[i]
     end
