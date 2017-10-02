@@ -7,22 +7,18 @@ function play_atari(c::Chromosome, game::Game)
     reset_game(game.ale)
     reward = 0
     frames = 0
-    # # breakout needs to "fire" to start
-    # for i=1:5
-    #     act(game.ale, game.actions[2])
-    # end
+    # breakout needs to "fire" to start
+    # act(game.ale, game.actions[2])
     # life = lives(game.ale)*1.0
     while ~game_over(game.ale)
         # in breakout, resend fire
         # if lives(game.ale) < life
         #     life = lives(game.ale)
-        #     for i=1:5
-        #         act(game.ale, game.actions[2])
-        #     end
+        #     act(game.ale, game.actions[2])
         # end
         output = process(c, get_inputs(game))
         action = game.actions[indmax(output)]
-        for i in 1:3
+        for i in 1:4
             reward += act(game.ale, game.actions[indmax(output)])
             frames += 1
         end
@@ -30,6 +26,7 @@ function play_atari(c::Chromosome, game::Game)
             println("Termination due to frame count")
             break
         end
+        # save(@sprintf("frames/frame_%05d.png", frames/4), draw(game))
     end
     reward
 end
