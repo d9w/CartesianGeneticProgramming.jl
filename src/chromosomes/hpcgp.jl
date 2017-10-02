@@ -11,8 +11,9 @@ type HPCGPChromo <: Chromosome
 end
 
 function HPCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::HPCGPChromo
-    nodes = Array{CGPNode}(nin+Config.num_nodes)
-    rgenes = reshape(genes[(nin+nout+1):end], (Config.num_nodes, 5))
+    num_nodes = Int64(ceil((length(genes)-nin-nout)/5))
+    nodes = Array{CGPNode}(nin+num_nodes)
+    rgenes = reshape(genes[(nin+nout+1):end], (5, num_nodes))'
     positions = [genes[1:nin]; rgenes[:, 1]]
     fc = [rgenes[:, 2]'; rgenes[:, 3]']
     connections = [zeros(Int64, 2, nin) snap(fc, positions)]
@@ -21,7 +22,7 @@ function HPCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::HPCGPChrom
     functions = [[x->x[i] for i in 1:nin];f]
     params = [zeros(nin); rgenes[:, 5]]
     active = find_active(nin, outputs, connections)
-    for i in 1:(nin+Config.num_nodes)
+    for i in 1:(nin+num_nodes)
         nodes[i] = CGPNode(connections[:, i], functions[i], active[i], params[i])
     end
     HPCGPChromo(genes, nodes, outputs, nin, nout)

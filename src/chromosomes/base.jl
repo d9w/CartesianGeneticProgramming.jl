@@ -1,4 +1,16 @@
-export Chromosome
+export Chromosome,
+    process,
+    find_active,
+    get_genes,
+    clone,
+    distance,
+    forward_connections,
+    simple_mutate,
+    add_mutate,
+    delete_mutate,
+    mixed_mutate,
+    mutate
+
 
 # abstract type Chromosome end
 abstract Chromosome
@@ -35,7 +47,7 @@ function process(c::Chromosome, inps::Array{Float64})::Array{Float64}
     end
     for n in c.nodes
         if n.active
-            n.output = CGP.Config.scaled(n.p * n.f(c.nodes[n.connections[1]].output,
+            n.output = CGP.Config.scaled(1.0 * n.f(c.nodes[n.connections[1]].output,
                                                    c.nodes[n.connections[2]].output,
                                                    n.p))
         end
@@ -74,34 +86,103 @@ function get_positions(c::Chromosome)
     c.genes
 end
 
-# function get_connections()
-# julia> for ci in eachindex(c2.nodes)
-#            connections[ci] = []
-#            for i in 1:2
-#                conn = c2.nodes[ci].connections[i]
-#                if conn > 0
-#                    if ~(contains(==, connections[ci], conn))
-#                        append!(connections[ci], [conn])
-#                    end
-#                    for j in eachindex(connections[conn])
-#                        if ~(contains(==, connections[ci], j))
-#                            append!(connections[ci], [j])
-#                        end
-#                    end
-#                end
-#            end
-#        end
-
 function distance(c1::Chromosome, c2::Chromosome)
     # position distance measure
     pc1 = get_positions(c1)
     pc2 = get_positions(c2)
-    sum((pc1-pc2).^2)
+    abs(mean(pc1) - mean(pc2))
+end
+
+function node_genes(c::Chromosome)
+    # TODO: write for all chromosomes
+    5
+end
+
+function get_genes(c::Chromosome, node_id::Int64)
+    # TODO: write for all chromosomes
+    if node_id <= c.nin
+        return [c.genes[c.nin]]
+    end
+    num_nodes = Int64(ceil((length(c.genes)-c.nin-c.nout)/node_genes(c)))
+    rgenes = reshape(c.genes[(c.nin+c.nout+1):end], (node_genes(c), num_nodes))
+    rgenes[:, node_id-c.nin]
+end
+
+function get_genes(c::Chromosome, nodes::Array{Int64})
+    return reduce(vcat, map(x->get_genes(c, x), nodes))
+end
+
+function forward_connections(c::Chromosome)
+    connections = [[i] for i in 1:length(c.nodes)]
+    for ci in eachindex(c.nodes)
+        for i in 1:2
+            conn = c.nodes[ci].connections[i]
+            if conn > 0
+                if ~(contains(==, connections[ci], conn))
+                    append!(connections[ci], [conn])
+                end
+                for j in eachindex(connections[conn])
+                    if ~(contains(==, connections[ci], j))
+                        append!(connections[ci], [j])
+                    end
+                end
+            end
+        end
+    end
+    connections
+end
+
+function simple_mutate(c::Chromosome)
+    genes = deepcopy(c.genes)
+    mutations = rand(size(genes)) .< Config.mutation_rate
+    genes[mutations] = rand(sum(mutations))
+    typeof(c)(genes, c.nin, c.nout)
+end
+
+function add_mutate(c::Chromosome)
+    # Add a connected subtree
+    n_nodes = 3#rand(2:Config.add_mutate_length)
+    genes = rand(n_nodes, node_genes(c))
+    pos_set = [rand(get_positions(c), n_nodes); genes[:, 1]]
+    genes[:, 3] = rand(pos_set, n_nodes)
+    genes[:, 4] = rand(pos_set, n_nodes)
+    typeof(c)([deepcopy(c.genes); genes[:]], c.nin, c.nout)
+end
+
+function delete_mutate(c::Chromosome)
+    # Removes connected subtrees
+    n_deletes = 3#rand(1:Config.delete_mutate_length)
+    conns = forward_connections(c)
+    conns = conns[map(x->length(x)>1, conns)]
+    if length(conns) > n_deletes
+        shuffle!(conns)
+        child_nodes = setdiff(collect((c.nin+1):length(c.nodes)),
+                              unique(reduce(vcat, conns[1:n_deletes])))
+        genes = [c.genes[1:c.nin+c.nout]; get_genes(c, child_nodes)]
+        return typeof(c)(genes, c.nin, c.nout)
+    else
+        return nothing
+    end
+end
+
+function mixed_mutate(c::Chromosome)
+    child = nothing
+    while child == nothing
+        method = rand()
+        if method < Config.add_mutate_rate
+            child = add_mutate(c)
+        elseif method < (Config.add_mutate_rate + Config.delete_mutate_rate)
+            child = delete_mutate(c)
+        else
+            child = simple_mutate(c)
+        end
+    end
+    child
 end
 
 function mutate(c::Chromosome)
-    # call constructor mutate method
-    typeof(c)(c)
+    # eval(parse(string(Config.mutate_method, "_mutate")))(c)
+    mixed_mutate(c)
 end
 
 function clone(c::Chromosome)

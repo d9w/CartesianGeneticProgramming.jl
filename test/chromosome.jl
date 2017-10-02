@@ -2,13 +2,15 @@ using Base.Test
 using CGP
 CGP.Config.init("cfg/test.yaml")
 
-CTYPES = [CGPChromo, PCGPChromo, HPCGPChromo, EIPCGPChromo, MTPCGPChromo]
+# CTYPES = [CGPChromo, PCGPChromo, HPCGPChromo, EIPCGPChromo, MTPCGPChromo]
+CTYPES = [HPCGPChromo]
 
 @testset "Creation tests" begin
     for ct in CTYPES
         println(ct)
         nin = rand(1:100); nout = rand(1:100);
         c = ct(nin, nout)
+        cgenes = deepcopy(c.genes)
         @testset "Simple $ct" begin
             @test all(c.genes .<= 1.0)
             @test all(c.genes .>= -1.0)
@@ -23,7 +25,6 @@ CTYPES = [CGPChromo, PCGPChromo, HPCGPChromo, EIPCGPChromo, MTPCGPChromo]
             @test d.genes == newgenes
         end
         @testset "Gene equality $ct" begin
-            cgenes = deepcopy(c.genes)
             for i=1:10
                 d = ct(cgenes, nin, nout)
                 @test c.genes == d.genes
@@ -35,7 +36,20 @@ CTYPES = [CGPChromo, PCGPChromo, HPCGPChromo, EIPCGPChromo, MTPCGPChromo]
                 @test [n.active for n in c.nodes] == [n.active for n in d.nodes]
             end
         end
+        @testset "Gene reconstruction $ct" begin
+            genes = get_genes(c, collect((c.nin+1):length(c.nodes)))
+            @test length(genes) == (length(cgenes) - c.nin - c.nout)
+            @test genes == cgenes[(c.nin+c.nout+1):end]
+        end
     end
+end
+
+function test_mutate(c::Chromosome, child::Chromosome)
+      @test child != c
+      @test child.genes != c.genes
+      @test child.nin == c.nin
+      @test child.nout == c.nout
+      @test distance(c, child) > 0
 end
 
 @testset "Mutation tests" begin
@@ -43,15 +57,39 @@ end
         println(ct)
         nin = rand(1:100); nout = rand(1:100)
         c = ct(nin, nout)
-        @testset "Constructor $ct" begin
-            copy = deepcopy(c)
-            child = ct(c)
+        cgenes = deepcopy(c.genes)
+        @testset "Clone $ct" begin
+            copy = clone(c)
             @test copy.genes == c.genes
-            @test child != c
-            @test child.genes != c.genes
-            @test child.nin == c.nin
-            @test child.nout == c.nout
-            @test distance(c, child) > 0
+        end
+        @testset "Constructor $ct" begin
+            child = ct(c)
+            test_mutate(c, child)
+        end
+        @testset "Simple mutate $ct" begin
+            child = simple_mutate(c)
+            test_mutate(c, child)
+            @test length(child.genes) == length(c.genes)
+        end
+        @testset "Add mutate $ct" begin
+            child = add_mutate(c)
+            test_mutate(c, child)
+            @test length(child.genes) > length(c.genes)
+            @test forward_connections(c) != forward_connections(child)
+            @test issubset([n.p for n in c.nodes], [n.p for n in child.nodes])
+            @test issubset([n.f for n in c.nodes], [n.f for n in child.nodes])
+        end
+        @testset "Delete mutate $ct" begin
+            child = delete_mutate(c)
+            test_mutate(c, child)
+            @test length(child.genes) < length(c.genes)
+            @test forward_connections(c) != forward_connections(child)
+            @test issubset([n.p for n in child.nodes], [n.p for n in c.nodes])
+            @test issubset([n.f for n in child.nodes], [n.f for n in c.nodes])
+        end
+        @testset "Mixed mutate $ct" begin
+            child = mixed_mutate(c)
+            test_mutate(c, child)
         end
     end
 end
