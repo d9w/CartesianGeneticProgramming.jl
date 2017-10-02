@@ -69,14 +69,14 @@ end
 
 function sgen(name::String, s1::String, s2::String, s3::String, s4::String)
     eval(parse(string(name,
-                      "(x::Float64, y::Float64, c::Float64=0.0)=scaled(",
-                      s1, ");", name,
-                      "(x::Float64, y::Array{Float64}, c::Float64=0.0)=scaled(",
-                      s2, ");", name,
-                      "(x::Array{Float64}, y::Float64, c::Float64=0.0)=scaled(",
-                      s3, ");", name,
-                      "(x::Array{Float64}, y::Array{Float64}, c::Float64=0.0)=scaled(",
-                      s4, ")")))
+                      "(x::Float64, y::Float64, c::Float64=0.0)=",
+                      s1, ";", name,
+                      "(x::Float64, y::Array{Float64}, c::Float64=0.0)=",
+                      s2, ";", name,
+                      "(x::Array{Float64}, y::Float64, c::Float64=0.0)=",
+                      s3, ";", name,
+                      "(x::Array{Float64}, y::Array{Float64}, c::Float64=0.0)=",
+                      s4)))
 end
 
 function load_functions(funs::Dict)

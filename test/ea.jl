@@ -3,7 +3,7 @@ using CGP
 CGP.Config.init("cfg/test.yaml")
 
 EAs = [oneplus, cgpneat, GA, cmaes]
-CTYPES = [CGPChromo, PCGPChromo, HPCGPChromo, FPCGPChromo, EIPCGPChromo, MTPCGPChromo]
+CTYPES = [CGPChromo, PCGPChromo, HPCGPChromo, EIPCGPChromo, MTPCGPChromo]
 
 @testset "Simple fit" begin
     function simple_fit(c::Chromosome)

@@ -4,7 +4,7 @@ DATA=/tmpdir/wilson/data/julia
 
 EA=cgpneat
 WORK_DIR=/tmpdir/wilson/dennis/$SLURM_JOB_ID/$SLURM_TASK_PID
-CTYPES=(CGPChromo PCGPChromo HPCGPChromo FPCGPChromo EIPCGPChromo MTPCGPChromo)
+CTYPES=(CGPChromo PCGPChromo HPCGPChromo EIPCGPChromo MTPCGPChromo)
 
 mkdir -p $WORK_DIR
 cd $CGP

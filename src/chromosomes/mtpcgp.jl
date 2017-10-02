@@ -2,11 +2,11 @@ export MTPCGPChromo, construct, mutate, distance, process
 
 # MT-CGP with mutated positions, inputs based on node inputs (different from classic)
 
-type MTNode
+type MTNode <: Node
     connections::Array{Int64}
     f::Function
-    param::Float64
     active::Bool
+    p::Float64
     output::Any
 end
 
@@ -30,7 +30,7 @@ function MTPCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::MTPCGPChr
     params = rgenes[:, 5]
     active = find_active(outputs, connections)
     for i in 1:Config.num_nodes
-        nodes[i] = MTNode(connections[:, i], functions[i], params[i], active[i], 0.0)
+        nodes[i] = MTNode(connections[:, i], functions[i], active[i], params[i], 0.0)
     end
     MTPCGPChromo(genes, nodes, outputs, nin, nout)
 end
@@ -54,9 +54,9 @@ function process(c::MTPCGPChromo, inps::Array{Float64})::Array{Float64}
                                     mean(c.nodes[n.connections[1]].output),
                                     mean(c.nodes[n.connections[2]].output))
             else
-                n.output = n.f(c.nodes[n.connections[1]].output,
-                              c.nodes[n.connections[2]].output,
-                              n.param)
+                n.output = CGP.Config.scaled(n.p .* n.f(c.nodes[n.connections[1]].output,
+                                                        c.nodes[n.connections[2]].output,
+                                                        n.p))
             end
         end
     end

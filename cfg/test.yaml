@@ -1,4 +1,4 @@
-mutation_rate: 0.1
+mutation_rate: 0.5
 num_generations: 200
 population_size: 5
 num_nodes: 20

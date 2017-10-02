@@ -5,7 +5,7 @@ JOB_DIR=/tmpdir/wilson/dennis/$JOB_ID
 HOME=/users/p16043/wilson/CGP.jl
 DATA=/tmpdir/$LOGNAME/data/julia/
 RESULTS_DIR=$HOME/results/$JOB_ID
-CTYPES=(CGPChromo PCGPChromo HPCGPChromo FPCGPChromo EIPCGPChromo)
+CTYPES=(CGPChromo PCGPChromo HPCGPChromo EIPCGPChromo)
 
 mkdir -p $RESULTS_DIR
 

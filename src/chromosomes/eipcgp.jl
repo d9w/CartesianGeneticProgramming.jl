@@ -4,14 +4,14 @@ export EIPCGPChromo, construct, mutate, distance, process
 
 type EIPCGPChromo <: Chromosome
     genes::Array{Float64}
-    nodes::Array{HPCGPNode}
+    nodes::Array{CGPNode}
     outputs::Array{Int64}
     nin::Int64
     nout::Int64
 end
 
 function EIPCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::EIPCGPChromo
-    nodes = Array{HPCGPNode}(Config.num_nodes)
+    nodes = Array{CGPNode}(Config.num_nodes)
     rgenes = reshape(genes[(nout+1):end], (Config.num_nodes, 5))
     positions = rgenes[:, 1]
     fc = [rgenes[:, 2]'; rgenes[:, 3]']
@@ -22,7 +22,7 @@ function EIPCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::EIPCGPChr
     params = rgenes[:, 5]
     active = find_active(outputs, connections)
     for i in 1:Config.num_nodes
-        nodes[i] = HPCGPNode(connections[:, i], functions[i], params[i], active[i])
+        nodes[i] = CGPNode(connections[:, i], functions[i], active[i], params[i])
     end
     EIPCGPChromo(genes, nodes, outputs, nin, nout)
 end
@@ -42,11 +42,11 @@ function process(c::EIPCGPChromo, inps::Array{Float64})::Array{Float64}
     for n in c.nodes
         if n.active
             if n.f == CGP.Config.f_input
-                n.output = inps[Int64(ceil(n.param * length(inps)))]
+                n.output = inps[Int64(ceil(n.p * length(inps)))]
             else
-                n.output = n.f(c.nodes[n.connections[1]].output,
-                              c.nodes[n.connections[2]].output,
-                              n.param)
+                n.output = CGP.Config.scaled(n.p * n.f(c.nodes[n.connections[1]].output,
+                                                       c.nodes[n.connections[2]].output,
+                                                       n.p))
             end
         end
     end
