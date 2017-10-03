@@ -112,7 +112,11 @@ function get_genes(c::Chromosome, node_id::Int64)
 end
 
 function get_genes(c::Chromosome, nodes::Array{Int64})
-    return reduce(vcat, map(x->get_genes(c, x), nodes))
+    if length(nodes) > 0
+        return reduce(vcat, map(x->get_genes(c, x), nodes))
+    else
+        return Array{Int64}(0)
+    end
 end
 
 function forward_connections(c::Chromosome)
@@ -144,7 +148,7 @@ end
 
 function add_mutate(c::Chromosome)
     # Add a connected subtree
-    n_nodes = 3#rand(2:Config.add_mutate_length)
+    n_nodes = rand(2:Config.add_mutate_length)
     genes = rand(n_nodes, node_genes(c))
     pos_set = [rand(get_positions(c), n_nodes); genes[:, 1]]
     genes[:, 3] = rand(pos_set, n_nodes)
@@ -154,7 +158,7 @@ end
 
 function delete_mutate(c::Chromosome)
     # Removes connected subtrees
-    n_deletes = 3#rand(1:Config.delete_mutate_length)
+    n_deletes = rand(2:Config.delete_mutate_length)
     conns = forward_connections(c)
     conns = conns[map(x->length(x)>1, conns)]
     if length(conns) > n_deletes
@@ -224,8 +228,8 @@ function graph_crossover(c1::Chromosome, c2::Chromosome)
             end
         end
     end
-    c1_nodes = unique(intersect(collect((c1.nin+1):length(c1.nodes)), c1_nodes))
-    c2_nodes = unique(intersect(collect((c2.nin+1):length(c2.nodes)), c2_nodes))
+    c1_nodes = Array{Int64}(unique(intersect(collect((c1.nin+1):length(c1.nodes)), c1_nodes)))
+    c2_nodes = Array{Int64}(unique(intersect(collect((c2.nin+1):length(c2.nodes)), c2_nodes)))
     genes = zeros(c1.nin+c1.nout)
     for i in 1:(c1.nin+c1.nout)
         if rand(Bool)
@@ -234,7 +238,12 @@ function graph_crossover(c1::Chromosome, c2::Chromosome)
             genes[i] = c2.genes[i]
         end
     end
-    genes = [genes; get_genes(c1, c1_nodes); get_genes(c2, c2_nodes)]
+    if length(c1_nodes) > 0
+        genes = [genes; get_genes(c1, c1_nodes)]
+    end
+    if length(c2_nodes) > 0
+        genes = [genes; get_genes(c2, c2_nodes)]
+    end
     typeof(c1)(genes, c1.nin, c1.nout)
 end
 
