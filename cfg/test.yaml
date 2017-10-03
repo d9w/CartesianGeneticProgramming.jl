@@ -8,8 +8,8 @@ save_best: False
 mutate_method: :simple
 add_mutate_length: 10
 delete_mutate_length: 5
-add_mutate_rate: 1.0
-delete_mutate_rate: 0.0
+add_mutate_rate: 0.3
+delete_mutate_rate: 0.2
 neat_speciation_thresh: 0.02
 neat_population: 20
 neat_num_generations: 20

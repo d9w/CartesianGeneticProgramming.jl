@@ -10,6 +10,11 @@ num_nodes: 500
 fitness_threshold: 0.001
 node_inputs: 2
 save_best: True
+mutate_method: :simple
+add_mutate_length: 10
+delete_mutate_length: 5
+add_mutate_rate: 0.3
+delete_mutate_rate: 0.2
 neat_speciation_thresh: 0.02
 neat_population: 100
 neat_num_generations: 250

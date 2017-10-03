@@ -94,6 +94,35 @@ end
     end
 end
 
+@testset "Crossover tests" begin
+    for ct in CTYPES
+        println(ct)
+        nin = rand(1:100); nout = rand(1:100)
+        p1 = ct(nin, nout)
+        p1genes = deepcopy(p1.genes)
+        p2 = ct(nin, nout)
+        p2genes = deepcopy(p2.genes)
+        @test p1genes != p2genes
+        @testset "Single point $ct" begin
+            child = single_point_crossover(p1, p2)
+            @test length(intersect([n.p for n in p1.nodes], [n.p for n in child.nodes])) > 0
+            @test length(intersect([n.p for n in p2.nodes], [n.p for n in child.nodes])) > 0
+            @test length(intersect([n.f for n in p1.nodes], [n.f for n in child.nodes])) > 0
+            @test length(intersect([n.f for n in p2.nodes], [n.f for n in child.nodes])) > 0
+        end
+        @testset "Graph $ct" begin
+            child = graph_crossover(p1, p2)
+            @test length(intersect([n.p for n in p1.nodes], [n.p for n in child.nodes])) > 0
+            @test length(intersect([n.p for n in p2.nodes], [n.p for n in child.nodes])) > 0
+            @test length(intersect([n.f for n in p1.nodes], [n.f for n in child.nodes])) > 0
+            @test length(intersect([n.f for n in p2.nodes], [n.f for n in child.nodes])) > 0
+            @test length(intersect(forward_connections(p1), forward_connections(child))) > 0
+            @test length(intersect(forward_connections(p2), forward_connections(child))) > 0
+        end
+    end
+end
+
+
 @testset "Functional tests" begin
     for ct in CTYPES
         println(ct)
