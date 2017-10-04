@@ -34,6 +34,7 @@ function play_atari(c::Chromosome, game::Game, display::Bool, frame_dir::String)
 end
 
 function play_and_draw(c::Chromosome, game::Game, display::Bool, frame_dir::String)
+    mkpath(frame_dir)
     rm(frame_dir, recursive=true)
     mkpath(frame_dir)
     play_atari(c, game, display, frame_dir)
