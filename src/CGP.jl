@@ -35,7 +35,9 @@ Logging.configure(level=INFO)
     export init, reset
     end
 
-include("chromosomes/base.jl")
+include("chromosome.jl")
+include("mutation.jl")
+include("crossover.jl")
 include("chromosomes/cgp.jl")
 include("chromosomes/pcgp.jl")
 include("chromosomes/hpcgp.jl")
