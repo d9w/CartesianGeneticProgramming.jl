@@ -7,7 +7,8 @@ function selection(fits::Array{Float64}, n::Int64=3)
     fshuffle[winner]
 end
 
-function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
+function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
+            record_best::Bool, record_fitness::Function)
     population = Array{ctype}(Config.ga_population)
     fits = -Inf*ones(Float64, Config.ga_population)
     population = [ctype(nin, nout) for i in 1:Config.ga_population]
@@ -30,6 +31,7 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
     for generation in 1:Config.ga_num_generations
         # evaluation
         Logging.debug("evaluation $generation")
+        new_best = false
         for p in eachindex(population)
             if fits[p] == -Inf
                 fit = fitness(population[p])
@@ -38,13 +40,25 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
                 if fit > max_fit
                     max_fit = fit
                     best = population[p]
-                    Logging.info(@sprintf("R: %d %0.2f", eval_count, max_fit))
-                    if Config.save_best
-                        Logging.info(@sprintf("C: %s", string(best.genes)))
-                    end
+                    new_best = true
                 end
             end
         end
+
+        if new_best
+            refit = max_fit
+            if record_best
+                refit = record_fitness(best)
+            end
+            Logging.info(@sprintf("R: %d %0.2f %0.2f %0.2f %d %0.2f",
+                                  eval_count, max_fit, refit, mean(fits),
+                                  length(best.nodes),
+                                  mean(map(x->length(x.nodes), population))))
+            if Config.save_best
+                Logging.info(@sprintf("C: %s", string(best.genes)))
+            end
+        end
+
 
         # create new population
         Logging.debug("new population $generation")
@@ -90,4 +104,8 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
     end
 
     max_fit, best.genes
+end
+
+function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
+    GA(ctype, nin, nout, fitness, false, fitness)
 end

@@ -53,7 +53,8 @@ function species_sizes(fits::Array{Float64}, species::Array{Int64})
 end
 
 
-function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
+function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
+                 record_best::Bool, record_fitness::Function)
     population = Array{ctype}(Config.neat_population)
     fits = -Inf*ones(Float64, Config.neat_population)
     species = Array{Int64}(Config.neat_population)
@@ -74,6 +75,7 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
     for generation in 1:Config.neat_num_generations
         # evaluation
         Logging.debug("evaluation $generation")
+        new_best = false
         for p in eachindex(population)
             if fits[p] == -Inf
                 fit = fitness(population[p])
@@ -82,8 +84,22 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
                 if fit > max_fit
                     max_fit = fit
                     best = population[p]
-                    Logging.info(@sprintf("R: %d %0.2f", eval_count, max_fit))
+                    new_best = true
                 end
+            end
+        end
+
+        if new_best
+            refit = max_fit
+            if record_best
+                refit = record_fitness(best)
+            end
+            Logging.info(@sprintf("R: %d %0.2f %0.2f %0.2f %d %0.2f",
+                                  eval_count, max_fit, refit, mean(fits),
+                                  length(best.nodes),
+                                  mean(map(x->length(x.nodes), population))))
+            if Config.save_best
+                Logging.info(@sprintf("C: %s", string(best.genes)))
             end
         end
 
@@ -150,4 +166,8 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
     end
 
     max_fit, best.genes
+end
+
+function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
+    cgpneat(ctype, nin, nout, fitness, false, fitness)
 end

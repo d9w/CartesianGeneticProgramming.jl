@@ -1,9 +1,9 @@
 using ArcadeLearningEnvironment
 using CGP
 using Logging
-# using Images
+using Images
 
-function play_atari(c::Chromosome, game::Game)
+function play_atari(c::Chromosome, game::Game, display::Bool)
     reset_game(game.ale)
     reward = 0
     frames = 0
@@ -21,12 +21,14 @@ function play_atari(c::Chromosome, game::Game)
         for i in 1:4
             reward += act(game.ale, game.actions[indmax(output)])
             frames += 1
+            if display
+                save(@sprintf("frames/frame_%05d.png", frames), draw(game))
+            end
         end
         if frames > 108000
             println("Termination due to frame count")
             break
         end
-        # save(@sprintf("frames/frame_%05d.png", frames/4), draw(game))
     end
     reward
 end
@@ -54,6 +56,7 @@ srand(seed)
 game = Game("qbert")
 nin = length(get_inputs(game))
 nout = length(game.actions)
-fit = x->play_atari(x, game)
-maxfit, best = ea(ctype, nin, nout, fit)
+fit = x->play_atari(x, game, false)
+record = x->play_atari(x, game, true)
+maxfit, best = ea(ctype, nin, nout, fit, true, record)
 close!(game)
