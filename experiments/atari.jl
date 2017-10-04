@@ -33,6 +33,12 @@ function play_atari(c::Chromosome, game::Game, display::Bool, frame_dir::String)
     reward
 end
 
+function play_and_draw(c::Chromosome, game::Game, display::Bool, frame_dir::String)
+    rm(frame_dir, recursive=true)
+    mkpath(frame_dir)
+    play_atari(c, game, display, frame_dir)
+end
+
 seed = 0
 log = "log"
 ea = oneplus
@@ -54,12 +60,11 @@ end
 Logging.configure(filename=log, level=INFO)
 Logging.info("I: $seed $ea $ctype")
 srand(seed)
-mkpath(frame_dir)
 
 game = Game("qbert")
 nin = length(get_inputs(game))
 nout = length(game.actions)
 fit = x->play_atari(x, game, false, frame_dir)
-record = x->play_atari(x, game, true, frame_dir)
+record = x->play_and_draw(x, game, true, frame_dir)
 maxfit, best = ea(ctype, nin, nout, fit, true, record)
 close!(game)
