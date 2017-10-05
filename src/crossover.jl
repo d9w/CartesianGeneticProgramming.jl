@@ -1,5 +1,8 @@
 export single_point_crossover,
-    graph_crossover,
+    random_node_crossover,
+    aligned_node_crossover,
+    output_graph_crossover,
+    subgraph_crossover,
     crossover
 
 function single_point_crossover(c1::Chromosome, c2::Chromosome)
@@ -9,7 +12,26 @@ function single_point_crossover(c1::Chromosome, c2::Chromosome)
     typeof(c1)(ngenes, c1.nin, c1.nout)
 end
 
-function graph_crossover(c1::Chromosome, c2::Chromosome)
+function random_node_crossover(c1::Chromosome, c2::Chromosome)
+    # take random nodes from each parent equally
+    clone(c1)
+end
+
+function aligned_node_crossover(c1::Chromosome, c2::Chromosome)
+    # align nodes based on position, then take from each parent equally
+    clone(c1)
+end
+
+function output_graph_crossover(c1::Chromosome, c2::Chromosome)
+    # split outputs equally between parents, then construct a child from their
+    # corresponding input graphs
+    clone(c1)
+end
+
+
+function subgraph_crossover(c1::Chromosome, c2::Chromosome)
+    # Take subgraphs from both parents equally, adding all nodes of the chosen
+    # subgraphs to the child.
     fc1 = forward_connections(c1)
     fc2 = forward_connections(c2)
     c1_nodes = []; c2_nodes = []
@@ -54,5 +76,5 @@ end
 
 function crossover(c1::Chromosome, c2::Chromosome)
     # TODO: read from Config
-    graph_crossover(c1, c2)
+    subgraph_crossover(c1, c2)
 end
