@@ -66,29 +66,49 @@ end
             child = ct(c)
             test_mutate(c, child)
         end
-        @testset "Simple mutate $ct" begin
-            child = simple_mutate(c)
+        @testset "Mutate genes $ct" begin
+            child = mutate_genes(c)
             test_mutate(c, child)
             @test length(child.genes) == length(c.genes)
         end
-        @testset "Add mutate $ct" begin
-            child = add_mutate(c)
+        @testset "Add nodes $ct" begin
+            child = add_nodes(c)
             test_mutate(c, child)
             @test length(child.genes) > length(c.genes)
             @test forward_connections(c) != forward_connections(child)
             @test issubset([n.p for n in c.nodes], [n.p for n in child.nodes])
             @test issubset([n.f for n in c.nodes], [n.f for n in child.nodes])
         end
-        @testset "Delete mutate $ct" begin
-            child = delete_mutate(c)
+        @testset "Delete nodes $ct" begin
+            child = delete_nodes(c)
             test_mutate(c, child)
             @test length(child.genes) < length(c.genes)
             @test forward_connections(c) != forward_connections(child)
             @test issubset([n.p for n in child.nodes], [n.p for n in c.nodes])
             @test issubset([n.f for n in child.nodes], [n.f for n in c.nodes])
         end
-        @testset "Mixed mutate $ct" begin
-            child = mixed_mutate(c)
+        @testset "Mixed node mutate $ct" begin
+            child = mixed_node_mutate(c)
+            test_mutate(c, child)
+        end
+        @testset "Add subtree $ct" begin
+            child = add_nodes(c)
+            test_mutate(c, child)
+            @test length(child.genes) > length(c.genes)
+            @test forward_connections(c) != forward_connections(child)
+            @test issubset([n.p for n in c.nodes], [n.p for n in child.nodes])
+            @test issubset([n.f for n in c.nodes], [n.f for n in child.nodes])
+        end
+        @testset "Delete subtree $ct" begin
+            child = delete_nodes(c)
+            test_mutate(c, child)
+            @test length(child.genes) < length(c.genes)
+            @test forward_connections(c) != forward_connections(child)
+            @test issubset([n.p for n in child.nodes], [n.p for n in c.nodes])
+            @test issubset([n.f for n in child.nodes], [n.f for n in c.nodes])
+        end
+        @testset "Mixed subtree mutate $ct" begin
+            child = mixed_subtree_mutate(c)
             test_mutate(c, child)
         end
     end

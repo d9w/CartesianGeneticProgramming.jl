@@ -33,10 +33,11 @@ function HPCGPChromo(nin::Int64, nout::Int64)::HPCGPChromo
 end
 
 function HPCGPChromo(c::HPCGPChromo)::HPCGPChromo
-    genes = deepcopy(c.genes)
-    mutations = rand(size(genes)) .< Config.mutation_rate
-    genes[mutations] = rand(sum(mutations))
-    HPCGPChromo(genes, c.nin, c.nout)
+    # genes = deepcopy(c.genes)
+    # mutations = rand(size(genes)) .< Config.gene_mutation_rate
+    # genes[mutations] = rand(sum(mutations))
+    # HPCGPChromo(genes, c.nin, c.nout)
+    mutate_genes(c)
 end
 
 function get_positions(c::HPCGPChromo)
