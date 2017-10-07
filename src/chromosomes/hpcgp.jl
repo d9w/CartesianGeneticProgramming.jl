@@ -11,6 +11,7 @@ type HPCGPChromo <: Chromosome
 end
 
 function HPCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::HPCGPChromo
+    # TODO: sort based on position, process goes in order
     num_nodes = Int64(ceil((length(genes)-nin-nout)/5))
     nodes = Array{CGPNode}(nin+num_nodes)
     rgenes = reshape(genes[(nin+nout+1):end], (5, num_nodes))'

@@ -77,14 +77,31 @@ function find_active(outputs::Array{Int64}, connections::Array{Int64})::BitArray
 end
 
 function get_positions(c::Chromosome)
-    c.genes
+    # TODO: write for all chromosomes
+    num_nodes = Int64(ceil((length(c.genes)-c.nin-c.nout)/node_genes(c)))
+    rgenes = reshape(genes[(c.nin+c.nout+1):end], (node_genes(c), num_nodes))'
+    [c.genes[1:c.nin]; rgenes[:, 1]]
 end
 
 function distance(c1::Chromosome, c2::Chromosome)
     # position distance measure
+    # TODO: use a behavioral distance in speciation
     pc1 = get_positions(c1)
     pc2 = get_positions(c2)
     abs(mean(pc1) - mean(pc2))
+end
+
+function get_output_trace(c::Chromosome, output::Int64)
+    # similar to decode, just return a list of node indices that determine the output
+    []
+end
+
+function get_output_trace(c::Chromosome, outputs::Array{Int64})
+    if length(output) > 0
+        return unique(reduce(vcat, map(x->get_output_trace(c, x), outputs)))
+    else
+        return Array{Int64}(0)
+    end
 end
 
 function node_genes(c::Chromosome)
