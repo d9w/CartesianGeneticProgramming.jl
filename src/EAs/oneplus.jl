@@ -2,7 +2,7 @@ export oneplus
 
 function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
             record_best::Bool, record_fitness::Function)
-    population = Array{ctype}(Config.population_size)
+    population = Array{ctype}(Config.oneplus_population_size)
     for i in eachindex(population)
         population[i] = ctype(nin, nout)
     end
@@ -10,7 +10,7 @@ function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
     max_fit = -Inf
     eval_count = 0
 
-    for i=1:Config.num_generations
+    for i=1:Config.oneplus_num_generations
         # evaluation
         new_fit = false
         for p in eachindex(population)
