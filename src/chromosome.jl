@@ -16,7 +16,7 @@ type CGPNode <: Node
     f::Function
     active::Bool
     p::Float64
-    output::Float64
+    output::Any
 end
 
 function CGPNode(ins::Array{Int64}, f::Function)
@@ -35,7 +35,7 @@ function snap(fc::Array{Float64}, p::Array{Float64})::Array{Int64}
     map(x->indmin(abs.(p-x)), fc)
 end
 
-function process(c::Chromosome, inps::Array{Float64})::Array{Float64}
+function process(c::Chromosome, inps::Array)::Array{Float64}
     for i in 1:c.nin
         c.nodes[i].output = inps[i]
     end
@@ -46,7 +46,11 @@ function process(c::Chromosome, inps::Array{Float64})::Array{Float64}
                                                    n.p))
         end
     end
-    map(x->c.nodes[x].output, c.outputs)
+    outs = Array{Float64}(c.nout)
+    for i in eachindex(outs)
+        outs[i] = mean(c.nodes[c.outputs[i]].output)
+    end
+    outs
 end
 
 function recur_active!(active::BitArray, connections::Array{Int64}, ind::Int64)::Void

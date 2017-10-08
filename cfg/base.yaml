@@ -1,30 +1,33 @@
-mutation_rate: 0.1
-position_mutation_rate: 0.1
-connection_mutation_rate: 0.1
-function_mutation_rate: 0.1
-parameter_mutation_rate: 0.1
-output_mutation_rate: 0.1
-num_generations: 5000
-population_size: 5
-num_nodes: 500
-fitness_threshold: 0.001
+# General settings
+num_nodes: 100
 node_inputs: 2
 save_best: True
-mutate_method: :simple
-add_mutate_length: 10
-delete_mutate_length: 5
-add_mutate_rate: 0.3
-delete_mutate_rate: 0.2
+# Mutation
+gene_mutation_rate: 0.1
+input_mutation_rate: 0.1
+output_mutation_rate: 0.1
+node_mutation_rate: 0.1
+mutation_method: :simple
+add_node_rate: 0.1
+delete_node_rate: 0.1
+add_mutation_rate: 0.4
+delete_mutation_rate: 0.1
+# Oneplus settings
+oneplus_num_generations: 1000
+oneplus_population_size: 5
+# CGP NEAT settings
 neat_speciation_thresh: 0.02
-neat_population: 100
-neat_num_generations: 250
-neat_init_species: 4
+neat_population: 50
+neat_num_generations: 100
+neat_init_species: 5
 neat_crossover_rate: 0.25
-neat_mutation_rate: 0.75
-ga_population: 100
-ga_num_generations: 250
+neat_mutation_rate: 0.65
+# GA settings
+ga_population: 50
+ga_num_generations: 100
 ga_elitism_rate: 0.1
 ga_crossover_rate: 0.25
 ga_mutation_rate: 0.65
-cmaes_population: 25
-cmaes_stopeval: 25000
+# CMAES settings
+cmaes_population: 5
+cmaes_stopeval: 5000

@@ -146,18 +146,18 @@ end
             child = single_point_crossover(p1, p2)
             test_crossover(p1, p2, child)
         end
-        @testset "Random node $ct" begin
-            child = random_node_crossover(p1, p2)
-            test_crossover(p1, p2, child)
-        end
-        @testset "Aligned node $ct" begin
-            child = aligned_node_crossover(p1, p2)
-            test_crossover(p1, p2, child)
-        end
-        @testset "Output graph $ct" begin
-            child = output_graph_crossover(p1, p2)
-            test_crossover(p1, p2, child)
-        end
+        # @testset "Random node $ct" begin
+        #     child = random_node_crossover(p1, p2)
+        #     test_crossover(p1, p2, child)
+        # end
+        # @testset "Aligned node $ct" begin
+        #     child = aligned_node_crossover(p1, p2)
+        #     test_crossover(p1, p2, child)
+        # end
+        # @testset "Output graph $ct" begin
+        #     child = output_graph_crossover(p1, p2)
+        #     test_crossover(p1, p2, child)
+        # end
         @testset "Subgraph $ct" begin
             child = subgraph_crossover(p1, p2)
             test_crossover(p1, p2, child)

@@ -8,18 +8,19 @@ function play_atari(c::Chromosome, game::Game, display::Bool, frame_dir::String)
     reward = 0
     frames = 0
     # breakout needs to "fire" to start
-    # act(game.ale, game.actions[2])
-    # life = lives(game.ale)*1.0
+    act(game.ale, game.actions[2])
+    life = lives(game.ale)*1.0
     while ~game_over(game.ale)
         # in breakout, resend fire
-        # if lives(game.ale) < life
-        #     life = lives(game.ale)
-        #     act(game.ale, game.actions[2])
-        # end
-        output = process(c, get_inputs(game))
-        action = game.actions[indmax(output)]
+        action = game.actions[2]
+        if lives(game.ale) < life
+            life = lives(game.ale)*1.0
+        else
+            output = process(c, [get_inputs(game)])
+            action = game.actions[indmax(output)]
+        end
         for i in 1:4
-            reward += act(game.ale, game.actions[indmax(output)])
+            reward += act(game.ale, action)
             frames += 1
             if display
                 save(@sprintf("%s/frame_%05d.png", frame_dir, frames), draw(game))
@@ -65,7 +66,7 @@ Logging.info("I: $seed $ea $ctype $game_name")
 srand(seed)
 
 game = Game(game_name)
-nin = length(get_inputs(game))
+nin = 1
 nout = length(game.actions)
 fit = x->play_atari(x, game, false, frame_dir)
 record = x->play_and_draw(x, game, true, frame_dir)
