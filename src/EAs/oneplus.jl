@@ -17,7 +17,7 @@ function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
             fit = fitness(population[p])
             eval_count += 1
             if fit >= max_fit
-                best = population[p]
+                best = clone(population[p])
                 if fit > max_fit
                     max_fit = fit
                     new_fit = true
