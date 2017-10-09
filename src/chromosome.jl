@@ -44,6 +44,9 @@ function process(c::Chromosome, inps::Array)::Array{Float64}
             n.output = CGP.Config.scaled(1.0 * n.f(c.nodes[n.connections[1]].output,
                                                    c.nodes[n.connections[2]].output,
                                                    n.p))
+            if length(n.output) == 0
+                n.output = 0.0
+            end
         end
     end
     outs = Array{Float64}(c.nout)
