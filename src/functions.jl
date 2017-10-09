@@ -43,7 +43,13 @@ function range_in(list::Array{Float64}, xi::Array{Float64}, yi::Float64)
     range_in(list, mean(xi), yi)
 end
 
-function eqsize(x::Array{Float64}, y::Array{Float64}, c::Float64)
+function minsize(x::Array{Float64}, y::Array{Float64})
+    dims = min(ndims(x), ndims(y))
+    shape = [min(size(x, i), size(y, i)) for i in 1:dims]
+    (x[[1:i for i in shape]...], y[[1:i for i in shape]...])
+end
+
+function fillsize(x::Array{Float64}, y::Array{Float64}, c::Float64)
     if ndims(x) == ndims(y)
         return paddedviews(c, x, y)
     elseif ndims(x) > ndims(y)
@@ -57,14 +63,8 @@ function eqsize(x::Array{Float64}, y::Array{Float64}, c::Float64)
     end
 end
 
-function bdiv(x::Float64, y::Float64)
-    if y > x
-        return x/y
-    elseif y == x
-        return 1.0
-    else
-        return y/x
-    end
+function eqsize(x::Array{Float64}, y::Array{Float64}, c::Float64)
+    minsize(x, y)
 end
 
 function sgen(name::String, s1::String, s2::String, s3::String, s4::String)
