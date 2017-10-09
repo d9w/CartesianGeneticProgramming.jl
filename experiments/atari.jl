@@ -55,11 +55,7 @@ if length(ARGS) > 4; game_name = ARGS[5]; end
 if length(ARGS) > 5; frame_dir = ARGS[6]; end
 
 CGP.Config.init("cfg/base.yaml")
-if ctype == MTPCGPChromo
-    CGP.Config.init("cfg/mtcgp.yaml")
-else
-    CGP.Config.init("cfg/classic.yaml")
-end
+CGP.Config.init("cfg/atari.yaml")
 
 Logging.configure(filename=log, level=INFO)
 Logging.info("I: $seed $ea $ctype $game_name")
