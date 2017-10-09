@@ -55,12 +55,16 @@ functions:
     - "x.*y"
     - "x.*y"
     - ".*(eqsize(x,y,c)...)"
+  f_cmult:
+    - "x.*c"
   f_inv:
     - "scaled(1./x)"
   f_abs:
     - "abs.(x)"
   f_sqrt:
     - "sqrt.(abs.(x))"
+  f_squared:
+    - "x.^2"
   f_cpow:
     - "abs.(x).^abs(c)"
   f_ypow:
@@ -74,6 +78,17 @@ functions:
     - "sin.(x)"
   f_cosx:
     - "cos.(x)"
+  f_sqrtxy:
+    - "sqrt.(x*x+y*y)/sqrt(2.0)"
+    - "sqrt.(x*x+y.*y)/sqrt(2.0)"
+    - "sqrt.(x.*x+y*y)/sqrt(2.0)"
+    - "sqrt.(.+(eqsize(x.*x, y.*y, c)...))/sqrt(2.0)"
+  f_acos:
+    - "acos.(x)/pi"
+  f_asin:
+    - "2*asin.(x)/pi"
+  f_atan:
+    - "4*atan.(x)/pi"
   # Comparison
   f_lt:
     - "Float64(x < y)"
@@ -85,6 +100,26 @@ functions:
     - "Float64.(x.>y)"
     - "Float64.(x.>y)"
     - "Float64.(.>(eqsize(x,y,c)...))"
+  f_not:
+    - "Float64(~Bool(round(abs(x))))"
+    - "Float64(~Bool(round(abs(x))))"
+    - "Float64.(.~(BitArray(round.(abs.(x)))))"
+    - "Float64.(.~(BitArray(round.(abs.(x)))))"
+  f_and:
+    - "Float64(Bool(round(abs(x)))&Bool(round(abs(y))))"
+    - "Float64.(Bool(round(abs(x))).&BitArray(round.(abs.(y))))"
+    - "Float64.(BitArray(round.(abs.(x))).&Bool(round(abs(y))))"
+    - "Float64.(BitArray(round.(abs.(eqsize(x,y,c)[1]))).&BitArray(round.(abs.(eqsize(x,y,c)[2]))))"
+  f_or:
+    - "Float64(Bool(round(abs(x)))|Bool(round(abs(y))))"
+    - "Float64.(Bool(round(abs(x))).|BitArray(round.(abs.(y))))"
+    - "Float64.(BitArray(round.(abs.(x))).|Bool(round(abs(y))))"
+    - "Float64.(BitArray(round.(abs.(eqsize(x,y,c)[1]))).|BitArray(round.(abs.(eqsize(x,y,c)[2]))))"
+  f_xor:
+    - "Float64(xor(Bool(round(abs(x))), Bool(round(abs(y)))))"
+    - "Float64.(xor.(Bool(round(abs(x))), BitArray(round.(abs.(y)))))"
+    - "Float64.(xor.(BitArray(round.(abs.(x))), Bool(round(abs(y)))))"
+    - "Float64.(xor.(map(i->BitArray(round.(abs.(i))), eqsize(x,y,c))...))"
   # Statistical
   f_standarddeviation:
     - "0.0"
@@ -104,6 +139,12 @@ functions:
   f_range:
     - "x"
     - "maximum(x)-minimum(x)-1.0"
+  f_round:
+    - "round.(x)"
+  f_ceil:
+    - "ceil.(x)"
+  f_floor:
+    - "floor.(x)"
   f_max1:
     - "x"
     - "maximum(x)"

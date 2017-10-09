@@ -48,11 +48,8 @@ functions:
     - x.*y
     - x.*y
     - ".*(eqsize(x,y,c)...)"
-  f_bdiv:
-    - bdiv(x, y)
-    - (i->bdiv(x,i)).(y)
-    - (i->bdiv(i,y)).(x)
-    - "[bdiv(eqsize(x,y,c)[1][i], eqsize(x,y,c)[2][i]) for i in eachindex(eqsize(x,y,c)[1])]"
+  f_inv:
+    - "scaled(1./x)"
   f_nans:
     - "scaled(NaN)"
     - "scaled([NaN, NaN, NaN])"

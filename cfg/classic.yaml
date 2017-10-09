@@ -1,15 +1,15 @@
 functions:
   f_sqrt:
-    - sqrt.(x)
+    - sqrt.(abs.(x))
   f_squared:
     - x.^2
   f_cpow:
-    - x.^c
+    - abs.(x).^abs(c)
   f_ypow:
-    - x^y
-    - x.^y
-    - x.^y
-    - .^(eqsize(x,y,c)...)
+    - abs(x)^abs(y)
+    - abs.(x).^abs.(y)
+    - abs.(x).^abs.(y)
+    - .^(eqsize(abs.(x),abs.(y),c)...)
   f_expx:
     - (exp.(x)-1.0)/(exp(1.0)-1.0)
   f_sinx:
@@ -38,11 +38,8 @@ functions:
     - ".*(eqsize(x,y,c)...)"
   f_cmult:
     - x.*c
-  f_bdiv:
-    - bdiv(x, y)
-    - (i->bdiv(x,i)).(y)
-    - (i->bdiv(i,y)).(x)
-    - "[bdiv(eqsize(x,y,c)[1][i], eqsize(x,y,c)[2][i]) for i in eachindex(eqsize(x,y,c)[1])]"
+  f_inv:
+    - scaled(1./x)
   f_gt:
     - Float64(x > y)
     - Float64.(x.>y)
@@ -51,31 +48,11 @@ functions:
   f_const:
     - c
   f_acos:
-    - acos.(x)/pi*2
+    - acos.(x)/pi
   f_asin:
-    - asin.(x)/pi*2
+    - 2*asin.(x)/pi
   f_atan:
-    - atan.(x)/pi*4
-# f_not:
-#   - Float64(~Bool(round(x)))
-#   - Float64(~Bool(round(x)))
-#   - Float64.(.~(BitArray(round.(x))))
-#   - Float64.(.~(BitArray(round.(x))))
-# f_and:
-#   - Float64(Bool(round(x))&Bool(round(y)))
-#   - Float64.(Bool(round(x)).&BitArray(round.(y)))
-#   - Float64.(BitArray(round.(x)).&Bool(round(y)))
-#   - Float64.(BitArray(round.(eqsize(x,y,c)[1])).&BitArray(round.(eqsize(x,y,c)[2])))
-# f_or:
-#   - Float64(Bool(round(x))|Bool(round(y)))
-#   - Float64.(Bool(round(x)).|BitArray(round.(y)))
-#   - Float64.(BitArray(round.(x)).|Bool(round(y)))
-#   - Float64.(BitArray(round.(eqsize(x,y,c)[1])).|BitArray(round.(eqsize(x,y,c)[2])))
-  # f_xor:
-  #   - Float64(Bool(round(x))$Bool(round(y)))
-  #   - Float64.(Bool(round(x)).$BitArray(round.(y)))
-  #   - Float64.(BitArray(round.(x)).$Bool(round(y)))
-  #   - Float64.(BitArray(round.(eqsize(x,y,c)[1])).$BitArray(round.(eqsize(x,y,c)[2])))
+    - 4*atan.(x)/pi
   f_min:
     - min(x,y)
     - min.(x,y)
