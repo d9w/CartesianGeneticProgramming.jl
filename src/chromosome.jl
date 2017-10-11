@@ -39,14 +39,19 @@ function process(c::Chromosome, inps::Array)::Array{Float64}
     for i in 1:c.nin
         c.nodes[i].output = inps[i]
     end
+    maxlength = maximum(map(length, inps))
     for n in c.nodes
         if n.active
-            n.output = CGP.Config.scaled(1.0 * n.f(c.nodes[n.connections[1]].output,
-                                                   c.nodes[n.connections[2]].output,
-                                                   n.p))
-            if length(n.output) == 0
-                n.output = 0.0
+            output = CGP.Config.scaled(1.0 * n.f(c.nodes[n.connections[1]].output,
+                                                 c.nodes[n.connections[2]].output,
+                                                 n.p))
+            if length(output) == 0
+                output = 0.0
             end
+            if length(output) > maxlength
+                output = output[1:maxlength]
+            end
+            n.output = output
         end
     end
     outs = Array{Float64}(c.nout)
@@ -118,13 +123,15 @@ end
 
 function get_genes(c::Chromosome, node_id::Int64)
     # TODO: write for all chromosomes
-    if node_id <= c.nin
-        return [c.genes[c.nin]]
-    end
-    num_nodes = Int64(ceil((length(c.genes)-c.nin-c.nout)/node_genes(c)))
-    rgenes = reshape(c.genes[(c.nin+c.nout+1):end], (node_genes(c), num_nodes))
-    rgenes[:, node_id-c.nin]
+    c.genes[(c.nin+c.nout)+((node_id-1-c.nin)*node_genes(c))+(1:node_genes(c))]
 end
+#     if node_id <= c.nin
+#         return [c.genes[c.nin]]
+#     end
+#     num_nodes = Int64(ceil((length(c.genes)-c.nin-c.nout)/node_genes(c)))
+#     rgenes = reshape(c.genes[(c.nin+c.nout+1):end], (node_genes(c), num_nodes))
+#     rgenes[:, node_id-c.nin]
+# end
 
 function get_genes(c::Chromosome, nodes::Array{Int64})
     if length(nodes) > 0
@@ -132,6 +139,10 @@ function get_genes(c::Chromosome, nodes::Array{Int64})
     else
         return Array{Int64}(0)
     end
+end
+
+function set_genes!(c::Chromosome, node_id::Int64, genes::Array{Float64})
+    c.genes[(c.nin+c.nout)+((node_id-1-c.nin)*node_genes(c))+(1:node_genes(c))] = genes
 end
 
 function forward_connections(c::Chromosome)
