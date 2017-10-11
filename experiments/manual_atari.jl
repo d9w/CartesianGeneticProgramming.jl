@@ -1,7 +1,8 @@
 using ArcadeLearningEnvironment
-# using CGP
+using CGP
 using Logging
 using Images
+
 
 function play_qbert()
     game = Game("qbert")
@@ -29,18 +30,45 @@ function play_qbert()
     reward
 end
 
-function f_indmax(x::Array)
-    i = indmax(x)
-    if ndims(i) > 1
-        i = ind2sub(x, i)
+function random_breakout_expert(nin::Int64, nout::Int64)
+    # TODO: debug / rewrite without segmentation
+    c = HPCGPChromo(nin, nout)
+    pos = sort!(rand(15))
+    c.genes[1] = pos[1]
+    for out in nin+(1:nout)
+        c.genes[out] = pos[15]
     end
-    i ./ size(x)
-end
-
-f_indmax(x::Array, y::Array) = f_indmax(x)
-
-function f_com(x::Array)
-    # TODO: get coordinates of center of mass of array
+    c.genes[nin+4] = pos[13]
+    c.genes[nin+5] = pos[14]
+    CGP.set_genes!(c, nin+1, [
+        pos[2], rand(), rand(), CGP.Config.func2f(CGP.Config.f_const), 0.6])
+    CGP.set_genes!(c, nin+2, [
+        pos[3], rand(), rand(), CGP.Config.func2f(CGP.Config.f_const), 0.8])
+    CGP.set_genes!(c, nin+3, [
+        pos[4], pos[1], rand(), CGP.Config.func2f(CGP.Config.f_felzenszwalb), 0.8])
+    CGP.set_genes!(c, nin+4, [
+        pos[5], pos[4], pos[2], CGP.Config.func2f(CGP.Config.f_gt), rand()])
+    CGP.set_genes!(c, nin+5, [
+        pos[6], pos[4], pos[3], CGP.Config.func2f(CGP.Config.f_lt), rand()])
+    CGP.set_genes!(c, nin+6, [
+        pos[7], pos[4], pos[3], CGP.Config.func2f(CGP.Config.f_gt), rand()])
+    CGP.set_genes!(c, nin+7, [
+        pos[8], pos[5], pos[6], CGP.Config.func2f(CGP.Config.f_and), rand()])
+    CGP.set_genes!(c, nin+8, [
+        pos[9], pos[7], rand(), CGP.Config.func2f(CGP.Config.f_com), rand()])
+    CGP.set_genes!(c, nin+9, [
+        pos[10], pos[8], rand(), CGP.Config.func2f(CGP.Config.f_com), rand()])
+    CGP.set_genes!(c, nin+10, [
+        pos[11], pos[9], rand(), CGP.Config.func2f(CGP.Config.f_last), rand()])
+    CGP.set_genes!(c, nin+11, [
+        pos[12], pos[10], rand(), CGP.Config.func2f(CGP.Config.f_last), rand()])
+    CGP.set_genes!(c, nin+12, [
+        pos[13], pos[11], pos[12], CGP.Config.func2f(CGP.Config.f_gt), rand()])
+    CGP.set_genes!(c, nin+13, [
+        pos[14], pos[11], pos[12], CGP.Config.func2f(CGP.Config.f_lt), rand()])
+    CGP.set_genes!(c, nin+14, [
+        pos[15], rand(), rand(), CGP.Config.func2f(CGP.Config.f_zeros), rand()])
+    HPCGPChromo(c.genes, nin, nout)
 end
 
 function get_breakout_action(inputs::Array{Float64})
@@ -53,15 +81,10 @@ function get_breakout_action(inputs::Array{Float64})
         bullet_pos = mean(map(x->ind2sub(bullet_box, x)[2], bullet_poses))
         slider_pos = mean(map(x->ind2sub(slider_box, x)[2], slider_poses))
         if bullet_pos < slider_pos
-            action = game.actions[5]
+            action = 5
         else
-            action = game.actions[4]
+            action = 4
         end
-    end
-    if f_indmax(bullet_box) < f_indmax(slider_box)
-        action = 5
-    else
-        action = 4
     end
     action
 end
@@ -88,7 +111,6 @@ function play_breakout()
     close!(game)
     reward
 end
-
 
 # ACTION_MEANING = {
 #     0 : "NOOP",
