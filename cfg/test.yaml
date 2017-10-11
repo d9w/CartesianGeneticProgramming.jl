@@ -13,24 +13,24 @@ delete_node_rate: 0.5
 add_mutation_rate: 0.3
 delete_mutation_rate: 0.3
 # Oneplus settings
-oneplus_num_generations: 200
+oneplus_num_generations: 100
 oneplus_population_size: 5
 # CGP NEAT settings
 neat_speciation_thresh: 0.02
-neat_population: 20
+neat_population: 25
 neat_num_generations: 20
-neat_init_species: 4
+neat_init_species: 5
 neat_crossover_rate: 0.25
 neat_mutation_rate: 0.65
 # GA settings
-ga_population: 20
+ga_population: 25
 ga_num_generations: 20
 ga_elitism_rate: 0.1
 ga_crossover_rate: 0.25
 ga_mutation_rate: 0.5
 # CMAES settings
 cmaes_population: 5
-cmaes_stopeval: 1000
+cmaes_stopeval: 500
 # Test functions
 functions:
   f_sum:

@@ -3,7 +3,7 @@ using CGP
 CGP.Config.init("cfg/test.yaml")
 
 # EAs = [oneplus, cgpneat, GA, cmaes]
-EAs = [GA]
+EAs = [oneplus]
 # CTYPES = [CGPChromo, PCGPChromo, HPCGPChromo, EIPCGPChromo, MTPCGPChromo]
 CTYPES = [HPCGPChromo]
 
@@ -57,13 +57,12 @@ end
     using Colors
     function find_the_mandrill(c::Chromosome, inps::Array{Array{Float64,2},1},
                                outs::Array{Float64})
-        # CGP.Config.init("cfg/mtcgp.yaml")
         resout = 0
-        for i=1:5
+        for i=1:3
             perm = randperm(length(inps))
             inps = inps[perm]; outs = outs[perm]
             output = process(c, inps)
-            resout += sum([(output[i] - outs[i])^2 for i in 1:5])
+            resout += sum([(output[i] - outs[i])^2 for i in 1:3])
         end
         -resout
     end
@@ -73,14 +72,14 @@ end
             @testset "$ea $ct" begin
                 mandrill = Float64.(Gray.(testimage("mandrill")))
                 mandrill /= maximum(mandrill)
-                inps = [rand(size(mandrill)) for i in 1:5]
-                outs = zeros(5)
-                correct = rand(1:5)
+                inps = [rand(size(mandrill)) for i in 1:3]
+                outs = zeros(3)
+                correct = rand(1:3)
                 inps[correct] = mandrill
                 outs[correct] = 1.0
-                randc = ct(5, 5)
+                randc = ct(3, 3)
                 randfit = find_the_mandrill(randc, inps, outs)
-                max_fit, genes = ea(ct, 5, 5, c->find_the_mandrill(c, inps, outs))
+                max_fit, genes = ea(ct, 3, 3, c->find_the_mandrill(c, inps, outs))
                 @test max_fit > randfit
             end
         end
