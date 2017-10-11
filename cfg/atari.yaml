@@ -1,9 +1,24 @@
 functions:
   # list processing
+  f_split_before:
+    - "x"
+    - "if length(x) > 1; return x[1:f2ind(x, (c+1)/2.0)]; else; return x; end"
+  f_split_after:
+    - "x"
+    - "if length(x) > 1; return x[f2ind(x, (c+1)/2.0):end]; else; return x; end"
+  f_range_in:
+    - "x"
+    - "range_in(x, (y+1)/2.0, (c+1)/2.0)"
+  f_index_y:
+    - "x"
+    - "index_in(x, (y+1)/2.0)"
+  f_index_c:
+    - "x"
+    - "index_in(x, (c+1)/2.0)"
   f_vectorize:
     - "x"
     - "x[:]"
-  f_head:
+  f_first:
     - "x"
     - "x[1]"
   f_last:
@@ -39,6 +54,9 @@ functions:
   f_sum:
     - "x"
     - "scaled(sum(x))"
+  f_transpose:
+    - "x"
+    - "if ndims(x) < 3; return Array{Float64}(ctranspose(x)); else; return x; end"
   # mathematical
   f_add:
     - "(x+y)/2.0"
@@ -63,10 +81,8 @@ functions:
     - "abs.(x)"
   f_sqrt:
     - "sqrt.(abs.(x))"
-  f_squared:
-    - "x.^2"
   f_cpow:
-    - "abs.(x).^abs(c)"
+    - "abs.(x).^(c+1.0)"
   f_ypow:
     - "abs(x)^abs(y)"
     - "abs.(x).^abs.(y)"
@@ -133,9 +149,6 @@ functions:
   f_mean:
     - "x"
     - "mean(x)"
-  f_median:
-    - "x"
-    - "median(x)"
   f_range:
     - "x"
     - "maximum(x)-minimum(x)-1.0"
@@ -174,6 +187,9 @@ functions:
   f_constvectord:
     - "c"
     - "c.*ones(size(x))"
-  f_emptyvectord:
+  f_zeros:
     - "0.0"
     - "zeros(size(x))"
+  f_ones:
+    - "1.0"
+    - "ones(size(x))"

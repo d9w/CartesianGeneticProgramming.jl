@@ -22,17 +22,43 @@ function scaled(x::Array{Float64})
     min.(max.(x, -1.0), 1.0)
 end
 
+function f2ind(list::Array{Float64}, index::Float64)
+    # index must be in [0, 1]
+    Int64(floor(index*(length(list)-1)))+1
+end
+
+function func2f(f::Function)
+    findfirst(CGP.Config.functions .== f) / length(CGP.Config.functions)
+end
+
+function f2ind(list::Array{Float64}, index::Array{Float64})
+    # index must be in [0, 1]
+    Int64.(floor.(index.*(length(list)-1)))+1
+end
+
 function index_in(list::Array{Float64}, index::Float64)
-    list[Int64(floor(abs(index)*(length(list)-1)))+1]
+    list[f2ind(list, index)]
 end
 
 function index_in(list::Array{Float64}, index::Array{Float64})
     index_in(list, mean(index))
 end
 
+#TODO: n-dimensional square indexing
+
+function segmentation(x::Array{Float64}, p::Float64, f::Function)
+    if ndims(x) == 2
+        segments = f(x, p)
+        return segments.image_indexmap / maximum(segments.segment_labels)
+    else
+        return x
+    end
+end
+
 function range_in(list::Array{Float64}, xi::Float64, yi::Float64)
+    # TODO: multi-dimensional
     bounds = [min(xi, yi), max(xi, yi)]
-    bounds = Int64.(floor.(abs.(bounds)).*(length(list)-1)+1)
+    bounds = f2ind(list, abs.(bounds))
     if bounds[1] == bounds[2]
         return 0.0
     end
@@ -41,6 +67,25 @@ end
 
 function range_in(list::Array{Float64}, xi::Array{Float64}, yi::Float64)
     range_in(list, mean(xi), yi)
+end
+
+function scaled_indmax(x::Array{Float64})
+    scaled(collect((ind2sub(x, indmax(x)) .- 1) ./ (size(x) .- 1)))
+end
+
+scaled_indmax(x::Array{Float64}, y::Array{Float64}) = scaled_indmax(x)
+
+function com(x::Array{Float64})
+    # TODO: speed up
+    com = Tuple(zeros(ndims(x)))
+    sx = sum(x.+1)
+    if sx > 0
+        for i in eachindex(x)
+            com = com .+ ((x[i]+1) .* (ind2sub(x, i) .- 1 .- ((size(x) .- 1)./2)))
+        end
+        com = com ./ sx
+    end
+    scaled(collect((com .+ (size(x) .- 1) ./ 2) ./ (size(x) .- 1)))
 end
 
 function minsize(x::Array{Float64}, y::Array{Float64})
