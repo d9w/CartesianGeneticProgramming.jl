@@ -16,7 +16,7 @@ function play_atari(c::Chromosome, game::Game, display::Bool, frame_dir::String)
         if lives(game.ale) < life
             life = lives(game.ale)*1.0
         else
-            output = process(c, [get_inputs(game)])
+            output = process(c, get_rgb(game))
             action = game.actions[indmax(output)]
         end
         for i in 1:4
@@ -62,7 +62,7 @@ Logging.info("I: $seed $ea $ctype $game_name")
 srand(seed)
 
 game = Game(game_name)
-nin = 1
+nin = 3 # r g b
 nout = length(game.actions)
 fit = x->play_atari(x, game, false, frame_dir)
 record = x->play_and_draw(x, game, true, frame_dir)
