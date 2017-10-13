@@ -2,6 +2,8 @@
 num_nodes: 100
 node_inputs: 2
 save_best: True
+mutate_method: ":mixed_node_mutate"
+crossover_method: ":output_graph_crossover"
 # Mutation
 gene_mutation_rate: 0.1
 input_mutation_rate: 0.1

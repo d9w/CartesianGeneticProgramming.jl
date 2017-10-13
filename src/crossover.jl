@@ -154,6 +154,5 @@ function subgraph_crossover(c1::Chromosome, c2::Chromosome)
 end
 
 function crossover(c1::Chromosome, c2::Chromosome)
-    # TODO: read from Config
-    subgraph_crossover(c1, c2)
+    eval(parse(string(Config.crossover_method)))(c1, c2)
 end

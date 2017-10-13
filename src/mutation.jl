@@ -127,6 +127,5 @@ function mixed_node_mutate(c::Chromosome)
 end
 
 function mutate(c::Chromosome)
-    # eval(parse(string(Config.mutate_method, "_mutate")))(c)
-    mutate_genes(c)
+    eval(parse(string(Config.mutate_method)))(c)
 end
