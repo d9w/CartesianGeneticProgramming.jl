@@ -18,7 +18,7 @@ function random_inputs(c1::Chromosome, c2::Chromosome)
     child_inputs = zeros(c1.nin)
     parent = bitrand(c1.nin)
     child_inputs[parent] = c1.genes[1:c1.nin][parent]
-    child_inputs[~parent] = c2.genes[1:c1.nin][~parent]
+    child_inputs[.~parent] = c2.genes[1:c1.nin][.~parent]
     child_inputs
 end
 
@@ -27,8 +27,8 @@ function random_outputs(c1::Chromosome, c2::Chromosome)
     # not a full crossover operator
     child_outputs = zeros(c1.nout)
     parent = bitrand(c1.nout)
-    child_outputs[parent] = c1.genes[(c1.nin+1):c1.nout][parent]
-    child_outputs[~parent] = c2.genes[(c1.nin+1):c1.nout][~parent]
+    child_outputs[parent] = c1.genes[c1.nin+(1:c1.nout)][parent]
+    child_outputs[.~parent] = c2.genes[c1.nin+(1:c1.nout)][.~parent]
     child_outputs
 end
 
@@ -48,15 +48,15 @@ function aligned_node_crossover(c1::Chromosome, c2::Chromosome)
     p2_pos = get_positions(c2)
     min_nodes = min(length(c1.nodes)-c1.nin, length(c2.nodes)-c2.nin)
     p1_inds = c1.nin + collect(1:min_nodes)
-    p1_nodes = []
-    p2_nodes = []
+    p1_nodes = Array{Int64}(0)
+    p2_nodes = Array{Int64}(0)
     for node in c1.nin+(1:min_nodes)
         if rand() < 0.5
-            i = indmin(c1.nin + collect(1:min_nodes)abs.(p1_pos[p1_inds] - p2_pos[node]))
-            append!(p1_nodes, p1_inds[i])
+            i = indmin(abs.(p1_pos[p1_inds] - p2_pos[node]))
+            append!(p1_nodes, [p1_inds[i]])
             p1_inds = deleteat!(p1_inds, i)
         else
-            append!(p2_nodes, node)
+            append!(p2_nodes, [node])
         end
     end
     genes = [random_inputs(c1, c2); random_outputs(c1, c2); get_genes(
@@ -67,15 +67,44 @@ end
 function output_graph_crossover(c1::Chromosome, c2::Chromosome)
     # split outputs equally between parents, then construct a child from their
     # corresponding input graphs
-    child_outputs = zeros(c1.nout)
-    parent = bitrand(c1.nout)
-    child_outputs[parent] = c1.genes[(c1.nin+1):c1.nout][parent]
-    child_outputs[~parent] = c2.genes[(c1.nin+1):c1.nout][~parent]
-    child_outputs
-    p1_nodes = get_output_trace(c1, (1:c1.nout)[parent])
-    p2_nodes = get_output_trace(c2, (1:c1.nout)[~parent])
-    genes = [random_inputs(c1, c2); random_outputs(c1, c2); get_genes(
-        c1, p1_nodes); get_genes(c2, p2_nodes)]
+    p1_nodes = Array{Int64}(0)
+    p2_nodes = Array{Int64}(0)
+    output_genes = Array{Float64}(0)
+    for output in 1:c1.nout
+        if rand() < 0.5
+            append!(p1_nodes, get_output_trace(c1, output))
+            append!(output_genes, [c1.genes[c1.nin+output]])
+        else
+            append!(p2_nodes, get_output_trace(c2, output))
+            append!(output_genes, [c2.genes[c2.nin+output]])
+        end
+    end
+    p1_nodes = sort!(unique(p1_nodes))
+    p2_nodes = sort!(unique(p2_nodes))
+    input_genes = Array{Float64}(0)
+    # take inputs from either parent trace, if they are in the parent traces
+    for input in 1:c1.nin
+        gene = c1.genes[input]
+        if contains(==, p1_nodes, input)
+            if contains(==, p2_nodes, input)
+                if rand() < 0.5
+                    gene = c2.genes[input]
+                end
+            end
+        else
+            if contains(==, p2_nodes, input)
+                gene = c2.genes[input]
+            else
+                if rand() < 0.5
+                    gene = c2.genes[input]
+                end
+            end
+        end
+        append!(input_genes, [gene])
+    end
+    p1_nodes = p1_nodes[p1_nodes .> c1.nin]
+    p2_nodes = p2_nodes[p2_nodes .> c1.nin]
+    genes = [input_genes; output_genes; get_genes(c1, p1_nodes); get_genes(c2, p2_nodes)]
     typeof(c1)(genes, c1.nin, c1.nout)
 end
 

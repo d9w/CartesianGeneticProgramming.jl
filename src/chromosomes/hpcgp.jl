@@ -21,7 +21,7 @@ function HPCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::HPCGPChrom
     outputs = snap(genes[nin+(1:nout)], positions)
     f = Config.functions[Int64.(ceil.(rgenes[:, 4]*length(Config.functions)))]
     functions = [[x->x[i] for i in 1:nin];f]
-    params = [zeros(nin); rgenes[:, 5]]
+    params = [zeros(nin); 2.0*rgenes[:, 5]-1.0]
     active = find_active(nin, outputs, connections)
     for i in 1:(nin+num_nodes)
         nodes[i] = CGPNode(connections[:, i], functions[i], active[i], params[i])

@@ -4,7 +4,8 @@ export Chromosome,
     get_genes,
     clone,
     distance,
-    forward_connections
+    forward_connections,
+    get_output_trace
 
 # abstract type Chromosome end
 abstract Chromosome
@@ -88,6 +89,12 @@ function find_active(outputs::Array{Int64}, connections::Array{Int64})::BitArray
     active
 end
 
+function reset!(c::Chromosome)
+    for n in c.nodes
+        n.output = 0.0
+    end
+end
+
 function get_positions(c::Chromosome)
     # TODO: write for all chromosomes
     num_nodes = Int64(ceil((length(c.genes)-c.nin-c.nout)/node_genes(c)))
@@ -103,17 +110,34 @@ function distance(c1::Chromosome, c2::Chromosome)
     abs(mean(pc1) - mean(pc2))
 end
 
-function get_output_trace(c::Chromosome, output::Int64)
+function recur_output_trace(c::Chromosome, ind::Int64, visited::Array{Int64})
+    if ~contains(==, visited, ind)
+        append!(visited, [ind])
+        if (ind > c.nin) && (c.nodes[ind].f != Config.f_input)
+            for i in c.nodes[ind].connections
+                recur_output_trace(c, i, visited)
+            end
+        end
+    end
+    visited
+end
+
+function get_output_trace(c::Chromosome, output_ind::Int64)
     # similar to decode, just return a list of node indices that determine the output
-    []
+    recur_output_trace(c, c.outputs[output_ind], Array{Int64}(0))
 end
 
 function get_output_trace(c::Chromosome, outputs::Array{Int64})
-    if length(output) > 0
+    if length(outputs) > 0
         return unique(reduce(vcat, map(x->get_output_trace(c, x), outputs)))
     else
         return Array{Int64}(0)
     end
+end
+
+function get_output_trace(c::Chromosome)
+    # same as indexing over active nodes
+    get_output_trace(c, collect(1:c.nout))
 end
 
 function node_genes(c::Chromosome)
