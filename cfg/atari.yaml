@@ -116,26 +116,6 @@ functions:
     - "Float64.(x.>y)"
     - "Float64.(x.>y)"
     - "Float64.(.>(eqsize(x,y,c)...))"
-  f_not:
-    - "Float64(~Bool(round(abs(x))))"
-    - "Float64(~Bool(round(abs(x))))"
-    - "Float64.(.~(BitArray(round.(abs.(x)))))"
-    - "Float64.(.~(BitArray(round.(abs.(x)))))"
-  f_and:
-    - "Float64(Bool(round(abs(x)))&Bool(round(abs(y))))"
-    - "Float64.(Bool(round(abs(x))).&BitArray(round.(abs.(y))))"
-    - "Float64.(BitArray(round.(abs.(x))).&Bool(round(abs(y))))"
-    - "Float64.(BitArray(round.(abs.(eqsize(x,y,c)[1]))).&BitArray(round.(abs.(eqsize(x,y,c)[2]))))"
-  f_or:
-    - "Float64(Bool(round(abs(x)))|Bool(round(abs(y))))"
-    - "Float64.(Bool(round(abs(x))).|BitArray(round.(abs.(y))))"
-    - "Float64.(BitArray(round.(abs.(x))).|Bool(round(abs(y))))"
-    - "Float64.(BitArray(round.(abs.(eqsize(x,y,c)[1]))).|BitArray(round.(abs.(eqsize(x,y,c)[2]))))"
-  f_xor:
-    - "Float64(xor(Bool(round(abs(x))), Bool(round(abs(y)))))"
-    - "Float64.(xor.(Bool(round(abs(x))), BitArray(round.(abs.(y)))))"
-    - "Float64.(xor.(BitArray(round.(abs.(x))), Bool(round(abs(y)))))"
-    - "Float64.(xor.(map(i->BitArray(round.(abs.(i))), eqsize(x,y,c))...))"
   # Statistical
   f_standarddeviation:
     - "0.0"
