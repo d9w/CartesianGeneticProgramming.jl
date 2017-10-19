@@ -39,7 +39,7 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
                 eval_count += 1
                 if fit > max_fit
                     max_fit = fit
-                    best = population[p]
+                    best = clone(population[p])
                     new_best = true
                 end
             end
