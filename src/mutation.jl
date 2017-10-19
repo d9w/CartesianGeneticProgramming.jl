@@ -73,6 +73,9 @@ end
 
 function add_subtree(c::Chromosome)
     # Add a connected subtree
+    if node_genes(c) == 4
+        return add_nodes(c::Chromosome)
+    end
     n_adds = Int64(round(length(c.nodes) * Config.add_node_rate))
     genes = rand(n_adds, node_genes(c))
     pos_set = [rand(get_positions(c), n_adds); genes[:, 1]]

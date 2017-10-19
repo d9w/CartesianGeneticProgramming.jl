@@ -28,6 +28,7 @@ Logging.configure(level=INFO)
             end
         end
     end
+    append!(functions, [f_input])
     function reset()
         empty!(functions)
     end
@@ -36,13 +37,13 @@ Logging.configure(level=INFO)
     end
 
 include("chromosome.jl")
+include("distance.jl")
 include("mutation.jl")
 include("crossover.jl")
 include("chromosomes/cgp.jl")
+include("chromosomes/epcgp.jl")
+include("chromosomes/rcgp.jl")
 include("chromosomes/pcgp.jl")
-include("chromosomes/hpcgp.jl")
-include("chromosomes/eipcgp.jl")
-include("chromosomes/mtpcgp.jl")
 include("EAs/oneplus.jl")
 include("EAs/cgpneat.jl")
 include("EAs/ga.jl")

@@ -3,7 +3,6 @@ export Chromosome,
     find_active,
     get_genes,
     clone,
-    distance,
     forward_connections,
     get_output_trace
 
@@ -41,15 +40,20 @@ function process(c::Chromosome, inps::Array)::Array{Float64}
         c.nodes[i].output = inps[i]
     end
     maxlength = maximum(map(length, inps))
-    for n in c.nodes
+    for i in eachindex(c.order)
+        n = c.nodes[c.order[i]]
         if n.active
-            output = CGP.Config.scaled(1.0 * n.f(c.nodes[n.connections[1]].output,
-                                                 c.nodes[n.connections[2]].output,
-                                                 n.p))
+            output = n.output
+            if n.f == Config.f_input
+                output = Config.index_in(inps, (n.p+1.0)/2.0)
+            else
+                output = CGP.Config.scaled(n.p * n.f(c.nodes[n.connections[1]].output,
+                                                     c.nodes[n.connections[2]].output,
+                                                     n.p))
+            end
             if length(output) == 0
                 output = 0.0
-            end
-            if length(output) > maxlength
+            elseif length(output) > maxlength
                 output = output[1:maxlength]
             end
             n.output = output
@@ -96,18 +100,7 @@ function reset!(c::Chromosome)
 end
 
 function get_positions(c::Chromosome)
-    # TODO: write for all chromosomes
-    num_nodes = Int64(ceil((length(c.genes)-c.nin-c.nout)/node_genes(c)))
-    rgenes = reshape(genes[(c.nin+c.nout+1):end], (node_genes(c), num_nodes))'
-    [c.genes[1:c.nin]; rgenes[:, 1]]
-end
-
-function distance(c1::Chromosome, c2::Chromosome)
-    # position distance measure
-    # TODO: use a behavioral distance in speciation
-    pc1 = get_positions(c1)
-    pc2 = get_positions(c2)
-    abs(mean(pc1) - mean(pc2))
+    error("Must be implemented in subclass")
 end
 
 function recur_output_trace(c::Chromosome, ind::Int64, visited::Array{Int64})
@@ -141,21 +134,13 @@ function get_output_trace(c::Chromosome)
 end
 
 function node_genes(c::Chromosome)
-    # TODO: write for all chromosomes
-    5
+    # number of genes per node (position, x, y, f, param)
+    error("Must be implemented in subclass")
 end
 
 function get_genes(c::Chromosome, node_id::Int64)
-    # TODO: write for all chromosomes
     c.genes[(c.nin+c.nout)+((node_id-1-c.nin)*node_genes(c))+(1:node_genes(c))]
 end
-#     if node_id <= c.nin
-#         return [c.genes[c.nin]]
-#     end
-#     num_nodes = Int64(ceil((length(c.genes)-c.nin-c.nout)/node_genes(c)))
-#     rgenes = reshape(c.genes[(c.nin+c.nout+1):end], (node_genes(c), num_nodes))
-#     rgenes[:, node_id-c.nin]
-# end
 
 function get_genes(c::Chromosome, nodes::Array{Int64})
     if length(nodes) > 0
