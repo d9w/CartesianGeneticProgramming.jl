@@ -1,6 +1,7 @@
 export single_point_crossover,
     random_node_crossover,
     aligned_node_crossover,
+    proportional_crossover,
     output_graph_crossover,
     subgraph_crossover,
     crossover
@@ -61,6 +62,23 @@ function aligned_node_crossover(c1::Chromosome, c2::Chromosome)
     end
     genes = [random_inputs(c1, c2); random_outputs(c1, c2); get_genes(
         c1, p1_nodes); get_genes(c2, p2_nodes)]
+    typeof(c1)(genes, c1.nin, c1.nout)
+end
+
+function proportional_crossover(c1::Chromosome, c2::Chromosome)
+    genes = Array{Float64}(0)
+    if length(c1.genes) == length(c2.genes)
+        r = rand(length(c1.genes))
+        genes = ((1 .- r) .* c1.genes) .+ (r .* c2.genes)
+    elseif length(c1.genes) > length(c2.genes)
+        r = rand(length(c2.genes))
+        genes = ((1 .- r) .* c1.genes[1:length(c2.genes)]) .+ (r .* c2.genes)
+        genes = [genes; c1.genes[(length(c2.genes)+1):end]]
+    else
+        r = rand(length(c1.genes))
+        genes = ((1 .- r) .* c1.genes) .+ (r .* c2.genes[1:length(c1.genes)])
+        genes = [genes; c2.genes[(length(c1.genes)+1):end]]
+    end
     typeof(c1)(genes, c1.nin, c1.nout)
 end
 
