@@ -46,6 +46,6 @@ function node_genes(c::RCGPChromo)
     4
 end
 
-function get_positions(c::Chromosome)
+function get_positions(c::RCGPChromo)
     collect(1:(length(c.nodes)))/length(c.nodes)
 end
