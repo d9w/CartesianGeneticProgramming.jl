@@ -2,21 +2,42 @@ using Base.Test
 using CGP
 CGP.Config.init("cfg/test.yaml")
 
-EAs = [oneplus, cgpneat, GA, cmaes]
+# EAs = [oneplus, cgpneat, GA, cmaes]
+EAs = [oneplus, cgpneat, GA]
 CTYPES = [CGPChromo, EPCGPChromo, RCGPChromo, PCGPChromo]
+mutations = [mutate_genes, mixed_subtree_mutate, mixed_node_mutate]
+crossovers = [single_point_crossover, random_node_crossover, aligned_node_crossover,
+              proportional_crossover, output_graph_crossover, subgraph_crossover]
+distances = [positional_distance, genetic_distance, functional_distance]
 
 @testset "Simple fit" begin
     function simple_fit(c::Chromosome)
         process(c, [1.0])[1]
     end
     for ea in EAs
+        dists = distances[:]
+        crosses = crossovers[:]
+        if ea!=cgpneat
+            dists = distances[1:1]
+        end
+        if ea!=GA
+            crosses = crossovers[1:1]
+        end
         for ct in CTYPES
-            println(ea, ", ", ct)
-            @testset "$ea $ct" begin
-                max_fit, genes = ea(ct, 1, 1, simple_fit)
-                @test max_fit == 1.0
-                c = ct(genes, 1, 1)
-                @test process(c, [1.0])[1] == 1.0
+            for mut in mutations
+                for cross in crosses
+                    for dist in dists
+                        println(ea, ", ", ct, ", ", mut, ", ", cross, ", ", dist)
+                        @testset "$ea $ct $mut $cross $dist" begin
+                            max_fit, genes = ea(ct, 1, 1, simple_fit;
+                                                f_mutate=mut, f_crossover=cross,
+                                                f_distance=dist)
+                            @test max_fit == 1.0
+                            c = ct(genes, 1, 1)
+                            @test process(c, [1.0])[1] == 1.0
+                        end
+                    end
+                end
             end
         end
     end

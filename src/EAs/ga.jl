@@ -7,8 +7,10 @@ function selection(fits::Array{Float64}, n::Int64=3)
     fshuffle[winner]
 end
 
-function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
-            record_best::Bool, record_fitness::Function)
+function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
+            record_best::Bool=false, record_fitness::Function=fitness,
+            f_mutate::Function=mutate, f_crossover::Function=crossover,
+            kwargs...)
     population = Array{ctype}(Config.ga_population)
     fits = -Inf*ones(Float64, Config.ga_population)
     population = [ctype(nin, nout) for i in 1:Config.ga_population]
@@ -45,15 +47,17 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
             end
         end
 
-        if new_best
+        if new_best || ((10 * generation / Config.ga_num_generations) % 1 == 0.0)
             refit = max_fit
             if record_best
                 refit = record_fitness(best)
             end
-            Logging.info(@sprintf("R: %d %0.2f %0.2f %0.2f %d %0.2f",
+            Logging.info(@sprintf("R: %d %0.2f %0.2f %0.2f %d %d %0.2f %s %s",
                                   eval_count, max_fit, refit, mean(fits),
+                                  sum([n.active for n in best.nodes]),
                                   length(best.nodes),
-                                  mean(map(x->length(x.nodes), population))))
+                                  mean(map(x->length(x.nodes), population)),
+                                  string(f_mutate), string(f_crossover)))
             if Config.save_best
                 Logging.info(@sprintf("C: %s", string(best.genes)))
             end
@@ -79,14 +83,14 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
         for i in 1:ncross
             p1 = population[selection(fits)]
             p2 = population[selection(fits)]
-            new_pop[popi] = crossover(p1, p2)
+            new_pop[popi] = f_crossover(p1, p2)
             popi += 1
         end
 
         # mutation
         for i in 1:nmutate
             parent = population[selection(fits)]
-            new_pop[popi] = mutate(parent)
+            new_pop[popi] = f_mutate(parent)
             popi += 1
         end
 
@@ -104,8 +108,4 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
     end
 
     max_fit, best.genes
-end
-
-function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
-    GA(ctype, nin, nout, fitness, false, fitness)
 end

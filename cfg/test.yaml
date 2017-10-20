@@ -10,8 +10,8 @@ input_mutation_rate: 0.5
 output_mutation_rate: 0.5
 node_mutation_rate: 0.5
 mutation_method: :simple
-add_node_rate: 0.5
-delete_node_rate: 0.5
+add_node_rate: 0.1
+delete_node_rate: 0.1
 add_mutation_rate: 0.3
 delete_mutation_rate: 0.3
 # Oneplus settings

@@ -76,7 +76,7 @@ function add_subtree(c::Chromosome)
     if node_genes(c) == 4
         return add_nodes(c::Chromosome)
     end
-    n_adds = Int64(round(length(c.nodes) * Config.add_node_rate))
+    n_adds = Int64(floor(length(c.nodes) * Config.add_node_rate)) + 1
     genes = rand(n_adds, node_genes(c))
     pos_set = [rand(get_positions(c), n_adds); genes[:, 1]]
     genes[:, 3] = rand(pos_set, n_adds)
@@ -95,7 +95,6 @@ function delete_subtree(c::Chromosome)
         end
     end
     conns = forward_connections(c)
-    conns = conns[map(x->length(x)>1, conns)]
     shuffle!(conns)
     deletes = conns[1][conns[1] .> c.nin]
     if length(deletes) > n_dels

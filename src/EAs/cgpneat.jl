@@ -12,13 +12,13 @@ function species_selection(fits::Array{Float64})
     end
 end
 
-function speciation(population::Array, reprs::Array)
+function speciation(population::Array, reprs::Array, f_distance::Function)
     # return a vector of ints corresponding to the species of each individual in population
     species = Array{Int64}(length(population))
     for p in eachindex(population)
         distances = Array{Float64}(length(reprs))
         for r in eachindex(reprs)
-            distances[r] = distance(population[p], reprs[r])
+            distances[r] = f_distance(population[p], reprs[r])
         end
         # distances = [distance(population[p], reprs[r]) for r in eachindex(reprs)]
         if minimum(distances) < Config.neat_speciation_thresh
@@ -55,8 +55,10 @@ function species_sizes(fits::Array{Float64}, species::Array{Int64})
 end
 
 
-function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
-                 record_best::Bool, record_fitness::Function)
+function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
+                 record_best::Bool=false, record_fitness::Function=fitness,
+                 f_mutate::Function=mutate, f_crossover::Function=crossover,
+                 f_distance::Function=distance, kwargs...)
     population = Array{ctype}(Config.neat_population)
     fits = -Inf*ones(Float64, Config.neat_population)
     species = Array{Int64}(Config.neat_population)
@@ -66,7 +68,7 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
             species[p] = p
         else
             repr = rand(1:Config.neat_init_species)
-            population[p] = mutate(population[repr])
+            population[p] = f_mutate(population[repr])
             species[p] = repr
         end
     end
@@ -91,15 +93,18 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
             end
         end
 
-        if new_best
+        if new_best || ((10 * generation / Config.neat_num_generations) % 1 == 0.0)
             refit = max_fit
             if record_best
                 refit = record_fitness(best)
             end
-            Logging.info(@sprintf("R: %d %0.2f %0.2f %0.2f %d %0.2f",
+            Logging.info(@sprintf("R: %d %0.2f %0.2f %0.2f %d %d %0.2f %s %s %s %d",
                                   eval_count, max_fit, refit, mean(fits),
+                                  sum([n.active for n in best.nodes]),
                                   length(best.nodes),
-                                  mean(map(x->length(x.nodes), population))))
+                                  mean(map(x->length(x.nodes), population)),
+                                  string(f_mutate), string(f_crossover),
+                                  string(f_distance), length(unique(species))))
             if Config.save_best
                 Logging.info(@sprintf("C: %s", string(best.genes)))
             end
@@ -143,7 +148,7 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
             for i in 1:ncross
                 p1 = spec[species_selection(sfits)]
                 p2 = spec[species_selection(sfits)]
-                new_pop[popi] = crossover(p1, p2)
+                new_pop[popi] = f_crossover(p1, p2)
                 popi += 1
             end
 
@@ -151,7 +156,7 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
             Logging.debug("Mutation $s popi: $popi, nmut: $nmut")
             for i in 1:nmut
                 parent = spec[species_selection(sfits)]
-                new_pop[popi] = mutate(parent)
+                new_pop[popi] = f_mutate(parent)
                 popi += 1
             end
 
@@ -165,15 +170,11 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
         end
 
         Logging.debug("variable set $generation")
-        species = speciation(new_pop, reprs)
+        species = speciation(new_pop, reprs, f_distance)
         population = new_pop
         fits = new_fits
         Logging.debug("done $generation")
     end
 
     max_fit, best.genes
-end
-
-function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
-    cgpneat(ctype, nin, nout, fitness, false, fitness)
 end
