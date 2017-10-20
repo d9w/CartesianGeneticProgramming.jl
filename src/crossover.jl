@@ -19,7 +19,7 @@ function random_inputs(c1::Chromosome, c2::Chromosome)
     child_inputs = zeros(c1.nin)
     parent = bitrand(c1.nin)
     child_inputs[parent] = c1.genes[1:c1.nin][parent]
-    child_inputs[.~parent] = c2.genes[1:c1.nin][.~parent]
+    child_inputs[~parent] = c2.genes[1:c1.nin][~parent]
     child_inputs
 end
 
@@ -29,7 +29,7 @@ function random_outputs(c1::Chromosome, c2::Chromosome)
     child_outputs = zeros(c1.nout)
     parent = bitrand(c1.nout)
     child_outputs[parent] = c1.genes[c1.nin+(1:c1.nout)][parent]
-    child_outputs[.~parent] = c2.genes[c1.nin+(1:c1.nout)][.~parent]
+    child_outputs[~parent] = c2.genes[c1.nin+(1:c1.nout)][~parent]
     child_outputs
 end
 

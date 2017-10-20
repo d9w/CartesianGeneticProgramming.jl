@@ -1,15 +1,9 @@
 #!/bin/sh
 CGP=/users/p16043/wilson/CGP.jl
-DATA=/tmpdir/wilson/data/julia
-
-EA=cgpneat
-WORK_DIR=/tmpdir/wilson/dennis/$SLURM_JOB_ID/$SLURM_TASK_PID
-CTYPES=(CGPChromo PCGPChromo HPCGPChromo EIPCGPChromo MTPCGPChromo)
+WORK_DIR=/tmpdir/wilson/dennis/$SLURM_JOB_ID
+DATA_DIR=/tmpdir/wilson/data/julia
 
 mkdir -p $WORK_DIR
 cd $CGP
 
-for c in ${CTYPES[@]}
-do
-    julia experiments/atari.jl $SLURM_TASK_PID $WORK_DIR/$c.log $EA $c
-done
+julia experiments/classify.jl $SLURM_TASK_PID $DATA_DIR/cancer.dt $WORK_DIR/$SLURM_TASK_PID.log classify

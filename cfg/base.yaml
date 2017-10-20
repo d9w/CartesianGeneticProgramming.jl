@@ -1,7 +1,7 @@
 # General settings
 num_nodes: 100
 node_inputs: 2
-save_best: True
+save_best: False
 mutate_method: ":mixed_node_mutate"
 crossover_method: ":output_graph_crossover"
 # Mutation
@@ -18,7 +18,7 @@ delete_mutation_rate: 0.1
 oneplus_num_generations: 1000
 oneplus_population_size: 5
 # CGP NEAT settings
-neat_speciation_thresh: 0.02
+neat_speciation_thresh: 0.8
 neat_population: 50
 neat_num_generations: 100
 neat_init_species: 5
