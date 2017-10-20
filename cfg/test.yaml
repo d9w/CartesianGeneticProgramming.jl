@@ -18,7 +18,7 @@ delete_mutation_rate: 0.3
 oneplus_num_generations: 100
 oneplus_population_size: 5
 # CGP NEAT settings
-neat_speciation_thresh: 0.02
+neat_speciation_thresh: 0.8
 neat_population: 25
 neat_num_generations: 20
 neat_init_species: 5

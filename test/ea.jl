@@ -2,10 +2,8 @@ using Base.Test
 using CGP
 CGP.Config.init("cfg/test.yaml")
 
-# EAs = [oneplus, cgpneat, GA, cmaes]
-EAs = [oneplus]
-# CTYPES = [CGPChromo, PCGPChromo, HPCGPChromo, EIPCGPChromo, MTPCGPChromo]
-CTYPES = [HPCGPChromo]
+EAs = [oneplus, cgpneat, GA, cmaes]
+CTYPES = [CGPChromo, EPCGPChromo, RCGPChromo, PCGPChromo]
 
 @testset "Simple fit" begin
     function simple_fit(c::Chromosome)

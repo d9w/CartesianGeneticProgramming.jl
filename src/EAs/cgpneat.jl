@@ -37,7 +37,8 @@ end
 
 function species_sizes(fits::Array{Float64}, species::Array{Int64})
     nspecies = length(unique(species))
-    spec_fits = map(x->mean(fits[species.==x])+minimum(fits), 1:nspecies)
+    spec_fits = map(x->mean(fits[species.==x])-minimum(fits), 1:nspecies)
+    Logging.debug("spec fits: $spec_fits")
     spec_sizes = map(x->spec_fits[x]/sum(spec_fits), 1:nspecies)
     spec_sizes = spec_sizes./sum(spec_sizes).*Config.neat_population
     spec_sizes[isnan.(spec_sizes)] = 0
@@ -49,6 +50,7 @@ function species_sizes(fits::Array{Float64}, species::Array{Int64})
     while sum(spec_sizes) < Config.neat_population
         spec_sizes[indmin(spec_sizes)] += 1
     end
+    Logging.debug("spec sizes: $spec_sizes")
     spec_sizes
 end
 
@@ -112,15 +114,16 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
         end
 
         # species sizes
-        Logging.debug("species sizes $generation")
+        Logging.debug("species sizes $generation $nspecies")
         spec_sizes = species_sizes(fits, species)
         new_pop = Array{ctype}(Config.neat_population)
         new_fits = -Inf*ones(Float64, Config.neat_population)
         popi = 1
 
         # create new population
-        Logging.debug("new population $generation")
+        Logging.debug("new population $generation $spec_sizes")
         for s in 1:nspecies
+            Logging.debug("species $s")
             sfits = fits[species.==s]
             spec = population[species.==s]
             ncross = round(spec_sizes[s] * Config.neat_crossover_rate)
@@ -136,6 +139,7 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
             end
 
             # crossover
+            Logging.debug("Crossover $s popi: $popi, ncross: $ncross")
             for i in 1:ncross
                 p1 = spec[species_selection(sfits)]
                 p2 = spec[species_selection(sfits)]
@@ -144,6 +148,7 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
             end
 
             # mutation
+            Logging.debug("Mutation $s popi: $popi, nmut: $nmut")
             for i in 1:nmut
                 parent = spec[species_selection(sfits)]
                 new_pop[popi] = mutate(parent)
@@ -151,6 +156,7 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function,
             end
 
             # copy
+            Logging.debug("Copy $s popi: $popi, ncopy: $ncopy")
             for i in 1:ncopy
                 new_pop[popi] = clone(spec[species_selection(sfits)])
                 new_fits[popi] = fits[popi]
