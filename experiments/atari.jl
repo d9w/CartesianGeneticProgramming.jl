@@ -56,6 +56,7 @@ if length(ARGS) > 5; frame_dir = ARGS[6]; end
 
 CGP.Config.init("cfg/base.yaml")
 CGP.Config.init("cfg/atari.yaml")
+CGP.Config.init("cfg/images.yaml")
 
 Logging.configure(filename=log, level=INFO)
 Logging.info("I: $seed $ea $ctype $game_name")
@@ -66,5 +67,5 @@ nin = 3 # r g b
 nout = length(game.actions)
 fit = x->play_atari(x, game, false, frame_dir)
 record = x->play_and_draw(x, game, true, frame_dir)
-maxfit, best = ea(ctype, nin, nout, fit, true, record)
+maxfit, best = ea(ctype, nin, nout, fit; seed=seed, record_best=true, record_fitness=record)
 close!(game)
