@@ -52,13 +52,13 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
             if record_best
                 refit = record_fitness(best)
             end
-            Logging.info(@sprintf("R: %d %d %0.2f %0.2f %0.2f %d %d %0.2f %s %s %s %s %d",
+            Logging.info(@sprintf("R: %d %d %0.2f %0.2f %0.2f %d %d %0.2f %d %s %s %s %s %s",
                                   seed, eval_count, max_fit, refit, mean(fits),
                                   sum([n.active for n in best.nodes]),
                                   length(best.nodes),
-                                  mean(map(x->length(x.nodes), population)),
-                                  "GA", string(f_mutate), string(f_crossover),
-                                  "N/A", 0))
+                                  mean(map(x->length(x.nodes), population)), 0,
+                                  "GA", string(ctype), string(f_mutate),
+                                  string(f_crossover), "N/A"))
             if Config.save_best
                 Logging.info(@sprintf("C: %s", string(best.genes)))
             end
