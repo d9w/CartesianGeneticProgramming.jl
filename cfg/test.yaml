@@ -1,5 +1,6 @@
 # General settings
 num_nodes: 20
+node_size_cap: 200
 node_inputs: 2
 save_best: False
 mutate_method: ":mixed_node_mutate"

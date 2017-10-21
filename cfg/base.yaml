@@ -1,5 +1,6 @@
 # General settings
 num_nodes: 100
+node_size_cap: 1000
 node_inputs: 2
 save_best: False
 mutate_method: ":mixed_node_mutate"
@@ -12,8 +13,8 @@ node_mutation_rate: 0.1
 mutation_method: :simple
 add_node_rate: 0.1
 delete_node_rate: 0.1
-add_mutation_rate: 0.4
-delete_mutation_rate: 0.1
+add_mutation_rate: 0.25
+delete_mutation_rate: 0.15
 # Oneplus settings
 oneplus_num_generations: 1000
 oneplus_population_size: 5

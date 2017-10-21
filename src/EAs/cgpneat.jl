@@ -173,6 +173,14 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
         species = speciation(new_pop, reprs, f_distance)
         population = new_pop
         fits = new_fits
+
+        # size limit
+        for i in eachindex(population)
+            if length(population[i].nodes) > Config.node_size_cap
+                population[i] = ctype(nin, nout)
+                fits[i] = -Inf
+            end
+        end
         Logging.debug("done $generation")
     end
 

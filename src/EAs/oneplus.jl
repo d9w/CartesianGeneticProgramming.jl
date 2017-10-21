@@ -49,6 +49,13 @@ function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
         for p in eachindex(population)
             population[p] = f_mutate(best)
         end
+
+        # size limit
+        for i in eachindex(population)
+            if length(population[i].nodes) > Config.node_size_cap
+                population[i] = ctype(nin, nout)
+            end
+        end
     end
 
     max_fit, best.genes
