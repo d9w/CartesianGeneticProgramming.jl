@@ -10,6 +10,7 @@ files = ["cfg/test.yaml", "cfg/classic.yaml", "cfg/mtcgp.yaml", "cfg/atari.yaml"
 # files = ["cfg/classic.yaml"]
 # files = ["cfg/mtcgp.yaml"]
 # files = ["cfg/atari.yaml"]
+# files = ["cfg/images.yaml"]
 
 function test_inps(f, inps)
     out = f(inps...)

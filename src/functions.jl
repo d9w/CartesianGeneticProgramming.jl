@@ -22,13 +22,23 @@ function scaled(x::Array{Float64})
     min.(max.(x, -1.0), 1.0)
 end
 
-function f2ind(list::Array, index::Float64)
+function func2f(f::Function)
+    findfirst(CGP.Config.functions .== f) / length(CGP.Config.functions)
+end
+
+function f2ind(list::Tuple, index::Float64)
     # index must be in [0, 1]
     Int64(floor(index*(length(list)-1)))+1
 end
 
-function func2f(f::Function)
-    findfirst(CGP.Config.functions .== f) / length(CGP.Config.functions)
+function f2ind(list::Tuple, index::Array{Float64})
+    # index must be in [0, 1]
+    Int64.(floor.(index.*(length(list)-1)))+1
+end
+
+function f2ind(list::Array, index::Float64)
+    # index must be in [0, 1]
+    Int64(floor(index*(length(list)-1)))+1
 end
 
 function f2ind(list::Array, index::Array{Float64})
@@ -37,11 +47,19 @@ function f2ind(list::Array, index::Array{Float64})
 end
 
 function index_in(list::Array, index::Float64)
-    list[f2ind(list, index)]
+    list[f2ind(list, abs(index))]
 end
 
 function index_in(list::Array, index::Array{Float64})
-    index_in(list, mean(index))
+    index_in(list, mean(abs.(index)))
+end
+
+function index_in(list::Tuple, index::Float64)
+    list[f2ind(list, abs(index))]
+end
+
+function index_in(list::Tuple, index::Array{Float64})
+    index_in(list, mean(abs.(index)))
 end
 
 #TODO: n-dimensional square indexing

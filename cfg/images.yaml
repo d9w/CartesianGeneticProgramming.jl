@@ -1,10 +1,9 @@
 functions:
-  # Only verified for 1d and 2d arrays
   f_ssdn:
     - "x"
     - "x"
     - "x"
-    - "ssdn(eqsize(x,y,c)...)"
+    - "scaled(ssdn(eqsize(x,y,c)...))"
   f_cov:
     - "x"
     - "x"
@@ -35,105 +34,64 @@ functions:
     - "closing(x)"
   f_tophat:
     - "x"
-    - "tophat(x)"
+    - "scaled(tophat(x))"
   f_bothat:
     - "x"
-    - "bothat(x)"
+    - "scaled(bothat(x))"
   f_morphogradient:
     - "x"
-    - "morphogradient(x)"
+    - "scaled(morphogradient(x))"
   f_morpholaplace:
     - "x"
     - "scaled(morpholaplace(x))"
   f_integral_image:
     - "x"
     - "scaled(integral_image(x))"
-  f_deconv:
-    - "x"
-    - "x"
-    - "x"
-    - "deconv.(x[:],y[:])"
-  f_erf:
-    - "x"
-    - "scaled(erf(x))"
-  f_dawson:
-    - "x"
-    - "scaled(dawson(x))"
-  f_airyai:
-    - "x"
-    - "scaled(airyai(x))"
-  f_eta:
-    - "x"
-    - "scaled(eta(x))"
   f_circshift:
     - "x"
-    - "circshift(x,shifts(y))"
-  f_imresize:
-    - "x"
-    - "imresize(x, Tuple(Int64.(round(mean(y)*[size(x)...]))))"
-  f_imresize:
-    - "x"
-    - "imresize(x, Tuple(Int64.(round(c*[size(x)...]))))"
-  f_canny:
-    - "x"
-    - "Float64.(canny(x))"
+    - "circshift(x, round((c+1.0)*length(x)/2.0))"
   f_xcorr:
     - "x"
     - "x"
     - "x"
-    - "scaled(xcorr(eqsize(x,y,c)...))"
+    - "scaled(xcorr(map(x->vec(x), eqsize(x,y,c))...))"
   f_imfilter:
     - "x"
     - "x"
-    - "scaled(imfilter(x, centered(x))"
-    - "scaled(imfilter(x, centered(x))"
-  f_fastcorners:
-    - "x"
-    - "scaled(Float64.(fastcorners(img)))"
+    - "scaled(imfilter(x, centered(x)))"
+    - "scaled(imfilter(x, centered(x)))"
   f_sobel_filter:
     - "x"
-    - "scaled(imfilter(x,KernelFactors.sobel((true,true,true),axis(y/c))))"
+    - "if ndims(x)==2; return scaled(imfilter(x,KernelFactors.sobel((true,true),2))); else; return x; end"
   f_prewitt_filter:
     - "x"
-    - "scaled(imfilter(x,KernelFactors.prewitt((true,true,true),axis(y/c))))"
+    - "if ndims(x)==2; return scaled(imfilter(x,KernelFactors.prewitt((true,true),2))); else; return x; end"
   f_ando3_filter:
     - "x"
-    - "scaled(imfilter(x,KernelFactors.ando3((true,true,true),axis(y/c))))"
-  f_gaussian_filter:
-    - "x"
-    - "scaled(imfilter(x,KernelFactors.gaussian(mean(y))))"
-  f_dog_filter:
-    - "x"
-    - "scaled(imfilter(x,Kernel.DoG(mean(y))))"
-  f_log_filter:
-    - "x"
-    - "scaled(imfilter(x,Kernel.LoG(mean(y))))"
-  f_laplacian_filter:
-    - "x"
-    - "scaled(imfilter(x,Kernel.Laplacian((true,true))))"
+    - "if ndims(x)==2; return scaled(imfilter(x,KernelFactors.ando3((true,true),2))); else; return x; end"
   f_sobel_gradient:
     - "x"
-    - scaled(imgradients(x, "sobel")[y/c])
+    - "scaled(index_in(imgradients(x, KernelFactors.sobel), (c+1.0)/2.0))"
   f_prewitt_gradient:
     - "x"
-    - scaled(imgradients(x, "prewitt")[y/c])
+    - "scaled(index_in(imgradients(x, KernelFactors.prewitt), (c+1.0)/2.0))"
   f_ando3_gradient:
     - "x"
-    - scaled(imgradients(x, "ando3")[y/c])
+    - "scaled(index_in(imgradients(x, KernelFactors.ando3), (c+1.0)/2.0))"
   f_sobel_edge:
     - "x"
-    - imedge(x, "sobel")[3]
+    - "if ndims(x)==2; return scaled(index_in(imedge(x, KernelFactors.sobel), (c+1.0)/2.0)); else; return x; end"
   f_prewitt_edge:
     - "x"
-    - imedge(x, "prewitt")[3]
+    - "if ndims(x)==2; return scaled(index_in(imedge(x, KernelFactors.prewitt), (c+1.0)/2.0)); else; return x; end"
   f_ando3_edge:
     - "x"
-    - imedge(x, "ando3")[3]
+    - "if ndims(x)==2; return scaled(index_in(imedge(x, KernelFactors.ando3), (c+1.0)/2.0)); else; return x; end"
   f_sadn:
     - "x"
     - "x"
     - "x"
-    - "sadn(eqsize(x,y,c)...)"
+    - "scaled(sadn(eqsize(x,y,c)...))"
   f_fftshift:
     - "x"
     - "fftshift(x)"
@@ -158,9 +116,18 @@ functions:
   f_indmax:
     - "x"
     - "scaled_indmax(x)"
-  f_com:
-    - "x"
-    - "com(x)"
   f_felzenszwalb:
     - "x"
-    - "segmentation(x, 5000*c, felzenszwalb)"
+    - "segmentation(x, 2000*(c+1), felzenszwalb)"
+  # f_fastcorners:
+  #   - "x"
+  #   - "scaled(Float64.(fastcorners(x)))"
+  # f_gaussian_filter:
+  #   - "x"
+  #   - "scaled(imfilter(x,KernelFactors.gaussian(mean(abs.(y)))))"
+  # f_laplacian_filter:
+  #   - "x"
+  #   - "scaled(imfilter(x,Kernel.Laplacian((true,true))))"
+  # f_imresize:
+  #   - "x"
+  #   - "if (ndims(x) == 2 && all(size(x) .> 1)); return imresize(x, Tuple(Int64.(ceil.(((c+1.0)/2.0).*[size(x)...])))); else; return x; end"
