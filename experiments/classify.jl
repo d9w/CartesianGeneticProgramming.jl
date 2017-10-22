@@ -30,7 +30,7 @@ function regression(c::Chromosome, data::Array{Float64}, nin::Int64, nout::Int64
     for d in 1:nsamples
         outputs = process(c, data[1:nin, d])
         for p in eachindex(outputs)
-            error += (outputs[p] - data[d, nin+p])^2
+            error += (outputs[p] - data[nin+p, d])^2
         end
     end
     error /= nsamples
