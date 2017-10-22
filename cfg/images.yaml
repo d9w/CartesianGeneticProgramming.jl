@@ -50,6 +50,18 @@ functions:
   f_circshift:
     - "x"
     - "circshift(x, round((c+1.0)*length(x)/2.0))"
+  f_shift_up:
+    - "x"
+    - "circshift(x, -round((c+1.0)*size(x,1)/2.0))"
+  f_shift_down:
+    - "x"
+    - "circshift(x, round((c+1.0)*size(x,2)/2.0))"
+  f_shift_left:
+    - "x"
+    - "if ndims(x)==2; return circshift(x, (0, -round((c+1.0)*size(x,2)/2.0))); else; return x; end"
+  f_shift_right:
+    - "x"
+    - "if ndims(x)==2; return circshift(x, (0, round((c+1.0)*size(x,2)/2.0))); else; return x; end"
   f_xcorr:
     - "x"
     - "x"
