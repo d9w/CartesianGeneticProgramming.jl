@@ -19,7 +19,6 @@ function cart_pole(c::Chromosome)
         # get action
         inps = [-1.0; max.(min.(state ./ limits, 1.0), -1.0)[:]]
         action = indmax(process(c, inps))
-        # action = indmax(rand(2))
         force = force_mag * (2 * (action - 1) - 1)
         reward += 1
 
@@ -42,18 +41,21 @@ function mountain_car(c::Chromosome)
     min_x = -1.2; max_x = 0.6; max_v = 0.07
     goal_position = 0.45; power = 0.0015
     steps = 0
-
-    x = -0.6 + 0.2 * randn(); v = 0.0
+    x = -0.6 + 0.2 * rand(); v = 0.0
+    best_x = x
     while ((x <= goal_position) && (steps < 100))
         inps = [0.0, 0.0, 2*((x-min_x)/(max_x-min_x))-1.0, v / max_v, 0.0]
         force = process(c, inps)[1]
-        # force = 2*rand() - 1.0
-        v = min(max(v + force * power - 0.0025 * cos(3 * x), max_v), max_v)
+        v = min(max(v + force * power - 0.0025 * cos(3 * x), -max_v), max_v)
         x = min(max(x + v, min_x), max_x)
+        if (x == min_x) && (v < 0)
+            v = 0
+        end
         steps += 1
+        best_x = max(best_x, x)
         # println(steps, " ", inps, " ", force, " ", x, " ", v, " ")
     end
-    (100-steps)/90
+    min(best_x / goal_position, 1.0)
 end
 
 function pendulum(c::Chromosome)
@@ -65,11 +67,8 @@ function pendulum(c::Chromosome)
 
     cost = 0.0; steps = 0;
     while steps < 100
-        u = 2 * rand() - 1.0
         inps = [1.0, cos(th), sin(th), thdot / max_speed, 0.0]
-        # u = max_torque * process(c, inps)[2]
-        # u = 0.0
-        u = max_torque * (2*rand() - 1.0)
+        u = max_torque * process(c, inps)[2]
 
         angle = (((th+pi) % (2*pi)) - pi)
         cost -= angle^2 + (.1*thdot)^2 + 0.001*(u^2)
@@ -93,10 +92,10 @@ end
 
 function repeat(c::Chromosome, func::Function)
     score = 0
-    for i = 1:100
+    for i = 1:10
         score += func(c)
     end
-    score/100
+    score/10
 end
 
 seed = 0
@@ -106,9 +105,9 @@ if length(ARGS) > 0; seed = parse(Int64, ARGS[1]); end
 if length(ARGS) > 1; log = ARGS[2]; end
 if length(ARGS) > 2; fitness = ARGS[3]; end
 
-# CGP.Config.init("cfg/base.yaml")
-# CGP.Config.init("cfg/classic.yaml")
-CGP.Config.init("cfg/test.yaml")
+CGP.Config.init("cfg/base.yaml")
+CGP.Config.init("cfg/classic.yaml")
+# CGP.Config.init("cfg/test.yaml")
 
 Logging.configure(filename=log, level=INFO)
 # nin = inputs[fitness]; nout = outputs[fitness]
