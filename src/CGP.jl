@@ -54,4 +54,11 @@ include("EAs/cgpneat.jl")
 include("EAs/ga.jl")
 include("EAs/cmaes.jl")
 
+EAs = [oneplus, cgpneat, GA]
+CTYPES = [CGPChromo, EPCGPChromo, RCGPChromo, PCGPChromo]
+mutations = [mutate_genes, mixed_subtree_mutate, mixed_node_mutate]
+crossovers = [single_point_crossover, random_node_crossover, aligned_node_crossover,
+              proportional_crossover, output_graph_crossover, subgraph_crossover]
+distances = [positional_distance, genetic_distance, functional_distance]
+
 end
