@@ -50,28 +50,21 @@ if length(ARGS) > 3; fitness = eval(parse(ARGS[4])); end
 # CGP.Config.init("cfg/classic.yaml")
 CGP.Config.init("cfg/test.yaml")
 
-EAs = [oneplus, cgpneat, GA]
-CTYPES = [CGPChromo, EPCGPChromo, RCGPChromo, PCGPChromo]
-mutations = [mutate_genes, mixed_subtree_mutate, mixed_node_mutate]
-crossovers = [single_point_crossover, random_node_crossover, aligned_node_crossover,
-              proportional_crossover, output_graph_crossover, subgraph_crossover]
-distances = [positional_distance, genetic_distance, functional_distance]
-
 Logging.configure(filename=log, level=INFO)
 nin, nout, train, test = read_data(dfile)
 fit = x->fitness(x, train, nin, nout)
 
-for ea in EAs
-    dists = distances[:]
-    crosses = crossovers[:]
+for ea in CGP.EAs
+    dists = CGP.distances[:]
+    crosses = CGP.crossovers[:]
     if ea!=cgpneat
-        dists = distances[1:1]
+        dists = CGP.distances[1:1]
     end
-    if ea!=GA
-        crosses = crossovers[1:1]
+    if ea==oneplus
+        crosses = CGP.crossovers[1:1]
     end
-    for ct in CTYPES
-        for mut in mutations
+    for ct in CGP.CTYPES
+        for mut in CGP.mutations
             for cross in crosses
                 for dist in dists
                     srand(seed)

@@ -39,7 +39,7 @@ function idf(ea::String, chromosome::String, mutation::String, crossover::String
              distance::String)::Int64
     id = 1e4 * findfirst(["oneplus", "NEAT", "GA"] .== ea)
     id += 1e3 * findfirst(["CGP.CGPChromo", "CGP.EPCGPChromo", "CGP.RCGPChromo",
-                           "CGP.PCGPChromo"] .== chromosome)
+                           "CGP.PCGPChromo", "CGP.RPCGPChromo"] .== chromosome)
     id += 1e2 * findfirst(["CGP.mutate_genes", "CGP.mixed_node_mutate",
                            "CGP.mixed_subtree_mutate"] .== mutation)
     id += 1e1 * findfirst(["N/A", "CGP.single_point_crossover",

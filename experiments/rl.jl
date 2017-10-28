@@ -120,7 +120,7 @@ for ea in CGP.EAs
     if ea!=cgpneat
         dists = CGP.distances[1:1]
     end
-    if ea!=GA
+    if ea==oneplus
         crosses = CGP.crossovers[1:1]
     end
     for ct in CGP.CTYPES
