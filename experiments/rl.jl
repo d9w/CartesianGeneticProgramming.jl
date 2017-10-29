@@ -55,7 +55,7 @@ function mountain_car(c::Chromosome)
         best_x = max(best_x, x)
         # println(steps, " ", inps, " ", force, " ", x, " ", v, " ")
     end
-    min(best_x / goal_position, 1.0)
+    min(max(best_x / goal_position, 0.0), 1.0)
 end
 
 function pendulum(c::Chromosome)
