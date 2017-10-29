@@ -15,8 +15,8 @@ function CGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::CGPChromo
     rgenes = reshape(genes[(nin+nout+1):end], (4, num_nodes))'
     connections = Array{Int64}(2, nin+num_nodes)
     connections[:, 1:nin] = zeros(2, nin)
-    positions = collect(linspace(0.0, 1.0, nin+num_nodes))
-    fc = hcat(zeros(2, nin), [rgenes[:, 2]'; rgenes[:, 3]'])
+    positions = collect(1:(nin+num_nodes))/(1.0*(nin+num_nodes))
+    fc = deepcopy(hcat(zeros(2, nin), [rgenes[:, 2]'; rgenes[:, 3]']))
     for i in nin:length(positions)
         i_factor = Int64(floor((length(positions)-(i-1))*Config.recurrency))+(i-1)
         fc[:, i] .*= positions[i_factor]
@@ -24,8 +24,7 @@ function CGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::CGPChromo
     connections = snap(fc, positions)
     functions = Array{Function}(nin+num_nodes)
     functions[1:nin] = Config.f_input
-    functions[(nin+1):end] = Config.functions[(
-        Int64.(ceil.(rgenes[:, 3]*length(Config.functions))))]
+    functions[(nin+1):end] = map(i->Config.index_in(Config.functions, i), rgenes[:, 3])
     outputs = Int64.(ceil.(genes[nin+(1:nout)]*(nin+num_nodes)))
     active = find_active(nin, outputs, connections)
     params = [zeros(nin); 2.0*rgenes[:, 4]-1.0]
@@ -49,5 +48,5 @@ function node_genes(c::CGPChromo)
 end
 
 function get_positions(c::CGPChromo)
-    collect(linspace(0.0, 1.0, length(c.nodes)))
+    collect(1:length(c.nodes))/(1.0*length(c.nodes))
 end

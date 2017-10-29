@@ -5,6 +5,7 @@ node_inputs: 2
 save_best: False
 mutate_method: ":mixed_node_mutate"
 crossover_method: ":output_graph_crossover"
+distance_method: ":genetic_distance"
 recurrency: 1.0
 # Mutation
 input_mutation_rate: 0.5
@@ -17,19 +18,15 @@ delete_mutation_rate: 0.3
 # Oneplus settings
 oneplus_num_generations: 100
 oneplus_population_size: 5
-# CGP NEAT settings
-neat_speciation_thresh: 0.8
-neat_population: 25
-neat_num_generations: 20
-neat_init_species: 5
-neat_crossover_rate: 0.25
-neat_mutation_rate: 0.65
 # GA settings
 ga_population: 25
 ga_num_generations: 20
 ga_elitism_rate: 0.1
 ga_crossover_rate: 0.25
 ga_mutation_rate: 0.5
+# Speciation settings
+speciation_thresh: 0.8
+init_species: 5
 # CMAES settings
 cmaes_population: 5
 cmaes_stopeval: 500

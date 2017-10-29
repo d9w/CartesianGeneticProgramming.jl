@@ -1,8 +1,7 @@
 export oneplus
 
 function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
-                 seed::Int64=0, record_best::Bool=false, record_fitness::Function=fitness,
-                 f_mutate::Function=mutate, kwargs...)
+                 seed::Int64=0, record_best::Bool=false, record_fitness::Function=fitness)
     population = Array{ctype}(Config.oneplus_population_size)
     for i in eachindex(population)
         population[i] = ctype(nin, nout)
@@ -34,13 +33,12 @@ function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
             if record_best
                 refit = record_fitness(best)
             end
-            Logging.info(@sprintf("R: %d %d %0.5f %0.5f %0.5f %d %d %0.2f %d %s %s %s %s %s",
-                                  seed, eval_count, max_fit, refit, mfit,
+            Logging.info(@sprintf("R: %d %d %0.5f %d %d %s %s %s",
+                                  seed, eval_count, max_fit,
                                   sum([n.active for n in best.nodes]),
                                   length(best.nodes),
-                                  mean(map(x->length(x.nodes), population)), 0,
-                                  "oneplus", string(ctype), string(f_mutate),
-                                  "N/A", "N/A"))
+                                  "oneplus", string(ctype),
+                                  Config.to_string()))
             if Config.save_best
                 Logging.info(@sprintf("C: %s", string(best.genes)))
             end
@@ -48,7 +46,7 @@ function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
 
         # selection
         for p in eachindex(population)
-            population[p] = f_mutate(best)
+            population[p] = mutate(best)
         end
 
         # size limit

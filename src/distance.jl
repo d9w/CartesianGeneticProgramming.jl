@@ -46,5 +46,5 @@ function functional_distance(c1::Chromosome, c2::Chromosome)
 end
 
 function distance(c1::Chromosome, c2::Chromosome)
-    genetic_distance(c1, c2)
+    eval(parse(string(Config.distance_method)))(c1, c2)
 end

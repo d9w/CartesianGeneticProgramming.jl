@@ -7,7 +7,7 @@ using Logging
 using PaddedViews
 using Distributions
 
-Logging.configure(level=DEBUG)
+Logging.configure(level=INFO)
 
     module Config
     using Images
@@ -36,6 +36,15 @@ Logging.configure(level=DEBUG)
         empty!(functions)
     end
 
+    function to_string()
+        @sprintf(
+        "%s %s %s %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f",
+            string(mutate_method), string(crossover_method), string(distance_method),
+            recurrency, input_mutation_rate, output_mutation_rate, node_mutation_rate,
+            add_node_rate, delete_node_rate, add_mutation_rate, delete_mutation_rate,
+            speciation_thresh, ga_elitism_rate, ga_crossover_rate, ga_mutation_rate)
+    end
+
     export init, reset
     end
 
@@ -51,10 +60,10 @@ include("EAs/ga.jl")
 include("EAs/cmaes.jl")
 
 EAs = [oneplus, cgpneat, GA]
-CTYPES = [CGPChromo, PCGPChromo]
-mutations = [gene_mutate, mixed_subtree_mutate, mixed_node_mutate]
-crossovers = [single_point_crossover, random_node_crossover, aligned_node_crossover,
-              proportional_crossover, output_graph_crossover, subgraph_crossover]
-distances = [positional_distance, genetic_distance, functional_distance]
+chromosomes = [CGPChromo, PCGPChromo]
+mutations = [:gene_mutate, :mixed_subtree_mutate, :mixed_node_mutate]
+crossovers = [:single_point_crossover, :random_node_crossover, :aligned_node_crossover,
+              :proportional_crossover, :output_graph_crossover, :subgraph_crossover]
+distances = [:positional_distance, :genetic_distance, :functional_distance]
 
 end
