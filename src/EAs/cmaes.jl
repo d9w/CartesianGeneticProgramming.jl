@@ -129,7 +129,8 @@ function pure_cmaes(objFun::Function, pinit::Array{Float64}, sigma::Array{Float6
             if arfitness[k] < min_fit
                 min_fit = arfitness[k]
                 xbest = deepcopy(arx[:,k])
-                Logging.info(@sprintf("CMAES: %d %0.2f %s", counteval, -min_fit, string(xbest)))
+                Logging.info(@sprintf("CMAES: %d %0.4f %s", counteval, -min_fit,
+                                      string(mod.(xbest, 1.0))))
             end
         end
 

@@ -54,35 +54,5 @@ Logging.configure(filename=log, level=INFO)
 nin, nout, train, test = read_data(dfile)
 fit = x->fitness(x, train, nin, nout)
 
-function run_config(cfg::Array{Float64})
-    cfg = mod.(cfg, 1.0)
-    ea = CGP.Config.index_in(CGP.EAs, cfg[1])
-    ctype = CGP.Config.index_in(CGP.chromosomes, cfg[2])
-    mut = CGP.Config.index_in(CGP.mutations, cfg[3])
-    cross = CGP.Config.index_in(CGP.crossovers, cfg[4])
-    dist = CGP.Config.index_in(CGP.distances, cfg[5])
-    CGP.Config.init(Dict("mutate_method" => string("\"", mut, "\""),
-                         "crossover_method" => string("\"", cross, "\""),
-                         "distance_method" => string("\"", dist, "\""),
-                         "recurrency" => cfg[6],
-                         "input_mutation_rate" => cfg[7],
-                         "output_mutation_rate" => cfg[8],
-                         "node_mutation_rate" => cfg[9],
-                         "add_node_rate" => cfg[10],
-                         "delete_node_rate" => cfg[11],
-                         "add_mutation_rate" => cfg[12],
-                         "delete_mutation_rate" => cfg[13],
-                         "speciation_thresh" => cfg[14],
-                         "ga_elitism_rate" => cfg[15],
-                         "ga_crossover_rate" => cfg[16],
-                         "ga_mutation_rate" => cfg[17]))
-    maxfit = Inf
-    try
-        maxfit, best = ea(ctype, nin, nout, fit)
-    catch
-        Logging.info("Error: $ea $ctype $mut $cross $dist")
-    end
-    -maxfit
-end
-
-pure_cmaes(run_config, 0.01*randn(17), 0.1*ones(17); lambda = 10, stopeval = 500)
+include("param_sweep.jl")
+param_sweep()

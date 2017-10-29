@@ -20,11 +20,17 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
     ncross = Int64(round(Config.ga_population * Config.ga_crossover_rate))
     nmutate = Int64(round(Config.ga_population * Config.ga_mutation_rate))
     if (nelite + ncross + nmutate) > Config.ga_population
+        rates = [Config.ga_elitism_rate, Config.ga_crossover_rate, Config.ga_mutation_rate]
+        norm_rates = rates ./ sum(rates)
+        nelite = Int64(floor(Config.ga_population * norm_rates[1]))
+        ncross = Int64(floor(Config.ga_population * norm_rates[2]))
         nmutate = Config.ga_population - (nelite + ncross)
         ncopy = 0
     else
         ncopy = Config.ga_population - (nelite + ncross + nmutate)
     end
+
+    @assert (nelite + ncross + nmutate + ncopy) == Config.ga_population
 
     Logging.debug(@sprintf("population: %d %d %d %d", nelite, ncross, nmutate, ncopy))
 
