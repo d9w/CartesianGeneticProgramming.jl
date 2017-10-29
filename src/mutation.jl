@@ -2,10 +2,7 @@
 # chromosomes, but assuming a [input, output, node1, node2, ...] gene structure
 # when necessary. Some chromosomes will need to override these functions.
 
-export mutate_genes,
-    mutate_nodes,
-    mutate_inputs,
-    mutate_outputs,
+export gene_mutate,
     add_nodes,
     delete_nodes,
     add_subtree,
@@ -14,34 +11,14 @@ export mutate_genes,
     mixed_node_mutate,
     mutate
 
-function mutate_genes(c::Chromosome)
-    # Mutate the entire genome uniformly
-    genes = deepcopy(c.genes)
-    mutations = rand(size(genes)) .< Config.gene_mutation_rate
-    genes[mutations] = rand(sum(mutations))
-    typeof(c)(genes, c.nin, c.nout)
-end
-
-function mutate_inputs(c::Chromosome)
-    # Mutate just input genes
+function gene_mutate(c::Chromosome)
+    # Mutate inputs, outputs, and node genes according to parameter probabilities
     genes = deepcopy(c.genes)
     mutations = [rand(c.nin) .< Config.input_mutation_rate; falses(length(genes) - c.nin)]
     genes[mutations] = rand(sum(mutations))
-    typeof(c)(genes, c.nin, c.nout)
-end
-
-function mutate_outputs(c::Chromosome)
-    # Mutate just output genes
-    genes = deepcopy(c.genes)
     mutations = [falses(c.nin); rand(c.nout) .< Config.input_mutation_rate;
                  falses(length(genes) - c.nin - c.nout)]
     genes[mutations] = rand(sum(mutations))
-    typeof(c)(genes, c.nin, c.nout)
-end
-
-function mutate_nodes(c::Chromosome)
-    # Mutate just intermediate node genes
-    genes = deepcopy(c.genes)
     mutations = [falses(c.nin+c.nout); rand(
         length(genes)-c.nin-c.nout) .< Config.node_mutation_rate]
     genes[mutations] = rand(sum(mutations))
@@ -107,17 +84,14 @@ end
 
 function mixed_mutate(c::Chromosome, add_f::Function, del_f::Function)
     # always mutate inputs and outputs
-    child = mutate_inputs(c)
-    child = mutate_outputs(child)
     method = rand()
     if method < Config.add_mutation_rate
-        child = add_f(child)
+        return add_f(c)
     elseif method < (Config.add_mutation_rate + Config.delete_mutation_rate)
-        child = del_f(child)
+        return del_f(c)
     else
-        child = mutate_nodes(child)
+        return gene_mutate(c)
     end
-    child
 end
 
 function mixed_subtree_mutate(c::Chromosome)

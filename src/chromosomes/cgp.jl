@@ -6,7 +6,6 @@ type CGPChromo <: Chromosome
     genes::Array{Float64}
     nodes::Array{CGPNode}
     outputs::Array{Int64}
-    order::Array{Int64}
     nin::Int64
     nout::Int64
 end
@@ -16,9 +15,13 @@ function CGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::CGPChromo
     rgenes = reshape(genes[(nin+nout+1):end], (4, num_nodes))'
     connections = Array{Int64}(2, nin+num_nodes)
     connections[:, 1:nin] = zeros(2, nin)
-    for i in 1:num_nodes
-        connections[:, nin+i] = Int64.(ceil.(rgenes[i, 1:2]*(nin+i-1)))
+    positions = collect(linspace(0.0, 1.0, nin+num_nodes))
+    fc = hcat(zeros(2, nin), [rgenes[:, 2]'; rgenes[:, 3]'])
+    for i in nin:length(positions)
+        i_factor = Int64(floor((length(positions)-(i-1))*Config.recurrency))+(i-1)
+        fc[:, i] .*= positions[i_factor]
     end
+    connections = snap(fc, positions)
     functions = Array{Function}(nin+num_nodes)
     functions[1:nin] = Config.f_input
     functions[(nin+1):end] = Config.functions[(
@@ -30,8 +33,7 @@ function CGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::CGPChromo
     for i in 1:(nin+num_nodes)
         nodes[i] = CGPNode(connections[:, i], functions[i], active[i], params[i])
     end
-    order = collect(1:length(nodes))
-    CGPChromo(genes, nodes, outputs, order, nin, nout)
+    CGPChromo(genes, nodes, outputs, nin, nout)
 end
 
 function CGPChromo(nin::Int64, nout::Int64)::CGPChromo
@@ -39,7 +41,7 @@ function CGPChromo(nin::Int64, nout::Int64)::CGPChromo
 end
 
 function CGPChromo(c::CGPChromo)::CGPChromo
-    mutate_genes(c)
+    gene_mutate(c)
 end
 
 function node_genes(c::CGPChromo)
@@ -47,5 +49,5 @@ function node_genes(c::CGPChromo)
 end
 
 function get_positions(c::CGPChromo)
-    collect(1:(length(c.nodes)))/length(c.nodes)
+    collect(linspace(0.0, 1.0, length(c.nodes)))
 end

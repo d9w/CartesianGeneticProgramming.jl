@@ -40,8 +40,7 @@ function process(c::Chromosome, inps::Array)::Array{Float64}
         c.nodes[i].output = inps[i]
     end
     maxlength = maximum(map(length, inps))
-    for i in eachindex(c.order)
-        n = c.nodes[c.order[i]]
+    for n in c.nodes
         if n.active
             output = n.output
             if n.f == Config.f_input

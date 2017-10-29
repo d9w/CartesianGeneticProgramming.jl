@@ -2,7 +2,7 @@ using Base.Test
 using CGP
 CGP.Config.init("cfg/test.yaml")
 
-CTYPES = [CGPChromo, EPCGPChromo, RCGPChromo, PCGPChromo]
+CTYPES = [CGPChromo, PCGPChromo]
 
 @testset "Creation tests" begin
     for ct in CTYPES
@@ -21,7 +21,6 @@ CTYPES = [CGPChromo, EPCGPChromo, RCGPChromo, PCGPChromo]
             d = ct(newgenes, nin, nout)
             @test c != d
             @test c.genes != d.genes
-            @test d.genes == newgenes
         end
         @testset "Gene equality $ct" begin
             for i=1:10
@@ -66,7 +65,7 @@ end
             test_mutate(c, child)
         end
         @testset "Mutate genes $ct" begin
-            child = mutate_genes(c)
+            child = gene_mutate(c)
             test_mutate(c, child)
             @test length(child.genes) == length(c.genes)
         end
@@ -128,8 +127,8 @@ function test_crossover(p1::Chromosome, p2::Chromosome, child::Chromosome)
       @test length(intersect([n.p for n in p2.nodes], [n.p for n in child.nodes])) > 0
       @test length(intersect([n.f for n in p1.nodes], [n.f for n in child.nodes])) > 0
       @test length(intersect([n.f for n in p2.nodes], [n.f for n in child.nodes])) > 0
-      @test length(intersect(forward_connections(p1), forward_connections(child))) > 0
-      @test length(intersect(forward_connections(p2), forward_connections(child))) > 0
+      # @test length(intersect(forward_connections(p1), forward_connections(child))) > 0
+      # @test length(intersect(forward_connections(p2), forward_connections(child))) > 0
       # @test length(intersect(get_output_trace(p1), get_output_trace(child))) > 0
       # @test length(intersect(get_output_trace(p2), get_output_trace(child))) > 0
 end

@@ -1,4 +1,4 @@
-export cmaes
+export cmaes, pure_cmaes
 
 function cmaes(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
     randcgp = ctype(nin, nout)

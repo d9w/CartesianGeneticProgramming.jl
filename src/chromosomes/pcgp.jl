@@ -6,7 +6,6 @@ type PCGPChromo <: Chromosome
     genes::Array{Float64}
     nodes::Array{CGPNode}
     outputs::Array{Int64}
-    order::Array{Int64}
     nin::Int64
     nout::Int64
 end
@@ -14,12 +13,15 @@ end
 function PCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::PCGPChromo
     num_nodes = Int64(ceil((length(genes)-nin-nout)/5))
     nodes = Array{CGPNode}(nin+num_nodes)
-    rgenes = reshape(genes[(nin+nout+1):end], (5, num_nodes))'
-    positions = [genes[1:nin]; rgenes[:, 1]]
-    order = collect(1:length(positions))
-    sort!(order, by=i->positions[i])
-    fc = [rgenes[:, 2]'; rgenes[:, 3]']
-    connections = [zeros(Int64, 2, nin) snap(fc, positions)]
+    rgenes = reshape(genes[(nin+nout+1):end], (5, num_nodes))
+    rgenes = sortcols(rgenes)'
+    positions = [-genes[1:nin]; rgenes[:, 1]]
+    fc = hcat(zeros(2, nin), [rgenes[:, 2]'; rgenes[:, 3]'])
+    for i in nin:length(positions)
+        i_factor = Int64(floor((length(positions)-(i-1))*Config.recurrency))+(i-1)
+        fc[:, i] = positions[i_factor].*fc[:,i] .+ fc[:,i] .- 1
+    end
+    connections = snap(fc, positions)
     outputs = snap(genes[nin+(1:nout)], positions)
     f = Config.functions[Int64.(ceil.(rgenes[:, 4]*length(Config.functions)))]
     functions = [[x->x[i] for i in 1:nin];f]
@@ -28,7 +30,7 @@ function PCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::PCGPChromo
     for i in 1:(nin+num_nodes)
         nodes[i] = CGPNode(connections[:, i], functions[i], active[i], params[i])
     end
-    PCGPChromo(genes, nodes, outputs, order, nin, nout)
+    PCGPChromo([genes[1:(nin+nout)]; rgenes'[:]], nodes, outputs, nin, nout)
 end
 
 function PCGPChromo(nin::Int64, nout::Int64)::PCGPChromo
@@ -36,7 +38,7 @@ function PCGPChromo(nin::Int64, nout::Int64)::PCGPChromo
 end
 
 function PCGPChromo(c::PCGPChromo)::PCGPChromo
-    mutate_genes(c)
+    gene_mutate(c)
 end
 
 function node_genes(c::PCGPChromo)
@@ -44,5 +46,5 @@ function node_genes(c::PCGPChromo)
 end
 
 function get_positions(c::PCGPChromo)
-    [c.genes[1:c.nin]; c.genes[(c.nin+c.nout+1):5:end]]
+    [-c.genes[1:c.nin]; c.genes[(c.nin+c.nout+1):5:end]]
 end

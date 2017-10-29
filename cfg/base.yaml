@@ -5,12 +5,11 @@ node_inputs: 2
 save_best: False
 mutate_method: ":mixed_node_mutate"
 crossover_method: ":output_graph_crossover"
+recurrency: 0.0
 # Mutation
-gene_mutation_rate: 0.1
 input_mutation_rate: 0.1
 output_mutation_rate: 0.1
 node_mutation_rate: 0.1
-mutation_method: :simple
 add_node_rate: 0.1
 delete_node_rate: 0.1
 add_mutation_rate: 0.25

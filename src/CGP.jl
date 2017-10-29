@@ -19,19 +19,17 @@ Logging.configure(level=DEBUG)
     using Distributions
     include("functions.jl")
     functions = []
-    function init(file::String)
-        config = YAML.load_file(file)
+    function init(config::Dict)
         for k in keys(config)
             if k == "functions"
                 append!(functions, load_functions(config["functions"]))
             else
-                if isdefined(Config, parse(k))
-                    debug("Loading $file: $k is already defined, skipping")
-                else
-                    eval(parse(string("const ", k, "=", config[k])))
-                end
+                eval(parse(string(k, "=", config[k])))
             end
         end
+    end
+    function init(file::String)
+        init(YAML.load_file(file))
     end
     append!(functions, [f_input])
     function reset()
@@ -46,18 +44,15 @@ include("distance.jl")
 include("mutation.jl")
 include("crossover.jl")
 include("chromosomes/cgp.jl")
-include("chromosomes/epcgp.jl")
-include("chromosomes/rcgp.jl")
 include("chromosomes/pcgp.jl")
-include("chromosomes/rpcgp.jl")
 include("EAs/oneplus.jl")
 include("EAs/cgpneat.jl")
 include("EAs/ga.jl")
 include("EAs/cmaes.jl")
 
 EAs = [oneplus, cgpneat, GA]
-CTYPES = [CGPChromo, EPCGPChromo, RCGPChromo, PCGPChromo, RPCGPChromo]
-mutations = [mutate_genes, mixed_subtree_mutate, mixed_node_mutate]
+CTYPES = [CGPChromo, PCGPChromo]
+mutations = [gene_mutate, mixed_subtree_mutate, mixed_node_mutate]
 crossovers = [single_point_crossover, random_node_crossover, aligned_node_crossover,
               proportional_crossover, output_graph_crossover, subgraph_crossover]
 distances = [positional_distance, genetic_distance, functional_distance]
