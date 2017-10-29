@@ -140,6 +140,10 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
                 ncopy = spec_sizes[s] - (ncross+nmut)
             end
 
+            if popi > length(new_pop)
+                break
+            end
+
             # crossover
             Logging.debug("Crossover $s popi: $popi, ncross: $ncross")
             for i in 1:ncross
@@ -147,6 +151,10 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
                 p2 = spec[species_selection(sfits)]
                 new_pop[popi] = crossover(p1, p2)
                 popi += 1
+            end
+
+            if popi > length(new_pop)
+                break
             end
 
             # mutation
@@ -157,12 +165,20 @@ function cgpneat(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
                 popi += 1
             end
 
+            if popi > length(new_pop)
+                break
+            end
+
             # copy
             Logging.debug("Copy $s popi: $popi, ncopy: $ncopy")
             for i in 1:ncopy
                 new_pop[popi] = clone(spec[species_selection(sfits)])
                 new_fits[popi] = fits[popi]
                 popi += 1
+            end
+
+            if popi > length(new_pop)
+                break
             end
         end
 
