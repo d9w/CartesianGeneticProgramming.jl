@@ -1,8 +1,8 @@
 using CGP
 using Logging
 
-# inputs = Dict("cart_pole"=>4, "mountain_car"=>2, "pendulum"=>3)
-# outputs = Dict("cart_pole"=>2, "mountain_car"=>1, "pendulum"=>1)
+inputs = Dict("cart_pole"=>4, "mountain_car"=>2, "pendulum"=>3)
+outputs = Dict("cart_pole"=>2, "mountain_car"=>1, "pendulum"=>1)
 
 function cart_pole(c::Chromosome)
     gravity = 9.81; m_cart = 1.0; m_pole = 0.1; tau = 0.02; force_mag = 10.0
@@ -92,10 +92,10 @@ end
 
 function repeat(c::Chromosome, func::Function)
     score = 0
-    for i = 1:10
+    for i = 1:5
         score += func(c)
     end
-    score/10
+    score/5
 end
 
 seed = 0
@@ -105,34 +105,43 @@ if length(ARGS) > 0; seed = parse(Int64, ARGS[1]); end
 if length(ARGS) > 1; log = ARGS[2]; end
 if length(ARGS) > 2; fitness = ARGS[3]; end
 
-CGP.Config.init("cfg/base.yaml")
-CGP.Config.init("cfg/classic.yaml")
-# CGP.Config.init("cfg/test.yaml")
+# CGP.Config.init("cfg/base.yaml")
+# CGP.Config.init("cfg/classic.yaml")
+CGP.Config.init("cfg/test.yaml")
 
 Logging.configure(filename=log, level=INFO)
-# nin = inputs[fitness]; nout = outputs[fitness]
-nin = 5; nout = 2;
+nin = inputs[fitness]; nout = outputs[fitness]
 fit = x->repeat(x, eval(parse(fitness)))
 
-for ea in CGP.EAs
-    dists = CGP.distances[:]
-    crosses = CGP.crossovers[:]
-    if ea!=cgpneat
-        dists = CGP.distances[1:1]
+function run_config(cfg::Array{Float64})
+    cfg = mod.(cfg, 1.0)
+    ea = CGP.Config.index_in(CGP.EAs, cfg[1])
+    ctype = CGP.Config.index_in(CGP.chromosomes, cfg[2])
+    mut = CGP.Config.index_in(CGP.mutations, cfg[3])
+    cross = CGP.Config.index_in(CGP.crossovers, cfg[4])
+    dist = CGP.Config.index_in(CGP.distances, cfg[5])
+    CGP.Config.init(Dict("mutate_method" => string("\"", mut, "\""),
+                         "crossover_method" => string("\"", cross, "\""),
+                         "distance_method" => string("\"", dist, "\""),
+                         "recurrency" => cfg[6],
+                         "input_mutation_rate" => cfg[7],
+                         "output_mutation_rate" => cfg[8],
+                         "node_mutation_rate" => cfg[9],
+                         "add_node_rate" => cfg[10],
+                         "delete_node_rate" => cfg[11],
+                         "add_mutation_rate" => cfg[12],
+                         "delete_mutation_rate" => cfg[13],
+                         "speciation_thresh" => cfg[14],
+                         "ga_elitism_rate" => cfg[15],
+                         "ga_crossover_rate" => cfg[16],
+                         "ga_mutation_rate" => cfg[17]))
+    maxfit = Inf
+    try
+        maxfit, best = ea(ctype, nin, nout, fit)
+    catch
+        Logging.info("Error: $ea $ctype $mut $cross $dist")
     end
-    if ea==oneplus
-        crosses = CGP.crossovers[1:1]
-    end
-    for ct in CGP.CTYPES
-        for mut in CGP.mutations
-            for cross in crosses
-                for dist in dists
-                    srand(seed)
-                    maxfit, best = ea(ct, nin, nout, fit;
-                                      f_mutate=mut, f_crossover=cross,
-                                      f_distance=dist, seed=seed)
-                end
-            end
-        end
-    end
+    -maxfit
 end
+
+pure_cmaes(run_config, 0.01*randn(17), 0.1*ones(17); lambda = 10, stopeval = 500)

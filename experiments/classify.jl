@@ -76,7 +76,12 @@ function run_config(cfg::Array{Float64})
                          "ga_elitism_rate" => cfg[15],
                          "ga_crossover_rate" => cfg[16],
                          "ga_mutation_rate" => cfg[17]))
-    maxfit, best = ea(ctype, nin, nout, fit)
+    maxfit = Inf
+    try
+        maxfit, best = ea(ctype, nin, nout, fit)
+    catch
+        Logging.info("Error: $ea $ctype $mut $cross $dist")
+    end
     -maxfit
 end
 
