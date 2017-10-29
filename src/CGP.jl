@@ -1,8 +1,5 @@
 module CGP
 
-using Images
-using ImageSegmentation
-using SpecialFunctions
 using Logging
 using PaddedViews
 using Distributions
@@ -10,9 +7,6 @@ using Distributions
 Logging.configure(level=INFO)
 
     module Config
-    using Images
-    using ImageSegmentation
-    using SpecialFunctions
     using YAML
     using Logging
     using PaddedViews
