@@ -1,6 +1,13 @@
 function get_fitness(ea::Function, ctype::DataType)
-    maxfit, best = ea(ctype, nin, nout, fit)
-    -maxfit
+    try
+        maxfit, best = ea(ctype, nin, nout, fit)
+        return -maxfit
+    catch err
+        Logging.info(@sprintf("Error: %s\nE:%s %s %s", err.msg, string(ea),
+                              string(ctype), CGP.Config.to_string()))
+        println(catch_stacktrace())
+        return Inf
+    end
 end
 
 function oneplus_config(cfg::Array{Float64}, ctype::DataType)
