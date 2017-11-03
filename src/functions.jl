@@ -26,24 +26,24 @@ function func2f(f::Function)
     findfirst(CGP.Config.functions .== f) / length(CGP.Config.functions)
 end
 
-function f2ind(list::Tuple, index::Float64)
-    # index must be in [0, 1]
-    Int64(floor(index*(length(list)-1)))+1
+function f2ind(list::Tuple, i::Float64)
+    l = length(list)
+    min(max(Int64(ceil(i*l)), 1), l)
 end
 
-function f2ind(list::Tuple, index::Array{Float64})
-    # index must be in [0, 1]
-    Int64.(floor.(index.*(length(list)-1)))+1
+function f2ind(list::Tuple, i::Array{Float64})
+    l = length(list)
+    min.(max.(Int64.(ceil.(i.*l)), 1), l)
 end
 
-function f2ind(list::Array, index::Float64)
-    # index must be in [0, 1]
-    Int64(floor(index*(length(list)-1)))+1
+function f2ind(list::Array, i::Float64)
+    l = length(list)
+    min(max(Int64(ceil(i*l)), 1), l)
 end
 
-function f2ind(list::Array, index::Array{Float64})
-    # index must be in [0, 1]
-    Int64.(floor.(index.*(length(list)-1)))+1
+function f2ind(list::Array, i::Array{Float64})
+    l = length(list)
+    min.(max.(Int64.(ceil.(i.*l)), 1), l)
 end
 
 function index_in(list::Array, index::Float64)
