@@ -2,10 +2,9 @@ function get_fitness(ea::Function, ctype::DataType)
     try
         maxfit, best = ea(ctype, nin, nout, fit)
         return -maxfit
-    catch err
-        Logging.info(@sprintf("Error: %s\nE:%s %s %s", err.msg, string(ea),
-                              string(ctype), CGP.Config.to_string()))
-        println(catch_stacktrace())
+    catch
+        Logging.info(@sprintf("Error: %s\nE:%s %s %s", string(catch_stacktrace()),
+                              string(ea), string(ctype), CGP.Config.to_string()))
         return Inf
     end
 end
