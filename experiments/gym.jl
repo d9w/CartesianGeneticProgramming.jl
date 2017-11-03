@@ -5,7 +5,7 @@ using PyCall
 @pyimport gym
 @pyimport pybullet_envs.bullet.simpleHumanoidGymEnv as humangym
 
-function play_env(c::Chromosome, id::String)
+function play_env(c::Chromosome, env)
     env = gym.make(id)
     ob = env[:reset]()
     total_reward = 0.0
@@ -40,7 +40,7 @@ Logging.configure(filename=log, level=INFO)
 env = gym.make(id)
 nin = length(env[:observation_space][:low])
 nout = length(env[:action_space][:low])
-fit = x->play_env(x, id)
+fit = x->play_env(x, env)
 
 include("param_sweep.jl")
 param_sweep()

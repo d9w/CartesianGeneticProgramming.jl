@@ -5,20 +5,11 @@ using Images
 
 function play_atari(c::Chromosome, game::Game, display::Bool, frame_dir::String)
     reset_game(game.ale)
-    reward = 0
+    reward = 0.0
     frames = 0
-    # breakout needs to "fire" to start
-    act(game.ale, game.actions[2])
-    life = lives(game.ale)*1.0
     while ~game_over(game.ale)
-        # in breakout, resend fire
-        action = game.actions[2]
-        if lives(game.ale) < life
-            life = lives(game.ale)*1.0
-        else
-            output = process(c, get_rgb(game))
-            action = game.actions[indmax(output)]
-        end
+        output = process(c, get_rgb(game))
+        action = game.actions[indmax(output)]
         for i in 1:4
             reward += act(game.ale, action)
             frames += 1

@@ -62,9 +62,8 @@ function neat_config(cfg::Array{Float64}, ctype::DataType)
                          "add_mutation_rate" => cfg[10],
                          "delete_mutation_rate" => cfg[11],
                          "speciation_thresh" => cfg[12],
-                         "ga_elitism_rate" => cfg[13],
-                         "ga_crossover_rate" => cfg[14],
-                         "ga_mutation_rate" => cfg[15]))
+                         "ga_crossover_rate" => cfg[13],
+                         "ga_mutation_rate" => cfg[14]))
     get_fitness(cgpneat, ctype)
 end
 
@@ -74,7 +73,7 @@ function param_sweep()
                    lambda=10, stopeval=100)
         pure_cmaes(x->ga_config(x, ctype), rand(13), 0.1*ones(13);
                    lambda=10, stopeval=100)
-        pure_cmaes(x->neat_config(x, ctype), rand(15), 0.1*ones(15);
+        pure_cmaes(x->neat_config(x, ctype), rand(14), 0.1*ones(14);
                    lambda=10, stopeval=100)
     end
 end
