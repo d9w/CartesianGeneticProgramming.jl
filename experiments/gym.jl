@@ -6,7 +6,6 @@ using PyCall
 @pyimport pybullet_envs.bullet.simpleHumanoidGymEnv as humangym
 
 function play_env(c::Chromosome, env)
-    env = gym.make(id)
     ob = env[:reset]()
     total_reward = 0.0
     done = false
@@ -32,9 +31,9 @@ if length(ARGS) > 0; seed = parse(Int64, ARGS[1]); end
 if length(ARGS) > 1; log = ARGS[2]; end
 if length(ARGS) > 2; id = ARGS[3]; end
 
-# CGP.Config.init("cfg/base.yaml")
-# CGP.Config.init("cfg/classic.yaml")
-CGP.Config.init("cfg/test.yaml")
+CGP.Config.init("cfg/base.yaml")
+CGP.Config.init("cfg/classic.yaml")
+# CGP.Config.init("cfg/test.yaml")
 
 Logging.configure(filename=log, level=INFO)
 env = gym.make(id)
