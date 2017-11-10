@@ -82,6 +82,11 @@ function proportional_crossover(c1::Chromosome, c2::Chromosome)
     typeof(c1)(genes, c1.nin, c1.nout)
 end
 
+function historical_crossover(c1::Chromosome, c2::Chromosome)
+    # TODO
+    typeof(c1)(c1.genes, c1.nin, c1.nout)
+end
+
 function output_graph_crossover(c1::Chromosome, c2::Chromosome)
     # split outputs equally between parents, then construct a child from their
     # corresponding input graphs

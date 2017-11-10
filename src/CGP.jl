@@ -58,6 +58,7 @@ chromosomes = [CGPChromo, PCGPChromo]
 mutations = [:gene_mutate, :mixed_node_mutate, :mixed_subtree_mutate]
 crossovers = [:single_point_crossover, :random_node_crossover, :aligned_node_crossover,
               :proportional_crossover, :subgraph_crossover]
-distances = [:positional_distance, :genetic_distance, :functional_distance]
+distances = [:positional_distance, :genetic_distance, :constant_functional_distance,
+             :random_functional_distance]
 
 end

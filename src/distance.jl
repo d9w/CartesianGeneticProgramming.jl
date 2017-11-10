@@ -1,48 +1,81 @@
 # Distance metrics between chromosomes
 export positional_distance,
     genetic_distance,
-    functional_distance,
+    constant_functional_distance,
+    random_functional_distance,
+    historical_distance,
     distance
 
 function positional_distance(c1::Chromosome, c2::Chromosome)
     pc1 = get_positions(c1)
     pc2 = get_positions(c2)
-    abs(mean(pc1) - mean(pc2))
+    distance = 0
+    if length(pc1) == length(pc2)
+        distance = sum(abs.(pc1 .- pc2)) / length(pc1)
+    elseif length(pc1) > length(pc2)
+        distance = (sum(abs.(pc1 .- [pc2; ones(length(pc1)-length(pc2))]))/length(pc1))
+    else
+        distance = (sum(abs.([pc1; ones(length(pc2)-length(pc1))] .- pc2))/length(pc2))
+    end
+    distance
 end
 
 function genetic_distance(c1::Chromosome, c2::Chromosome)
     distance = 0
     if length(c1.genes) == length(c2.genes)
-        distance = sum((c1.genes .- c2.genes).^2) / length(c1.genes)
+        distance = sum(abs.(c1.genes .- c2.genes)) / length(c1.genes)
     elseif length(c1.genes) > length(c2.genes)
-        distance = (sum((c1.genes .- [c2.genes;
-                                      zeros(length(c1.genes)-length(c2.genes))]).^2)/
-                    length(c2.genes))
+        distance = (sum(abs.(c1.genes .-
+                             [c2.genes;zeros(length(c1.genes)-length(c2.genes))]))/
+                    length(c1.genes))
     else
-        distance = (sum(([c1.genes; zeros(length(c2.genes)-length(c1.genes))]).^2)/
+        distance = (sum(abs.([c1.genes; zeros(length(c2.genes)-length(c1.genes))]
+                             .- c2.genes))/
                     length(c2.genes))
     end
     distance
 end
 
-function rand_input()
-    maxd = 5
-    rand([rand(),
-          rand(Int64(ceil(rand()*maxd))),
-          rand(Int64(ceil(rand()*maxd)), Int64(ceil(rand()*maxd)))])
-end
-
-function functional_distance(c1::Chromosome, c2::Chromosome)
+function constant_functional_distance(c1::Chromosome, c2::Chromosome)
     distance = 0
     reset!(c1)
     reset!(c2)
+    range_inps = linspace(-1, 1, 10)
     for i=1:10
-        inps = [rand_input() for i in 1:c1.nin]
-        c1outs = process(c1, inps)
-        c2outs = process(c2, inps)
-        distance += (sum((c1outs .- c2outs).^2)/c1.nout)
+        inps = repmat([range_inps[i]], c1.nin)
+        distance += sum(abs.(process(c1, inps) .- process(c2, inps)))/c1.nout
     end
     distance/10
+end
+
+function random_functional_distance(c1::Chromosome, c2::Chromosome)
+    distance = 0
+    reset!(c1)
+    reset!(c2)
+    range_inps = linspace(-1, 1, 10)
+    for i=1:10
+        inps = 2*rand(c1.nin) - 1.0
+        distance += sum(abs.(process(c1, inps) .- process(c2, inps)))/c1.nout
+    end
+    distance/10
+end
+
+function active_distance(c1::Chromosome, c2::Chromosome)
+    diff = 0.0
+    smaller = min(length(c1.nodes), length(c2.nodes))
+    larger = max(length(c1.nodes), length(c2.nodes))
+    diff /= smaller * node_genes(c)
+    for i in 1:smaller
+        if c1.nodes[i].active && c2.nodes[i].active
+            diff += sum(abs.(get_genes(c1, i) .- get_genes(c2, i)))
+        end
+    end
+    diff /= smaller * node_genes(c)
+end
+
+function historical_distance(c1::Chromosome, c2::Chromosome)
+    # TODO
+    0
 end
 
 function distance(c1::Chromosome, c2::Chromosome)

@@ -3,6 +3,7 @@
 # when necessary. Some chromosomes will need to override these functions.
 
 export gene_mutate,
+    active_gene_mutate,
     add_nodes,
     delete_nodes,
     add_subtree,
@@ -14,15 +15,27 @@ export gene_mutate,
 function gene_mutate(c::Chromosome)
     # Mutate inputs, outputs, and node genes according to parameter probabilities
     genes = deepcopy(c.genes)
+    # mutate inputs
     mutations = [rand(c.nin) .< Config.input_mutation_rate; falses(length(genes) - c.nin)]
     genes[mutations] = rand(sum(mutations))
-    mutations = [falses(c.nin); rand(c.nout) .< Config.input_mutation_rate;
+    # mutation outputs
+    mutations = [falses(c.nin); rand(c.nout) .< Config.output_mutation_rate;
                  falses(length(genes) - c.nin - c.nout)]
     genes[mutations] = rand(sum(mutations))
+    # mutate nodes
     mutations = [falses(c.nin+c.nout); rand(
         length(genes)-c.nin-c.nout) .< Config.node_mutation_rate]
     genes[mutations] = rand(sum(mutations))
     typeof(c)(genes, c.nin, c.nout)
+end
+
+function active_gene_mutate(c::Chromosome)
+    # Only use genetic mutation if active genes were mutated
+    d = gene_mutate(c)
+    while active_distance(c, d) == 0.0
+        d = gene_mutate(c)
+    end
+    d
 end
 
 function add_nodes(c::Chromosome)
