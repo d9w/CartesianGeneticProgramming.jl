@@ -64,13 +64,12 @@ function active_distance(c1::Chromosome, c2::Chromosome)
     diff = 0.0
     smaller = min(length(c1.nodes), length(c2.nodes))
     larger = max(length(c1.nodes), length(c2.nodes))
-    diff /= smaller * node_genes(c)
     for i in 1:smaller
         if c1.nodes[i].active && c2.nodes[i].active
             diff += sum(abs.(get_genes(c1, i) .- get_genes(c2, i)))
         end
     end
-    diff /= smaller * node_genes(c)
+    diff /= smaller * node_genes(c1)
 end
 
 function historical_distance(c1::Chromosome, c2::Chromosome)

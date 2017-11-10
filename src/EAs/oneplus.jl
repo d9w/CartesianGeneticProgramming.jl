@@ -9,26 +9,27 @@ function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
     best = population[1]
     max_fit = -Inf
     eval_count = 0
+    fits = -Inf*ones(Float64, Config.oneplus_population_size)
 
     for generation=1:Config.oneplus_num_generations
         # evaluation
         new_best = false
-        mfit = 0.0
         for p in eachindex(population)
-            fit = fitness(population[p])
-            eval_count += 1
-            mfit += fit
-            if fit >= max_fit
-                best = clone(population[p])
-                if fit > max_fit
-                    max_fit = fit
-                    new_best = true
+            if fits[p] == -Inf
+                fit = fitness(population[p])
+                eval_count += 1
+                if fit >= max_fit
+                    best = clone(population[p])
+                    if fit > max_fit
+                        max_fit = fit
+                        new_best = true
+                    end
                 end
+                fits[p] = fit
             end
         end
-        mfit /= length(population)
 
-        if new_best || ((10 * generation / Config.oneplus_num_generations) % 1 == 0.0)
+        if new_best
             refit = max_fit
             if record_best
                 refit = record_fitness(best)
@@ -45,14 +46,20 @@ function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
         end
 
         # selection
+        fits .= -Inf
         for p in eachindex(population)
-            population[p] = mutate(best)
+            child = mutate(best)
+            if active_distance(child, best) == 0
+                fits[p] = max_fit
+            end
+            population[p] = child
         end
 
         # size limit
         for i in eachindex(population)
             if length(population[i].nodes) > Config.node_size_cap
                 population[i] = ctype(nin, nout)
+                fits[i] = -Inf
             end
         end
     end

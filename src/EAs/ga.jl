@@ -51,7 +51,7 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
             end
         end
 
-        if new_best || ((10 * generation / Config.ga_num_generations) % 1 == 0.0)
+        if new_best
             refit = max_fit
             if record_best
                 refit = record_fitness(best)
@@ -94,7 +94,11 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
         # mutation
         for i in 1:nmutate
             parent = population[selection(fits)]
-            new_pop[popi] = mutate(parent)
+            child = mutate(parent)
+            if active_distance(parent, child) == 0
+                new_fits[popi] = fits[popi]
+            end
+            new_pop[popi] = child
             popi += 1
         end
 
