@@ -6,6 +6,7 @@ using PyCall
 @pyimport pybullet_envs.bullet.simpleHumanoidGymEnv as humangym
 
 function play_env(c::Chromosome, env)
+    env[:seed](0)
     ob = env[:reset]()
     total_reward = 0.0
     done = false
