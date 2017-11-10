@@ -160,20 +160,22 @@ function get_cmaes_results(log::String)
                            :delete_mutation_rate, :speciation_thresh, :ga_elitism_rate,
                            :ga_crossover_rate, :ga_mutation_rate])
     res[:chromosome] = map(x->split(split(x, '.')[2], "Chromo")[1], res[:chromo])
-    maxeval = maximum(res[:eval])
+    res[:ind] = 1:size(res,1)
+    res[:ea][res[:ea].=="NEAT"] = "GA+s"
+    inds = find(diff(res[:eval]) .< 0);
     runs = @from i in res begin
-        @where i.eval == maxeval
+        @where i.ind in inds
         @select i
         @collect DataFrame
     end
-    mutations = sort!(unique(runs[:mutation]))
-    println(mutations)
+    # mutations = sort!(unique(runs[:mutation]))
+    mutations = String["gene_mutate", "mixed_node_mutate", "mixed_subtree_mutate"]
     runs[:f_mutation] = indexin(runs[:mutation], mutations)./(1.0*length(mutations))
-    crossovers = sort!(unique(runs[:crossover]))
-    println(crossovers)
+    # crossovers = sort!(unique(runs[:crossover]))
+    crossovers = String["aligned_node_crossover", "output_graph_crossover", "proportional_crossover", "random_node_crossover", "single_point_crossover", "subgraph_crossover"]
     runs[:f_crossover] = indexin(runs[:crossover], crossovers)./(1.0*length(crossovers))
-    distances = sort!(unique(runs[:distance]))
-    println(distances)
+    # distances = sort!(unique(runs[:distance]))
+    distances = String["functional_distance", "genetic_distance", "positional_distance"]
     runs[:f_distance] = indexin(runs[:distance], distances)./(1.0*length(distances))
     eas = unique(runs[:ea])
     chromosomes = unique(runs[:chromosome])
@@ -204,14 +206,14 @@ end
 function plot_top_runs(top_runs::DataFrame, ti::String, filename::String;
                        ymin = floor(minimum(top_runs[:fit])*100)/100,
                        ymax = ceil(maximum(top_runs[:fit])*100)/100,
-                       step = round((ymax-ymin)/5*10)/10)
+                       step = max((round((ymax-ymin)/5*10)/10), 0.01))
 
     yticks = [ymin:step:ymax;]
 
     plt = plot(top_runs, xgroup=:chromosome,
                x=:ea, y=:fit, color=:ea,
                Geom.subplot_grid(Coord.cartesian(ymin=ymin, ymax=ymax),
-                                 Geom.boxplot),
+                                 Geom.violin),
                Scale.color_discrete_manual(colors...),
                Guide.ylabel(nothing), Guide.xlabel(nothing),
                Guide.title(ti))
@@ -224,14 +226,15 @@ function plot_top_params(top_runs::DataFrame, ti::String, filename::String)
     top_params = @from i in melted begin
         @where ((i.ea == "oneplus" && i.variable in ea_params) ||
                 (i.ea == "GA" && i.variable in ga_params) ||
-                (i.ea == "NEAT" && i.variable in neat_params))
+                (i.ea == "GA+s" && i.variable in neat_params))
         @select i
         @collect DataFrame
     end
-    top_params[:parameter] = indexin(top_params[:variable], all_params)
+    top_params[:parameter] = top_params[:variable]
+    top_params[:var] = indexin(top_params[:variable], all_params)
 
     plt = plot(top_params, xgroup=:ea, ygroup=:chromosome,
-               x=:parameter, y=:value, color=:variable,
+               x=:var, y=:value, color=:parameter,
                Geom.subplot_grid(Geom.boxplot,
                Coord.cartesian(ymin=0.0, ymax=1.0, xmin=0, xmax=length(all_params))),
                Guide.ylabel(nothing), Guide.xlabel(nothing),
@@ -239,6 +242,29 @@ function plot_top_params(top_runs::DataFrame, ti::String, filename::String)
                Guide.title(ti))
     draw(PDF(string(filename, "_params.pdf"), 12inch, 8inch), plt)
     top_params
+end
+
+function get_cors(res::DataFrame)
+    eas = ["oneplus", "GA", "GA+s"]
+    params = [ea_params, ga_params, neat_params]
+    cors = DataFrame(var=[], cor=[])
+    # for eai in eachindex(eas)
+    #     ea = @from i in res begin
+    #         @where i.ea == eas[eai]
+    #         @select i
+    #         @collect DataFrame
+    #     end
+    #     for p in params[eai]
+    #         push!(cors, (p, abs(cor(ea[:fit], ea[p]))))
+    #     end
+    # end
+    for p in all_params
+        push!(cors, (p, abs(cor(res[:fit], res[p]))))
+    end
+    final = by(cors, :var, df->mean(df[:cor]))
+    final[:ind] = indexin(final[:var], all_params)
+    sort!(final, cols=[:ind])
+    DataFrame(parameter=final[:var], correlation=final[:x1])
 end
 
 function get_bests(logs::Array{String})
@@ -251,6 +277,7 @@ function get_bests(logs::Array{String})
             @collect DataFrame
         end
         tops[:problem] = l
+        tops[:fit] = (tops[:fit]-minimum(tops[:fit]))/(maximum(tops[:fit])-minimum(tops[:fit]))
         bests = vcat(bests, tops)
     end
     bests
