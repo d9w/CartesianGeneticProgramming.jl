@@ -44,7 +44,7 @@ end
             child = aligned_node_crossover(p1, p2)
             test_crossover(p1, p2, child)
         end
-        @testset "Aligned node $ct" begin
+        @testset "Proportional $ct" begin
             child = proportional_crossover(p1, p2)
             test_crossover(p1, p2, child)
         end

@@ -2,8 +2,6 @@ using Base.Test
 using CGP
 CGP.Config.init("cfg/test.yaml")
 
-CTYPES = [CGPChromo, PCGPChromo]
-
 function test_mutate(c::Chromosome, child::Chromosome)
       @test child != c
       @test child.genes != c.genes
@@ -13,7 +11,7 @@ function test_mutate(c::Chromosome, child::Chromosome)
 end
 
 @testset "Mutation tests" begin
-    for ct in CTYPES
+    for ct in CGP.chromosomes
         println(ct)
         nin = rand(1:100); nout = rand(1:100)
         c = ct(nin, nout)
@@ -28,6 +26,11 @@ end
         end
         @testset "Mutate genes $ct" begin
             child = gene_mutate(c)
+            test_mutate(c, child)
+            @test length(child.genes) == length(c.genes)
+        end
+        @testset "Active genes $ct" begin
+            child = active_gene_mutate(c)
             test_mutate(c, child)
             @test length(child.genes) == length(c.genes)
         end

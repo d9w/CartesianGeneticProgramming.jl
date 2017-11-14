@@ -3,8 +3,8 @@ num_nodes: 100
 node_size_cap: 1000
 node_inputs: 2
 save_best: False
-mutate_method: ":mixed_node_mutate"
-crossover_method: ":output_graph_crossover"
+mutate_method: ":gene_mutate"
+crossover_method: ":single_point_crossover"
 distance_method: ":genetic_distance"
 recurrency: 0.0
 # Mutation

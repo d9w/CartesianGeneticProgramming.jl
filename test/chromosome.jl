@@ -2,10 +2,8 @@ using Base.Test
 using CGP
 CGP.Config.init("cfg/test.yaml")
 
-CTYPES = [CGPChromo, PCGPChromo]
-
 @testset "Creation tests" begin
-    for ct in CTYPES
+    for ct in CGP.chromosomes
         println(ct)
         nin = rand(1:100); nout = rand(1:100);
         c = ct(nin, nout)
@@ -43,7 +41,7 @@ CTYPES = [CGPChromo, PCGPChromo]
 end
 
 @testset "Functional tests" begin
-    for ct in CTYPES
+    for ct in CGP.chromosomes
         println(ct)
         nin = rand(1:100); nout = rand(1:100)
         @testset "Process $ct" begin

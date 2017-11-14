@@ -1,10 +1,26 @@
 # Distance metrics between chromosomes
-export positional_distance,
-    genetic_distance,
+export genetic_distance,
+    positional_distance,
     constant_functional_distance,
     random_functional_distance,
-    historical_distance,
+    active_distance,
     distance
+
+function genetic_distance(c1::Chromosome, c2::Chromosome)
+    distance = 0
+    if length(c1.genes) == length(c2.genes)
+        distance = sum(abs.(c1.genes .- c2.genes)) / length(c1.genes)
+    elseif length(c1.genes) > length(c2.genes)
+        distance = (sum(abs.(c1.genes .-
+                             [c2.genes; zeros(length(c1.genes)-length(c2.genes))]))/
+                    length(c1.genes))
+    else
+        distance = (sum(abs.([c1.genes; zeros(length(c2.genes)-length(c1.genes))]
+                             .- c2.genes))/
+                    length(c2.genes))
+    end
+    distance
+end
 
 function positional_distance(c1::Chromosome, c2::Chromosome)
     pc1 = get_positions(c1)
@@ -16,22 +32,6 @@ function positional_distance(c1::Chromosome, c2::Chromosome)
         distance = (sum(abs.(pc1 .- [pc2; ones(length(pc1)-length(pc2))]))/length(pc1))
     else
         distance = (sum(abs.([pc1; ones(length(pc2)-length(pc1))] .- pc2))/length(pc2))
-    end
-    distance
-end
-
-function genetic_distance(c1::Chromosome, c2::Chromosome)
-    distance = 0
-    if length(c1.genes) == length(c2.genes)
-        distance = sum(abs.(c1.genes .- c2.genes)) / length(c1.genes)
-    elseif length(c1.genes) > length(c2.genes)
-        distance = (sum(abs.(c1.genes .-
-                             [c2.genes;zeros(length(c1.genes)-length(c2.genes))]))/
-                    length(c1.genes))
-    else
-        distance = (sum(abs.([c1.genes; zeros(length(c2.genes)-length(c1.genes))]
-                             .- c2.genes))/
-                    length(c2.genes))
     end
     distance
 end
@@ -70,11 +70,6 @@ function active_distance(c1::Chromosome, c2::Chromosome)
         end
     end
     diff /= smaller * node_genes(c1)
-end
-
-function historical_distance(c1::Chromosome, c2::Chromosome)
-    # TODO
-    0
 end
 
 function distance(c1::Chromosome, c2::Chromosome)

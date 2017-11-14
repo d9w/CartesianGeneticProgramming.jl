@@ -86,7 +86,12 @@ function delete_subtree(c::Chromosome)
     end
     conns = forward_connections(c)
     shuffle!(conns)
-    deletes = conns[1][conns[1] .> c.nin]
+    i = 1
+    deletes = conns[i][conns[i] .> c.nin]
+    while length(deletes) == 0
+        i += 1
+        deletes = conns[i][conns[i] .> c.nin]
+    end
     if length(deletes) > n_dels
         deletes = deletes[1:n_dels]
     end
@@ -99,10 +104,13 @@ function mixed_mutate(c::Chromosome, add_f::Function, del_f::Function)
     # always mutate inputs and outputs
     method = rand()
     if method < Config.add_mutation_rate
+        debug("Add mutate")
         return add_f(c)
     elseif method < (Config.add_mutation_rate + Config.delete_mutation_rate)
+        debug("Delete mutate")
         return del_f(c)
     else
+        debug("Gene mutate")
         return gene_mutate(c)
     end
 end

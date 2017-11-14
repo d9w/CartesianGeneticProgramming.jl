@@ -8,9 +8,15 @@ export single_point_crossover,
 
 function single_point_crossover(c1::Chromosome, c2::Chromosome)
     # single point crossover
-    cpoint = rand(1:(min(length(c1.genes), length(c2.genes))-1))
-    ngenes = deepcopy([c1.genes[1:cpoint]; c2.genes[cpoint+1:end]])
-    typeof(c1)(ngenes, c1.nin, c1.nout)
+    cpoint = c1.nin + c1.nout + node_genes(c1) * rand(0:min(length(c1.nodes)-c1.nin,
+                                                            length(c2.nodes)-c2.nin))
+    if rand(Bool)
+        ngenes = deepcopy([c1.genes[1:cpoint]; c2.genes[(cpoint+1):end]])
+        return typeof(c1)(ngenes, c1.nin, c1.nout)
+    else
+        ngenes = deepcopy([c2.genes[1:cpoint]; c1.genes[(cpoint+1):end]])
+        return typeof(c2)(ngenes, c2.nin, c2.nout)
+    end
 end
 
 function random_inputs(c1::Chromosome, c2::Chromosome)
@@ -80,11 +86,6 @@ function proportional_crossover(c1::Chromosome, c2::Chromosome)
         genes = [genes; c2.genes[(length(c1.genes)+1):end]]
     end
     typeof(c1)(genes, c1.nin, c1.nout)
-end
-
-function historical_crossover(c1::Chromosome, c2::Chromosome)
-    # TODO
-    typeof(c1)(c1.genes, c1.nin, c1.nout)
 end
 
 function output_graph_crossover(c1::Chromosome, c2::Chromosome)

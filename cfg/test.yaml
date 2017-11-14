@@ -1,18 +1,18 @@
 # General settings
-num_nodes: 20
+num_nodes: 30
 node_size_cap: 200
 node_inputs: 2
 save_best: False
-mutate_method: ":mixed_node_mutate"
-crossover_method: ":output_graph_crossover"
+mutate_method: ":gene_mutate"
+crossover_method: ":single_point_crossover"
 distance_method: ":genetic_distance"
 recurrency: 1.0
 # Mutation
 input_mutation_rate: 0.5
 output_mutation_rate: 0.5
 node_mutation_rate: 0.5
-add_node_rate: 0.1
-delete_node_rate: 0.1
+add_node_rate: 0.4
+delete_node_rate: 0.4
 add_mutation_rate: 0.3
 delete_mutation_rate: 0.3
 # Oneplus settings
