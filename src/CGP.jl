@@ -6,42 +6,7 @@ using Distributions
 
 Logging.configure(level=INFO)
 
-    module Config
-    using YAML
-    using Logging
-    using PaddedViews
-    using Distributions
-    include("functions.jl")
-    functions = []
-    function init(config::Dict)
-        for k in keys(config)
-            if k == "functions"
-                append!(functions, load_functions(config["functions"]))
-            else
-                eval(parse(string(k, "=", config[k])))
-            end
-        end
-    end
-    function init(file::String)
-        init(YAML.load_file(file))
-    end
-    append!(functions, [f_input])
-    function reset()
-        empty!(functions)
-    end
-
-    function to_string()
-        @sprintf(
-        "%s %s %s %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f",
-            string(mutate_method), string(crossover_method), string(distance_method),
-            recurrency, input_mutation_rate, output_mutation_rate, node_mutation_rate,
-            add_node_rate, delete_node_rate, add_mutation_rate, delete_mutation_rate,
-            speciation_thresh, ga_elitism_rate, ga_crossover_rate, ga_mutation_rate)
-    end
-
-    export init, reset
-    end
-
+include("config.jl")
 include("chromosome.jl")
 include("distance.jl")
 include("mutation.jl")

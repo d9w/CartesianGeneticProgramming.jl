@@ -1,0 +1,47 @@
+#!/bin/bash
+###############################################################################
+# irace tuning script for CGP.jl
+#
+# PARAMETERS:
+# $1 is the ID of the candidate to be evaluated
+# $2 is the instance ID
+# $3 is the seed
+# $4 is the instance name
+# The rest ($* after `shift 4') are parameters for running ACOTSP
+#
+# RETURN VALUE:
+# This script should print a single numerical value (the value to be minimized).
+###############################################################################
+
+EXE=/usr/bin/julia
+
+CONFIG_ID="$1"
+INSTANCE_ID="$2"
+SEED="$3"
+INSTANCE="$4"
+# All other parameters are the candidate parameters to be passed to program
+shift 4 || error "Not enough parameters to $0"
+CONFIG_PARAMS=$*
+
+STDOUT=c${CONFIG_ID}-${INSTANCE_ID}.stdout
+STDERR=c${CONFIG_ID}-${INSTANCE_ID}.stderr
+
+error() {
+    echo "`TZ=UTC date`: error: $@" >&2
+    exit 1
+}
+
+$EXE $INSTANCE --seed $SEED --log ${INSTANCE_ID}_${CONFIG_ID}.log ${CONFIG_PARAMS} 1> $STDOUT 2> $STDERR
+
+COST=$(tail -n 1 ${STDOUT})
+if ! [[ "$COST" =~ ^[-+0-9.e]+$ ]] ; then
+    error "${STDOUT}: Output is not a number"
+fi
+
+# Print it!
+echo "$COST"
+
+# We are done with our duty. Clean files and exit with 0 (no error).
+rm -f "${STDOUT}" "${STDERR}"
+rm -f best.* stat.* cmp.*
+exit 0

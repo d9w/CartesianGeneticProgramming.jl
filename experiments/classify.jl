@@ -1,6 +1,6 @@
 using CGP
 using Logging
-#using JLD
+using ArgParse
 
 function read_data(dfile::String)
     df = open(dfile, "r")
@@ -37,22 +37,50 @@ function regression(c::Chromosome, data::Array{Float64}, nin::Int64, nout::Int64
     -error
 end
 
-seed = 0
-dfile = "data/glass.dt"
-log = "log"
-fitness = classify
-if length(ARGS) > 0; seed = parse(Int64, ARGS[1]); end
-if length(ARGS) > 1; dfile = ARGS[2]; end
-if length(ARGS) > 2; log = ARGS[3]; end
-if length(ARGS) > 3; fitness = eval(parse(ARGS[4])); end
+function get_args()
+    s = ArgParseSettings()
+
+    @add_arg_table s begin
+        "--seed"
+        arg_type = Int
+        default = 0
+        "--data"
+        arg_type = String
+        required = true
+        "--log"
+        arg_type = String
+        required = true
+        "--fitness"
+        arg_type = String
+        default = "classify"
+        "--ea"
+        arg_type = String
+        required = true
+        "--chromosome"
+        arg_type = String
+        required = true
+    end
+
+    CGP.Config.add_arg_settings!(s)
+end
 
 # CGP.Config.init("cfg/base.yaml")
 # CGP.Config.init("cfg/classic.yaml")
-CGP.Config.init("cfg/test.yaml")
+CGP.Config.init("../cfg/test.yaml")
 
-Logging.configure(filename=log, level=INFO)
-nin, nout, train, test = read_data(dfile)
+args = parse_args(get_args())
+println(args)
+CGP.Config.init(Dict([k=>args[k] for k in setdiff(
+    keys(args), ["seed", "data", "log", "fitness", "ea", "chromosome"])]...))
+
+srand(args["seed"])
+Logging.configure(filename=args["log"], level=INFO)
+nin, nout, train, test = read_data(args["data"])
+fitness = eval(parse(args["fitness"]))
+ea = eval(parse(args["ea"]))
+ctype = eval(parse(args["chromosome"]))
+
 fit = x->fitness(x, train, nin, nout)
+maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"])
 
-include("param_sweep.jl")
-param_sweep()
+println(-maxfit)
