@@ -1,6 +1,6 @@
 #../experiments/classify.jl --data ../data/glass.dt --ea oneplus --chromosome CGPChromo
 #../experiments/classify.jl --data ../data/cancer.dt --ea oneplus --chromosome CGPChromo
 #../experiments/classify.jl --data ../data/diabetes.dt --ea oneplus --chromosome CGPChromo
-../experiments/gym.jl --id HalfCheetahBulletEnv-v0 --ea oneplus --chromosome PCGPChromo
-../experiments/gym.jl --id AntBulletEnv-v0 --ea oneplus --chromosome PCGPChromo
-../experiments/gym.jl --id HumanoidBulletEnv-v0 --ea oneplus --chromosome PCGPChromo
+../experiments/gym.jl --id HalfCheetahBulletEnv-v0 --ea GA --chromosome PCGPChromo
+../experiments/gym.jl --id AntBulletEnv-v0 --ea GA --chromosome PCGPChromo
+../experiments/gym.jl --id HumanoidBulletEnv-v0 --ea GA --chromosome PCGPChromo
