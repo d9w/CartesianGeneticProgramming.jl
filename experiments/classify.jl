@@ -64,9 +64,9 @@ function get_args()
     CGP.Config.add_arg_settings!(s)
 end
 
-# CGP.Config.init("cfg/base.yaml")
-# CGP.Config.init("cfg/classic.yaml")
-CGP.Config.init("../cfg/test.yaml")
+CGP.Config.init("base.yaml")
+CGP.Config.init("classic.yaml")
+# CGP.Config.init("../cfg/test.yaml")
 
 args = parse_args(get_args())
 println(args)
@@ -83,4 +83,4 @@ ctype = eval(parse(args["chromosome"]))
 fit = x->fitness(x, train, nin, nout)
 maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"])
 
-println(-maxfit)
+Logging.info(@sprintf("E%0.8f", -maxfit))
