@@ -11,7 +11,7 @@
 ## parameter conditions (NA should be used for those parameters that
 ## are not enabled for a given configuration) and, if given, the
 ## constraints that describe forbidden configurations.
-recurrency input_mutation_rate output_mutation_rate node_mutation_rate
-0.037 0.236 0.142 0.499
-0.143 0.228 0.196 0.062
-0.027 0.177 0.842 0.048
+mutate_method recurrency input_mutation_rate output_mutation_rate node_mutation_rate add_node_rate delete_node_rate add_mutation_rate delete_mutation_rate
+:mixed_node_mutate 0.386 0.573 0.279 0.669 0.067 0.908 0.658 0.816
+:gene_mutate 0.203 0.394 0.639 0.197 0.248 0.76 0.239 0.571
+:mixed_subtree_mutate 0.064 0.641 0.14 0.346 0.992 0.354 0.174 0.106
