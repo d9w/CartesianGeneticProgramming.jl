@@ -70,4 +70,4 @@ nout = length(env[:action_space][:low])
 fit = x->play_env(x, env)
 maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"])
 
-println(-maxfit)
+Logging.info(@sprintf("E%0.6f", -maxfit))

@@ -37,7 +37,7 @@ $EXE $INSTANCE --seed $SEED --log ${INSTANCE_ID}_${CONFIG_ID}.log ${CONFIG_PARAM
 
 deactivate
 
-COST=$(tail -n 1 ${STDOUT})
+COST=$(tail -n 1 ${INSTANCE_ID}_${CONFIG_ID}.log | cut -d 'E' -f 2)
 if ! [[ "$COST" =~ ^[-+0-9.e]+$ ]] ; then
     error "${STDOUT}: Output is not a number"
 fi
