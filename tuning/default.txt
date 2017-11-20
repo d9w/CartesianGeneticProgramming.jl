@@ -12,6 +12,6 @@
 ## are not enabled for a given configuration) and, if given, the
 ## constraints that describe forbidden configurations.
 recurrency input_mutation_rate output_mutation_rate node_mutation_rate
-0.147 0.027 0.003 0.066
-0.04 0.052 0.117 0.097
-0.013 0.474 0.647 0.049
+0.037 0.236 0.142 0.499
+0.143 0.228 0.196 0.062
+0.027 0.177 0.842 0.048
