@@ -1,6 +1,7 @@
 using CGP
 using Logging
 using PyCall
+using ArgParse
 
 @pyimport gym
 @pyimport pybullet_envs.bullet.simpleHumanoidGymEnv as humangym
@@ -65,9 +66,8 @@ ctype = eval(parse(args["chromosome"]))
 env = gym.make(args["id"])
 nin = length(env[:observation_space][:low])
 nout = length(env[:action_space][:low])
-fit = x->play_env(x, env)
 
-fit = x->fitness(x, train, nin, nout)
+fit = x->play_env(x, env)
 maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"])
 
 println(-maxfit)
