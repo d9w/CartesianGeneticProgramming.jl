@@ -15,4 +15,4 @@ cp -r $CGP/tuning/* $WORK_DIR/
 cp -r $CGP/experiments/classify.jl $WORK_DIR/
 cd $WORK_DIR
 
-srun irace --parallel 20 2>&1 > irace.log
+irace --parallel 20 2>&1 > irace.log

@@ -2,7 +2,6 @@
 # name		switch		     type	values			[conditions (using R syntax)]
 mutate_method            "--mutate_method "            c    (:gene_mutate, :mixed_node_mutate, :mixed_subtree_mutate)
 crossover_method         "--crossover_method "         c    (:single_point_crossover, :random_node_crossover, :aligned_node_crossover, :proportional_crossover, :output_graph_crossover, :subgraph_crossover)
-distance_method          "--distance_method "          c    (:genetic_distance, :positional_distance, :constant_functional_distance, :random_functional_distance, :active_distance)
 recurrency               "--recurrency "               r    (0.00, 1.00)
 input_mutation_rate      "--input_mutation_rate "      r    (0.00, 1.00)
 output_mutation_rate     "--output_mutation_rate "     r    (0.00, 1.00)
@@ -11,6 +10,6 @@ add_node_rate            "--add_node_rate "            r    (0.00, 0.50) | mutat
 delete_node_rate         "--delete_node_rate "         r    (0.00, 0.50) | mutate_method != ":gene_mutate"
 add_mutation_rate        "--add_mutation_rate "        r    (0.00, 1.00) | mutate_method != ":gene_mutate"
 delete_mutation_rate     "--delete_mutation_rate "     r    (0.00, 1.00) | mutate_method != ":gene_mutate"
-speciation_thresh        "--speciation_thresh "        r    (0.00, 1.00)
+ga_elitism_rate          "--ga_elitism_rate"           r    (0.00, 1.00)
 ga_crossover_rate        "--ga_crossover_rate "        r    (0.00, 1.00)
 ga_mutation_rate         "--ga_mutation_rate "         r    (0.00, 1.00)
