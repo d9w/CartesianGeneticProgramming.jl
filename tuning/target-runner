@@ -31,7 +31,11 @@ error() {
     exit 1
 }
 
+source /home/d9w/.venvs/bullet/bin/activate
+
 $EXE $INSTANCE --seed $SEED --log ${INSTANCE_ID}_${CONFIG_ID}.log ${CONFIG_PARAMS} 1> $STDOUT 2> $STDERR
+
+deactivate
 
 COST=$(tail -n 1 ${STDOUT})
 if ! [[ "$COST" =~ ^[-+0-9.e]+$ ]] ; then

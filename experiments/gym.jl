@@ -25,22 +25,49 @@ function play_env(c::Chromosome, env)
     total_reward
 end
 
-seed = 0
-log = "log"
-id = "HalfCheetahBulletEnv-v0"
-if length(ARGS) > 0; seed = parse(Int64, ARGS[1]); end
-if length(ARGS) > 1; log = ARGS[2]; end
-if length(ARGS) > 2; id = ARGS[3]; end
+function get_args()
+    s = ArgParseSettings()
 
-CGP.Config.init("cfg/base.yaml")
-CGP.Config.init("cfg/classic.yaml")
+    @add_arg_table s begin
+        "--seed"
+        arg_type = Int
+        default = 0
+        "--log"
+        arg_type = String
+        required = true
+        "--id"
+        arg_type = String
+        default = "HalfCheetahBulletEnv-v0"
+        "--ea"
+        arg_type = String
+        required = true
+        "--chromosome"
+        arg_type = String
+        required = true
+    end
+
+    CGP.Config.add_arg_settings!(s)
+end
+
+CGP.Config.init("../cfg/base.yaml")
+CGP.Config.init("../cfg/classic.yaml")
 # CGP.Config.init("cfg/test.yaml")
 
-Logging.configure(filename=log, level=INFO)
-env = gym.make(id)
+args = parse_args(get_args())
+println(args)
+CGP.Config.init(Dict([k=>args[k] for k in setdiff(
+    keys(args), ["seed", "log", "id", "ea", "chromosome"])]...))
+
+srand(args["seed"])
+Logging.configure(filename=args["log"], level=INFO)
+ea = eval(parse(args["ea"]))
+ctype = eval(parse(args["chromosome"]))
+env = gym.make(args["id"])
 nin = length(env[:observation_space][:low])
 nout = length(env[:action_space][:low])
 fit = x->play_env(x, env)
 
-include("param_sweep.jl")
-param_sweep()
+fit = x->fitness(x, train, nin, nout)
+maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"])
+
+println(-maxfit)
