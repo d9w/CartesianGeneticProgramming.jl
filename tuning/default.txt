@@ -11,7 +11,8 @@
 ## parameter conditions (NA should be used for those parameters that
 ## are not enabled for a given configuration) and, if given, the
 ## constraints that describe forbidden configurations.
-mutate_method recurrency input_mutation_rate output_mutation_rate node_mutation_rate add_node_rate delete_node_rate add_mutation_rate delete_mutation_rate
-:mixed_node_mutate 0.386 0.573 0.279 0.669 0.067 0.908 0.658 0.816
-:gene_mutate 0.203 0.394 0.639 0.197 0.248 0.76 0.239 0.571
-:mixed_subtree_mutate 0.064 0.641 0.14 0.346 0.992 0.354 0.174 0.106
+#mutate_method crossover_method distance_method recurrency input_mutation_rate output_mutation_rate node_mutation_rate add_node_rate delete_node_rate add_mutation_rate delete_mutation_rate speciation_thresh ga_crossover_rate ga_mutation_rate
+mutate_method crossover_method recurrency input_mutation_rate output_mutation_rate node_mutation_rate add_node_rate delete_node_rate add_mutation_rate delete_mutation_rate ga_elitism_rate ga_crossover_rate ga_mutation_rate
+:gene_mutate :subgraph_crossover 0.123 0.306 0.69 0.422 0.631 0.949 0.99 0.958 0.415 0.436 0.641
+:mixed_node_mutate :subgraph_crossover 0.451 0.373 0.733 0.799 0.977 0.974 0.206 0.168 0.505 0.129 0.173
+:gene_mutate :random_node_crossover 0.181 0.079 0.953 0.422 0.901 0.245 0.226 0.834 0.244 0.11 0.831

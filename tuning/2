@@ -1,3 +1,0 @@
-classify.jl --data /tmpdir/wilson/data/julia/abalone.dt --fitness regression --ea oneplus --chromosome PCGPChromo
-classify.jl --data /tmpdir/wilson/data/julia/fires.dt --fitness regression --ea oneplus --chromosome PCGPChromo
-classify.jl --data /tmpdir/wilson/data/julia/quality.dt --fitness regression --ea oneplus --chromosome PCGPChromo
