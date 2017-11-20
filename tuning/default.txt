@@ -11,8 +11,7 @@
 ## parameter conditions (NA should be used for those parameters that
 ## are not enabled for a given configuration) and, if given, the
 ## constraints that describe forbidden configurations.
-#mutate_method crossover_method distance_method recurrency input_mutation_rate output_mutation_rate node_mutation_rate add_node_rate delete_node_rate add_mutation_rate delete_mutation_rate speciation_thresh ga_crossover_rate ga_mutation_rate
-mutate_method crossover_method recurrency input_mutation_rate output_mutation_rate node_mutation_rate add_node_rate delete_node_rate add_mutation_rate delete_mutation_rate ga_elitism_rate ga_crossover_rate ga_mutation_rate
-:gene_mutate :subgraph_crossover 0.123 0.306 0.69 0.422 0.631 0.949 0.99 0.958 0.415 0.436 0.641
-:mixed_node_mutate :subgraph_crossover 0.451 0.373 0.733 0.799 0.977 0.974 0.206 0.168 0.505 0.129 0.173
-:gene_mutate :random_node_crossover 0.181 0.079 0.953 0.422 0.901 0.245 0.226 0.834 0.244 0.11 0.831
+mutate_method crossover_method distance_method recurrency input_mutation_rate output_mutation_rate node_mutation_rate add_node_rate delete_node_rate add_mutation_rate delete_mutation_rate speciation_thresh ga_crossover_rate ga_mutation_rate
+:gene_mutate :subgraph_crossover :genetic_distance 0.221 0.506 0.419 0.983 0.46 0.592 0.285 0.893 0.813 0.858 0.294
+:mixed_subtree_mutate :single_point_crossover :positional_distance 0.452 0.072 0.083 0.393 0.562 0.107 0.329 0.487 0.782 0.608 0.997
+:gene_mutate :single_point_crossover :positional_distance 0.165 0.056 0.853 0.587 0.693 0.524 0.461 0.47 0.036 0.353 0.62
