@@ -34,10 +34,10 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
 
     Logging.debug(@sprintf("population: %d %d %d %d", nelite, ncross, nmutate, ncopy))
 
-    for generation in 1:Config.ga_num_generations
+    while eval_count < Config.total_evals
         # evaluation
-        Logging.debug("evaluation $generation")
-        new_best = false
+        Logging.debug("evaluation $eval_count")
+        log_gen = false
         for p in eachindex(population)
             if fits[p] == -Inf
                 fit = fitness(population[p])
@@ -46,12 +46,16 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
                 if fit > max_fit
                     max_fit = fit
                     best = clone(population[p])
-                    new_best = true
+                    log_gen = true
+                end
+                if eval_count == Config.total_evals
+                    log_gen = true
+                    break
                 end
             end
         end
 
-        if new_best
+        if log_gen
             refit = max_fit
             if record_best
                 refit = record_fitness(best)
@@ -67,9 +71,12 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
             end
         end
 
+        if eval_count == Config.total_evals
+            break
+        end
 
         # create new population
-        Logging.debug("new population $generation")
+        Logging.debug("new population $eval_count")
         new_pop = Array{ctype}(Config.ga_population)
         new_fits = -Inf*ones(Float64, Config.ga_population)
         popi = 1
@@ -94,11 +101,7 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
         # mutation
         for i in 1:nmutate
             parent = population[selection(fits)]
-            child = mutate(parent)
-            if active_distance(parent, child) == 0
-                new_fits[popi] = fits[popi]
-            end
-            new_pop[popi] = child
+            new_pop[popi] = mutate(parent)
             popi += 1
         end
 
@@ -109,7 +112,7 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
             popi += 1
         end
 
-        Logging.debug("variable set $generation")
+        Logging.debug("variable set $eval_count")
         population = new_pop
         fits = new_fits
 
@@ -121,7 +124,7 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
             end
         end
 
-        Logging.debug("done $generation")
+        Logging.debug("done $eval_count")
     end
 
     max_fit, best.genes

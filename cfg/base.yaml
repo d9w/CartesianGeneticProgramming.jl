@@ -1,12 +1,15 @@
 # General settings
-num_nodes: 100
-node_size_cap: 1000
+starting_nodes: 100
+static_node_size: 200
+node_size_cap: 300
 node_inputs: 2
 save_best: False
 mutate_method: ":gene_mutate"
 crossover_method: ":single_point_crossover"
 distance_method: ":genetic_distance"
 recurrency: 0.0
+total_evals: 5000
+input_start: -1.0
 # Mutation
 input_mutation_rate: 0.1
 output_mutation_rate: 0.1
@@ -16,11 +19,9 @@ delete_node_rate: 0.1
 add_mutation_rate: 0.25
 delete_mutation_rate: 0.15
 # Oneplus settings
-oneplus_num_generations: 1000
-oneplus_population_size: 5
+lambda: 5
 # GA settings
 ga_population: 50
-ga_num_generations: 100
 ga_elitism_rate: 0.1
 ga_crossover_rate: 0.25
 ga_mutation_rate: 0.65

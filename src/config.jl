@@ -4,8 +4,10 @@ using Logging
 using PaddedViews
 using Distributions
 using ArgParse
+
 include("functions.jl")
-functions = []
+functions = Array{Function}(0)
+
 function init(config::Dict)
     for k in keys(config)
         if k == "functions"
@@ -18,19 +20,22 @@ function init(config::Dict)
     end
 end
 
+function bloat()
+    ((mutate_method in [:mixed_node_mutate, :mixed_subtree_mutate]) ||
+     (crossover_method in [:output_graph_crossover, :subgraph_crossover]))
+end
+
 function init(file::String)
     init(YAML.load_file(file))
 end
-
-append!(functions, [f_input])
 
 function reset()
     empty!(functions)
 end
 
-
 function add_arg_settings!(s::ArgParseSettings)
-    mutations = [":gene_mutate", ":mixed_node_mutate", ":mixed_subtree_mutate"]
+    mutations = [":gene_mutate", ":active_gene_mutate", ":mixed_node_mutate",
+                 ":mixed_subtree_mutate"]
     crossovers = [":single_point_crossover", ":random_node_crossover",
                   ":aligned_node_crossover", ":proportional_crossover",
                   ":output_graph_crossover", ":subgraph_crossover"]
@@ -53,7 +58,8 @@ function add_arg_settings!(s::ArgParseSettings)
             help = "distance method; must be one of " * join(distances, ", ", " or ")
     end
 
-    params = ["recurrency", "input_mutation_rate", "output_mutation_rate",
+    params = ["total_evals", "input_start", "lambda", "recurrency",
+              "input_start", "input_mutation_rate", "output_mutation_rate",
               "node_mutation_rate", "add_node_rate", "delete_node_rate",
               "add_mutation_rate", "delete_mutation_rate", "speciation_thresh",
               "ga_elitism_rate", "ga_crossover_rate", "ga_mutation_rate"]
@@ -72,12 +78,15 @@ end
 
 function to_string()
     @sprintf(
-    "%s %s %s %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f",
-        string(mutate_method), string(crossover_method), string(distance_method),
-        recurrency, input_mutation_rate, output_mutation_rate, node_mutation_rate,
-        add_node_rate, delete_node_rate, add_mutation_rate, delete_mutation_rate,
-        speciation_thresh, ga_elitism_rate, ga_crossover_rate, ga_mutation_rate)
+        "%s %s %d %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %d %0.3f
+        %0.3f %0.3f", string(mutate_method), string(crossover_method), lambda,
+        input_start, recurrency, input_mutation_rate, output_mutation_rate,
+        node_mutation_rate, add_node_rate, delete_node_rate, add_mutation_rate,
+        delete_mutation_rate, ga_population, ga_elitism_rate, ga_crossover_rate,
+        ga_mutation_rate)
+
 end
 
+append!(functions, [f_input])
 export init, reset
 end

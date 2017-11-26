@@ -10,4 +10,6 @@
 ##
 ## Examples of valid logical operators are: ==  !=  >=  <=  >  <  &  |  !  %in%
 (mutate_method != :gene_mutate) & (add_mutation_rate == 0.0) & (delete_mutation_rate == 0.0)
+(mutate_method != :gene_mutate) & ((add_mutation_rate + delete_mutation_rate) > 1.0)
 (mutate_method != :gene_mutate) & (add_node_rate == 0.0) & (delete_node_rate == 0.0)
+(ga_elitism_rate + ga_crossover_rate + ga_mutation_rate) > 1.0

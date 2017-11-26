@@ -36,7 +36,11 @@ function CGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::CGPChromo
 end
 
 function CGPChromo(nin::Int64, nout::Int64)::CGPChromo
-    CGPChromo(rand(nin+nout+4*Config.num_nodes), nin, nout)
+    n_nodes = Config.static_node_size
+    if Config.bloat()
+        n_nodes = Config.starting_nodes
+    end
+    CGPChromo(rand(nin+nout+4*n_nodes), nin, nout)
 end
 
 function CGPChromo(c::CGPChromo)::CGPChromo

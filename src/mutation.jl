@@ -31,23 +31,25 @@ end
 
 function active_gene_mutate(c::Chromosome)
     # Only use genetic mutation if active genes were mutated
-    d = gene_mutate(c)
-    while active_distance(c, d) == 0.0
+    for i in 1:10
         d = gene_mutate(c)
+        if (active_distance(c, d) > 0.0)
+            return d
+        end
     end
-    d
+    gene_mutate(c)
 end
 
 function add_nodes(c::Chromosome)
     # Add random nodes
-    n_adds = Int64(floor(Config.num_nodes * Config.add_node_rate))+1
+    n_adds = Int64(floor(Config.starting_nodes * Config.add_node_rate))+1
     new_genes = rand(n_adds, node_genes(c))
     typeof(c)([deepcopy(c.genes); new_genes[:]], c.nin, c.nout)
 end
 
 function delete_nodes(c::Chromosome)
     # Remove random nodes
-    n_dels = Int64(round(Config.num_nodes * Config.delete_node_rate))
+    n_dels = Int64(round(Config.starting_nodes * Config.delete_node_rate))
     if (length(c.nodes) - c.nin) < n_dels
         if length(c.nodes) > c.nin
             n_dels = length(c.nodes) - c.nin
@@ -66,7 +68,7 @@ function add_subtree(c::Chromosome)
     if node_genes(c) == 4
         return add_nodes(c::Chromosome)
     end
-    n_adds = Int64(floor(Config.num_nodes * Config.add_node_rate))+1
+    n_adds = Int64(floor(Config.starting_nodes * Config.add_node_rate))+1
     genes = rand(n_adds, node_genes(c))
     pos_set = [rand(get_positions(c), n_adds); genes[:, 1]]
     genes[:, 3] = rand(pos_set, n_adds)
@@ -76,7 +78,7 @@ end
 
 function delete_subtree(c::Chromosome)
     # Removes a connected subtree
-    n_dels = Int64(round(Config.num_nodes * Config.delete_node_rate))
+    n_dels = Int64(round(Config.starting_nodes * Config.delete_node_rate))
     if (length(c.nodes) - c.nin) < n_dels
         if length(c.nodes) > c.nin
             n_dels = length(c.nodes) - c.nin

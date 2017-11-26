@@ -15,11 +15,11 @@ function PCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::PCGPChromo
     nodes = Array{CGPNode}(nin+num_nodes)
     rgenes = reshape(genes[(nin+nout+1):end], (5, num_nodes))
     rgenes = sortcols(rgenes)'
-    positions = [-genes[1:nin]; rgenes[:, 1]]
+    positions = [Config.input_start .* genes[1:nin]; rgenes[:, 1]]
     fc = deepcopy(hcat(zeros(2, nin), [rgenes[:, 2]'; rgenes[:, 3]']))
     for i in nin:length(positions)
         i_factor = Int64(floor((length(positions)-(i-1))*Config.recurrency))+(i-1)
-        fc[:, i] = positions[i_factor].*fc[:,i] .+ fc[:,i] .- 1
+        fc[:, i] = (positions[i_factor]-Config.input_start).*fc[:, i].+Config.input_start
     end
     connections = snap(fc, positions)
     outputs = snap(genes[nin+(1:nout)], positions)
@@ -35,7 +35,11 @@ function PCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::PCGPChromo
 end
 
 function PCGPChromo(nin::Int64, nout::Int64)::PCGPChromo
-    PCGPChromo(rand(nin+nout+5*Config.num_nodes), nin, nout)
+    n_nodes = Config.static_node_size
+    if Config.bloat()
+        n_nodes = Config.starting_nodes
+    end
+    PCGPChromo(rand(nin+nout+5*n_nodes), nin, nout)
 end
 
 function PCGPChromo(c::PCGPChromo)::PCGPChromo
@@ -47,5 +51,5 @@ function node_genes(c::PCGPChromo)
 end
 
 function get_positions(c::PCGPChromo)
-    [-c.genes[1:c.nin]; c.genes[(c.nin+c.nout+1):5:end]]
+    [Config.input_start .* c.genes[1:c.nin]; c.genes[(c.nin+c.nout+1):5:end]]
 end
