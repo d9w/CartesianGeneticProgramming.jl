@@ -58,14 +58,17 @@ function add_arg_settings!(s::ArgParseSettings)
             help = "distance method; must be one of " * join(distances, ", ", " or ")
     end
 
-    params = ["total_evals", "input_start", "lambda", "recurrency",
-              "input_mutation_rate", "output_mutation_rate",
-              "node_mutation_rate", "add_node_rate", "delete_node_rate",
-              "add_mutation_rate", "delete_mutation_rate", "speciation_thresh",
+    params = ["input_start", "recurrency", "input_mutation_rate",
+              "output_mutation_rate", "node_mutation_rate", "add_node_rate",
+              "delete_node_rate", "add_mutation_rate", "delete_mutation_rate",
               "ga_elitism_rate", "ga_crossover_rate", "ga_mutation_rate"]
 
     for p in params
         add_arg_table(s, ["--$p"], Dict(:help=>"Parameter: $p", :arg_type=>Float64))
+    end
+
+    for p in ["lambda", "ga_population"]
+        add_arg_table(s, ["--$p"], Dict(:help=>"Parameter: $p", :arg_type=>Int64))
     end
     s
 end
