@@ -9,7 +9,7 @@ Gadfly.push_theme(Theme(major_label_font="Droid Sans",
                         major_label_font_size=18pt, minor_label_font_size=16pt,
                         line_width=0.8mm, key_label_font="Droid Sans",
                         lowlight_color=c->RGBA{Float32}(c.r, c.g, c.b, 0.2),
-                        key_label_font_size=14pt, key_position=:none,
+                        key_label_font_size=14pt,
                         default_color=colorant"#000000"))
 
 colors = [colorant"#e41a1c", colorant"#377eb8", colorant"#4daf4a",
@@ -56,32 +56,7 @@ function mapf(i::Int64, df, xmax::Int64)
     df[:fit][i] * ones(df[:eval][i] - lower)
 end
 
-function idf(ea::String, chromosome::String, mutation::String, crossover::String,
-             distance::String)::Int64
-    id = 1e4 * findfirst(["oneplus", "NEAT", "GA"] .== ea)
-    id += 1e3 * findfirst(["CGP.CGPChromo", "CGP.EPCGPChromo", "CGP.RCGPChromo",
-                           "CGP.PCGPChromo", "CGP.RPCGPChromo"] .== chromosome)
-    id += 1e2 * findfirst(["CGP.mutate_genes", "CGP.mixed_node_mutate",
-                           "CGP.mixed_subtree_mutate"] .== mutation)
-    id += 1e1 * findfirst(["N/A", "CGP.single_point_crossover",
-                           "CGP.proportional_crossover",
-                           "CGP.random_node_crossover",
-                           "CGP.aligned_node_crossover",
-                           "CGP.output_graph_crossover",
-                           "CGP.subgraph_crossover"] .== crossover)
-    id += findfirst(["N/A", "CGP.functional_distance", "CGP.genetic_distance",
-                     "CGP.positional_distance"] .== distance)
-    id
-end
-
-function get_sweep_stats(log::String)
-    res = readtable(log, header=false, separator=' ',
-                    names=[:date, :time, :seed, :eval, :fit, :refit, :mean_fit,
-                           :active, :nodes, :mean_nodes, :species, :ea, :chromosome,
-                           :mutation, :crossover, :distance])
-
-    xmax = maximum(res[:eval])
-
+function get_stats(res::DataFrame; xmax::Int64 = maximum(res[:eval]))
     filled = by(res, [:seed, :ea, :chromosome, :mutation, :crossover, :distance],
                 df->reduce(vcat, reducef(df, xmax)))
     filled[:xs] = repeat(1:xmax, outer=Int64(size(filled,1)/xmax))
@@ -90,8 +65,7 @@ function get_sweep_stats(log::String)
                              maxs=maximum(df[:x1])))
     stats[:lower] = stats[:means]-0.5*stats[:stds]
     stats[:upper] = stats[:means]+0.5*stats[:stds]
-    stats[:id] = idf.(stats[:ea], stats[:chromosome], stats[:mutation],
-                      stats[:crossover], stats[:distance])
+    stats[:id] = string.(stats[:ea], ",", stats[:chromosome])
     stats
 end
 
@@ -159,15 +133,16 @@ function get_cmaes_results(log::String)
                            :add_node_rate, :delete_node_rate, :add_mutation_rate,
                            :delete_mutation_rate, :speciation_thresh, :ga_elitism_rate,
                            :ga_crossover_rate, :ga_mutation_rate])
-    res[:chromosome] = map(x->split(split(x, '.')[2], "Chromo")[1], res[:chromo])
+    res[:chromosome] = map(x->String(split(split(x, '.')[2], "Chromo")[1]), res[:chromo])
     res[:ind] = 1:size(res,1)
     res[:ea][res[:ea].=="NEAT"] = "GA+s"
-    inds = find(diff(res[:eval]) .< 0);
-    runs = @from i in res begin
-        @where i.ind in inds
-        @select i
-        @collect DataFrame
-    end
+    # inds = find(diff(res[:eval]) .< 0);
+    # runs = @from i in res begin
+    #     @where i.ind in inds
+    #     @select i
+    #     @collect DataFrame
+    # end
+    runs = res
     # mutations = sort!(unique(runs[:mutation]))
     mutations = String["gene_mutate", "mixed_node_mutate", "mixed_subtree_mutate"]
     runs[:f_mutation] = indexin(runs[:mutation], mutations)./(1.0*length(mutations))
