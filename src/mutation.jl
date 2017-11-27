@@ -90,7 +90,7 @@ function delete_subtree(c::Chromosome)
     shuffle!(conns)
     i = 1
     deletes = conns[i][conns[i] .> c.nin]
-    while length(deletes) == 0
+    while length(deletes) == 0 && i < length(conns)
         i += 1
         deletes = conns[i][conns[i] .> c.nin]
     end
