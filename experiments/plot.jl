@@ -19,7 +19,7 @@ all_params = [:recurrency, :input_mutation_rate, :output_mutation_rate,
               :node_mutation_rate, :add_node_rate, :delete_node_rate,
               :add_mutation_rate, :delete_mutation_rate,
               :speciation_thresh, :ga_elitism_rate, :ga_crossover_rate,
-              :ga_mutation_rate, :f_mutation, :f_crossover, :f_distance]
+              :ga_mutation_rate, :f_mutation, :f_crossover]
 
 ea_params = [:recurrency, :input_mutation_rate, :output_mutation_rate,
              :node_mutation_rate, :add_node_rate, :delete_node_rate,
@@ -35,7 +35,7 @@ neat_params = [:recurrency, :input_mutation_rate, :output_mutation_rate,
                :node_mutation_rate, :add_node_rate, :delete_node_rate,
                :add_mutation_rate, :delete_mutation_rate,
                :speciation_thresh, :ga_crossover_rate,
-               :ga_mutation_rate, :f_mutation, :f_crossover, :f_distance]
+               :ga_mutation_rate, :f_mutation, :f_crossover]
 
 function reducef(df, xmax)
     r = 1:length(df[:eval])
@@ -57,10 +57,10 @@ function mapf(i::Int64, df, xmax::Int64)
 end
 
 function get_stats(res::DataFrame; xmax::Int64 = maximum(res[:eval]))
-    filled = by(res, [:seed, :ea, :chromosome, :mutation, :crossover, :distance],
+    filled = by(res, [:seed, :ea, :chromosome],
                 df->reduce(vcat, reducef(df, xmax)))
     filled[:xs] = repeat(1:xmax, outer=Int64(size(filled,1)/xmax))
-    stats = by(filled, [:xs, :ea, :chromosome, :mutation, :crossover, :distance],
+    stats = by(filled, [:xs, :ea, :chromosome],
                df->DataFrame(stds=std(df[:x1]), means=mean(df[:x1]), mins=minimum(df[:x1]),
                              maxs=maximum(df[:x1])))
     stats[:lower] = stats[:means]-0.5*stats[:stds]
@@ -128,10 +128,10 @@ end
 function get_cmaes_results(log::String)
     res = readtable(log, header=false, separator=' ',
                     names=[:date, :time, :seed, :eval, :fit, :active, :nodes, :ea,
-                           :chromo, :mutation, :crossover, :distance, :recurrency,
+                           :chromo, :mutation, :crossover, :lambda, :input_start, :recurrency,
                            :input_mutation_rate, :output_mutation_rate, :node_mutation_rate,
                            :add_node_rate, :delete_node_rate, :add_mutation_rate,
-                           :delete_mutation_rate, :speciation_thresh, :ga_elitism_rate,
+                           :delete_mutation_rate, :ga_population, :ga_elitism_rate,
                            :ga_crossover_rate, :ga_mutation_rate])
     res[:chromosome] = map(x->String(split(split(x, '.')[2], "Chromo")[1]), res[:chromo])
     res[:ind] = 1:size(res,1)
@@ -150,8 +150,8 @@ function get_cmaes_results(log::String)
     crossovers = String["aligned_node_crossover", "output_graph_crossover", "proportional_crossover", "random_node_crossover", "single_point_crossover", "subgraph_crossover"]
     runs[:f_crossover] = indexin(runs[:crossover], crossovers)./(1.0*length(crossovers))
     # distances = sort!(unique(runs[:distance]))
-    distances = String["functional_distance", "genetic_distance", "positional_distance"]
-    runs[:f_distance] = indexin(runs[:distance], distances)./(1.0*length(distances))
+    # distances = String["functional_distance", "genetic_distance", "positional_distance"]
+    # runs[:f_distance] = indexin(runs[:distance], distances)./(1.0*length(distances))
     eas = unique(runs[:ea])
     chromosomes = unique(runs[:chromosome])
 
