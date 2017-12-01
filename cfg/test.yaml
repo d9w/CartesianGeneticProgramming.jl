@@ -10,13 +10,12 @@ recurrency: 1.0
 total_evals: 500
 input_start: -1.0
 # Mutation
+active_mutate: True
 input_mutation_rate: 0.5
 output_mutation_rate: 0.5
 node_mutation_rate: 0.5
-add_node_rate: 0.4
-delete_node_rate: 0.4
-add_mutation_rate: 0.3
-delete_mutation_rate: 0.3
+node_size_delta: 0.1
+modify_mutation_rate: 0.25
 # Oneplus settings
 lambda: 5
 # GA settings

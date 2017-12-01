@@ -22,6 +22,7 @@ function PCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::PCGPChromo
         fc[:, i] = (positions[i_factor]-Config.input_start).*fc[:, i].+Config.input_start
     end
     connections = snap(fc, positions)
+    # TODO: fc != c
     outputs = snap(genes[nin+(1:nout)], positions)
     functions = Array{Function}(nin+num_nodes)
     functions[1:nin] = Config.f_input

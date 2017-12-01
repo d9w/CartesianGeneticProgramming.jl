@@ -34,11 +34,14 @@ function reset()
 end
 
 function add_arg_settings!(s::ArgParseSettings)
-    mutations = [":gene_mutate", ":active_gene_mutate", ":mixed_node_mutate",
-                 ":mixed_subtree_mutate"]
+
+    mutations = [":gene_mutate", ":mixed_node_mutate", ":mixed_subtree_mutate",
+                 ":adaptive_node_mutate", ":adaptive_subtree_mutate"]
+
     crossovers = [":single_point_crossover", ":random_node_crossover",
                   ":aligned_node_crossover", ":proportional_crossover",
                   ":output_graph_crossover", ":subgraph_crossover"]
+
     distances = [":genetic_distance", ":positional_distance",
                  ":constant_functional_distance", ":random_functional_distance",
                  ":active_distance"]
@@ -59,9 +62,9 @@ function add_arg_settings!(s::ArgParseSettings)
     end
 
     params = ["input_start", "recurrency", "input_mutation_rate",
-              "output_mutation_rate", "node_mutation_rate", "add_node_rate",
-              "delete_node_rate", "add_mutation_rate", "delete_mutation_rate",
-              "ga_elitism_rate", "ga_crossover_rate", "ga_mutation_rate"]
+        "output_mutation_rate", "node_mutation_rate", "node_size_delta",
+        "modify_mutation_rate", "lambda", "ga_population", "ga_elitism_rate",
+        "ga_crossover_rate", "ga_mutation_rate"]
 
     for p in params
         add_arg_table(s, ["--$p"], Dict(:help=>"Parameter: $p", :arg_type=>Float64))
@@ -81,13 +84,11 @@ end
 
 function to_string()
     @sprintf(
-        "%s %s %d %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %d %0.3f %0.3f %0.3f",
-        string(mutate_method), string(crossover_method), lambda,
+        "%s %s %s %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %d %d %0.3f %0.3f %0.3f",
+        string(mutate_method), string(active_mutate), string(crossover_method),
         input_start, recurrency, input_mutation_rate, output_mutation_rate,
-        node_mutation_rate, add_node_rate, delete_node_rate, add_mutation_rate,
-        delete_mutation_rate, ga_population, ga_elitism_rate, ga_crossover_rate,
-        ga_mutation_rate)
-
+        node_mutation_rate, node_size_delta, modify_mutation_rate, lambda,
+        ga_population, ga_elitism_rate, ga_crossover_rate, ga_mutation_rate)
 end
 
 append!(functions, [f_input])

@@ -12,7 +12,7 @@ export gene_mutate,
     mixed_node_mutate,
     mutate
 
-function gene_mutate(c::Chromosome)
+function base_gene_mutate(c::Chromosome)
     # Mutate inputs, outputs, and node genes according to parameter probabilities
     genes = deepcopy(c.genes)
     # mutate inputs
@@ -32,24 +32,31 @@ end
 function active_gene_mutate(c::Chromosome)
     # Only use genetic mutation if active genes were mutated
     for i in 1:10
-        d = gene_mutate(c)
+        d = base_gene_mutate(c)
         if (active_distance(c, d) > 0.0)
             return d
         end
     end
-    gene_mutate(c)
+    base_gene_mutate(c)
+end
+
+function gene_mutate(c::Chromosome)
+    if Config.active_mutate
+        return active_gene_mutate(c)
+    end
+    base_gene_mutate(c)
 end
 
 function add_nodes(c::Chromosome)
     # Add random nodes
-    n_adds = Int64(floor(Config.starting_nodes * Config.add_node_rate))+1
+    n_adds = Int64(floor(Config.starting_nodes * Config.node_size_delta))+1
     new_genes = rand(n_adds, node_genes(c))
     typeof(c)([deepcopy(c.genes); new_genes[:]], c.nin, c.nout)
 end
 
 function delete_nodes(c::Chromosome)
     # Remove random nodes
-    n_dels = Int64(round(Config.starting_nodes * Config.delete_node_rate))
+    n_dels = Int64(round(Config.starting_nodes * Config.node_size_delta))
     if (length(c.nodes) - c.nin) < n_dels
         if length(c.nodes) > c.nin
             n_dels = length(c.nodes) - c.nin
@@ -68,9 +75,10 @@ function add_subtree(c::Chromosome)
     if node_genes(c) == 4
         return add_nodes(c::Chromosome)
     end
-    n_adds = Int64(floor(Config.starting_nodes * Config.add_node_rate))+1
+    n_adds = Int64(floor(Config.starting_nodes * Config.node_size_delta))+1
     genes = rand(n_adds, node_genes(c))
     pos_set = [rand(get_positions(c), n_adds); genes[:, 1]]
+    # TODO: connection gene != position
     genes[:, 3] = rand(pos_set, n_adds)
     genes[:, 4] = rand(pos_set, n_adds)
     typeof(c)([deepcopy(c.genes); genes[:]], c.nin, c.nout)
@@ -78,7 +86,7 @@ end
 
 function delete_subtree(c::Chromosome)
     # Removes a connected subtree
-    n_dels = Int64(round(Config.starting_nodes * Config.delete_node_rate))
+    n_dels = Int64(round(Config.starting_nodes * Config.node_size_delta))
     if (length(c.nodes) - c.nin) < n_dels
         if length(c.nodes) > c.nin
             n_dels = length(c.nodes) - c.nin
@@ -105,15 +113,39 @@ end
 function mixed_mutate(c::Chromosome, add_f::Function, del_f::Function)
     # always mutate inputs and outputs
     method = rand()
-    if method < Config.add_mutation_rate
-        debug("Add mutate")
-        return add_f(c)
-    elseif method < (Config.add_mutation_rate + Config.delete_mutation_rate)
+    if method < Config.modify_mutation_rate
+        debug("Gene mutate")
+        return gene_mutate(c)
+    else
+        method = (method - Config.modify_mutation_rate) / (1.0 - Config.modify_mutation_rate)
+        add_rate = (length(c.nodes) - Config.starting_nodes)/(
+            Config.node_size_cap - Config.starting_nodes)
+        if method < add_rate
+            debug("Add mutation")
+            return add_f(c)
+        else
+            debug("Delete mutate")
+            return del_f(c)
+        end
+    end
+end
+
+function adaptive_mutate(c::Chromosome, add_f::Function, del_f::Function)
+    # always mutate inputs and outputs
+    method = rand()
+    x = length(c.nodes); s = Config.starting_nodes; e = Config.node_size_cap
+    denom = 2.0/(s-e) * abs(x-(s+e)/2.0) + 2
+    modify_rate = (2.0/(s-e) * abs(x-(s+e)/2.0) + 1) / denom
+    delete_rate = (x-s)/(e-s) / denom
+    if method < modify_rate
+        debug("Gene mutate")
+        return gene_mutate(c)
+    elseif method < (modify_rate + delete_rate)
         debug("Delete mutate")
         return del_f(c)
     else
-        debug("Gene mutate")
-        return gene_mutate(c)
+        debug("Add mutation")
+        return add_f(c)
     end
 end
 
@@ -123,6 +155,14 @@ end
 
 function mixed_node_mutate(c::Chromosome)
     mixed_mutate(c, add_nodes, delete_nodes)
+end
+
+function adaptive_subtree_mutate(c::Chromosome)
+    adaptive_mutate(c, add_subtree, delete_subtree)
+end
+
+function adaptive_node_mutate(c::Chromosome)
+    adaptive_mutate(c, add_nodes, delete_nodes)
 end
 
 function mutate(c::Chromosome)

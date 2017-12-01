@@ -6,18 +6,16 @@ node_inputs: 2
 save_best: False
 mutate_method: ":gene_mutate"
 crossover_method: ":single_point_crossover"
-distance_method: ":genetic_distance"
 recurrency: 0.0
-total_evals: 5000
+total_evals: 10000
 input_start: -1.0
 # Mutation
+active_mutate: True
 input_mutation_rate: 0.1
 output_mutation_rate: 0.1
 node_mutation_rate: 0.1
-add_node_rate: 0.1
-delete_node_rate: 0.1
-add_mutation_rate: 0.25
-delete_mutation_rate: 0.15
+node_size_delta: 0.1
+modify_mutation_rate: 0.25
 # Oneplus settings
 lambda: 5
 # GA settings
