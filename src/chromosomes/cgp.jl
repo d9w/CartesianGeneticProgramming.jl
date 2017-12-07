@@ -17,9 +17,13 @@ function CGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::CGPChromo
     connections[:, 1:nin] = zeros(2, nin)
     positions = collect(1:(nin+num_nodes))/(1.0*(nin+num_nodes))
     fc = deepcopy(hcat(zeros(2, nin), [rgenes[:, 2]'; rgenes[:, 3]']))
-    for i in nin:length(positions)
-        i_factor = Int64(floor((length(positions)-(i-1))*Config.recurrency))+(i-1)
-        fc[:, i] .*= positions[i_factor]
+    if ~Config.recurrency
+        for i in nin:length(positions)
+            fc[:, i] = (fc[:, i].*(positions[i] - Config.input_start) .+ Config.input_start)
+            for j in eachindex(fc[:, i])
+                fc[j, i] = max(fc[j,i], positions[i-1])
+            end
+        end
     end
     connections = snap(fc, positions)
     functions = Array{Function}(nin+num_nodes)
