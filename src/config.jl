@@ -63,8 +63,8 @@ function add_arg_settings!(s::ArgParseSettings)
 
     params = ["input_start", "recurrency", "input_mutation_rate",
         "output_mutation_rate", "node_mutation_rate", "node_size_delta",
-        "modify_mutation_rate", "lambda", "ga_population", "ga_elitism_rate",
-        "ga_crossover_rate", "ga_mutation_rate"]
+        "modify_mutation_rate", "ga_elitism_rate", "ga_crossover_rate",
+        "ga_mutation_rate"]
 
     for p in params
         add_arg_table(s, ["--$p"], Dict(:help=>"Parameter: $p", :arg_type=>Float64))
