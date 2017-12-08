@@ -142,18 +142,18 @@ function adaptive_mutate(c::Chromosome, add_f::Function, del_f::Function)
     # Adaptive modify add and delete rates
     method = rand()
     x = length(c.nodes); s = Config.starting_nodes; e = Config.node_size_cap
-    denom = 2.0/(s-e) * abs(x-(s+e)/2.0) + 2
-    modify_rate = (2.0/(s-e) * abs(x-(s+e)/2.0) + 1) / denom
-    delete_rate = (x-s)/(e-s) / denom
+    denom = 2.0/(s-e) * (x-(s+e)/2.0)^2 + 2
+    modify_rate = (2.0/(s-e) * (x-(s+e)/2.0)^2 + 1) / denom
+    add_rate = (x-s)/(e-s) / denom
     if method < modify_rate
         debug("Gene mutate")
         return gene_mutate(c)
-    elseif method < (modify_rate + delete_rate)
-        debug("Delete mutate")
-        return del_f(c)
-    else
-        debug("Add mutation")
+    elseif method < (modify_rate + add_rate)
+        debug("Add mutate")
         return add_f(c)
+    else
+        debug("Delete mutation")
+        return del_f(c)
     end
 end
 
