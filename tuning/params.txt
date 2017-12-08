@@ -10,7 +10,7 @@ input_start              "--input_start "              r    (-1.0, -0.1)
 output_mutation_rate     "--output_mutation_rate "     r    (0.1, 1.0)
 node_mutation_rate       "--node_mutation_rate "       r    (0.1, 1.0)
 node_size_delta          "--node_size_delta "          r    (0.1, 0.5) | mutate_method != ":gene_mutate"
-modify_mutation_rate     "--modify_mutation_rate "     r    (0.1, 1.0) | (mutate_method == ":mixed_node_mutate") || (mutate_method == ":mixed_subtree_mutate")
+modify_mutation_rate     "--modify_mutation_rate "     r    (0.1, 0.9) | (mutate_method == ":mixed_node_mutate") || (mutate_method == ":mixed_subtree_mutate")
 ga_population            "--ga_population "            c    (10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
 ga_elitism_rate          "--ga_elitism_rate "          r    (0.0, 0.8)
 ga_crossover_rate        "--ga_crossover_rate "        r    (0.1, 1.0)
