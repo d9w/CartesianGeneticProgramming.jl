@@ -17,10 +17,13 @@ function CGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::CGPChromo
     connections[:, 1:nin] = zeros(2, nin)
     positions = collect(1:(nin+num_nodes))/(1.0*(nin+num_nodes))
     fc = deepcopy(hcat(zeros(2, nin), [rgenes[:, 2]'; rgenes[:, 3]']))
-    if ~Config.recurrency
-        for i in nin:length(positions)
-            fc[:, i] = (fc[:, i].*(positions[i] - Config.input_start) .+ Config.input_start)
-            for j in eachindex(fc[:, i])
+    e = (1.0 .- positions) .* Config.recurrency .+ positions
+    for j in 1:size(fc)[1]
+        fc[j, :] .*= e
+    end
+    if Config.recurrency == 0
+        for i in (nin+1):length(positions)
+            for j in 1:size(fc)[1]
                 fc[j, i] = max(fc[j,i], positions[i-1])
             end
         end
@@ -57,4 +60,12 @@ end
 
 function get_positions(c::CGPChromo)
     collect(1:length(c.nodes))/(1.0*length(c.nodes))
+end
+
+function add_subtree(c::CGPChromo)
+    add_nodes(c)
+end
+
+function delete_subtree(c::CGPChromo)
+    delete_nodes(c)
 end

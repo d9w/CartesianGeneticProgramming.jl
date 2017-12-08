@@ -72,15 +72,23 @@ end
 
 function add_subtree(c::Chromosome)
     # Add a connected subtree
-    if node_genes(c) == 4
-        return add_nodes(c::Chromosome)
-    end
     n_adds = Int64(floor(Config.starting_nodes * Config.node_size_delta))+1
-    genes = rand(n_adds, node_genes(c))
-    pos_set = [rand(get_positions(c), n_adds); genes[:, 1]]
-    # TODO: connection gene != position
-    genes[:, 3] = rand(pos_set, n_adds)
-    genes[:, 4] = rand(pos_set, n_adds)
+    functions = rand(n_adds)
+    params = rand(n_adds)
+    poses = rand(n_adds)
+    sort!(poses)
+    cpos = get_positions(c)
+    c1 = Array{Float64,1}(n_adds)
+    c2 = Array{Float64,1}(n_adds)
+    for n in 1:n_adds
+        pos_set = [poses[1:n]; rand(cpos[cpos .< poses[n]], n)]
+        c1[n] = rand(pos_set)
+        c2[n] = rand(pos_set)
+    end
+    e = (1.0 .- poses) .* Config.recurrency .+ poses
+    gc1 = (c1 .- Config.input_start)./(e .- Config.input_start)
+    gc2 = (c2 .- Config.input_start)./(e .- Config.input_start)
+    genes = [poses'; functions'; gc1'; gc2'; params']
     typeof(c)([deepcopy(c.genes); genes[:]], c.nin, c.nout)
 end
 

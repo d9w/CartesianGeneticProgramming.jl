@@ -6,7 +6,7 @@ save_best: False
 mutate_method: ":gene_mutate"
 crossover_method: ":single_point_crossover"
 distance_method: ":genetic_distance"
-recurrency: False
+recurrency: 0.5
 total_evals: 500
 input_start: -1.0
 # Mutation
