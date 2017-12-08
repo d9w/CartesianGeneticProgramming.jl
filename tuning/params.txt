@@ -1,6 +1,6 @@
 ### Parameter file for the ACOTSP software
 # name		switch		     type	values			[conditions (using R syntax)]
-mutate_method            "--mutate_method "            c    (:gene_mutate, :mixed_node_mutate, :mixed_subtree_mutate)
+mutate_method            "--mutate_method "            c    (:gene_mutate, :mixed_node_mutate, :mixed_subtree_mutate, :adaptive_node_mutate, :adaptive_subtree_mutate)
 crossover_method         "--crossover_method "         c    (:single_point_crossover, :random_node_crossover, :aligned_node_crossover, :proportional_crossover, :output_graph_crossover, :subgraph_crossover)
 active_mutate            "--active_mutate "            c    (True, False)
 recurrency               "--recurrency "               r    (0.0, 1.0)
@@ -8,9 +8,9 @@ lambda                   "--lambda "                   i    (1, 10)
 input_mutation_rate      "--input_mutation_rate "      r    (0.0, 1.0)
 input_start              "--input_start "              r    (-1.0, -0.1)
 output_mutation_rate     "--output_mutation_rate "     r    (0.1, 1.0)
-node_mutation_rate       "--node_mutation_rate  "      r    (0.1, 1.0)
-node_size_delta          "--node_size_delta "          r    (0.00, 0.50) | mutate_method != ":gene_mutate"
-modify_mutation_rate     "--modify_mutation_rate "     r    (0.00, 1.00) | (mutate_method == ":mixed_node_mutate") || (mutate_method == ":mixed_subtree_mutate")
+node_mutation_rate       "--node_mutation_rate "       r    (0.1, 1.0)
+node_size_delta          "--node_size_delta "          r    (0.1, 0.5) | mutate_method != ":gene_mutate"
+modify_mutation_rate     "--modify_mutation_rate "     r    (0.1, 1.0) | (mutate_method == ":mixed_node_mutate") || (mutate_method == ":mixed_subtree_mutate")
 ga_population            "--ga_population "            c    (10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
 ga_elitism_rate          "--ga_elitism_rate "          r    (0.0, 0.8)
 ga_crossover_rate        "--ga_crossover_rate "        r    (0.1, 1.0)

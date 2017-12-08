@@ -119,7 +119,7 @@ function delete_subtree(c::Chromosome)
 end
 
 function mixed_mutate(c::Chromosome, add_f::Function, del_f::Function)
-    # always mutate inputs and outputs
+    # Fixed modify mutation rate, adaptive add and delete
     method = rand()
     if method < Config.modify_mutation_rate
         debug("Gene mutate")
@@ -139,7 +139,7 @@ function mixed_mutate(c::Chromosome, add_f::Function, del_f::Function)
 end
 
 function adaptive_mutate(c::Chromosome, add_f::Function, del_f::Function)
-    # always mutate inputs and outputs
+    # Adaptive modify add and delete rates
     method = rand()
     x = length(c.nodes); s = Config.starting_nodes; e = Config.node_size_cap
     denom = 2.0/(s-e) * abs(x-(s+e)/2.0) + 2
