@@ -2,7 +2,7 @@
 # name		switch		     type	values			[conditions (using R syntax)]
 mutate_method            "--mutate_method "            c    (:gene_mutate, :mixed_node_mutate, :mixed_subtree_mutate, :adaptive_node_mutate, :adaptive_subtree_mutate)
 crossover_method         "--crossover_method "         c    (:single_point_crossover, :random_node_crossover, :aligned_node_crossover, :proportional_crossover, :output_graph_crossover, :subgraph_crossover)
-active_mutate            "--active_mutate "            c    (True, False)
+active_mutate            "--active_mutate "            c    (true, false)
 recurrency               "--recurrency "               r    (0.0, 1.0)
 lambda                   "--lambda "                   i    (1, 10)
 input_mutation_rate      "--input_mutation_rate "      r    (0.0, 1.0)

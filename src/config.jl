@@ -73,6 +73,8 @@ function add_arg_settings!(s::ArgParseSettings)
     for p in ["lambda", "ga_population"]
         add_arg_table(s, ["--$p"], Dict(:help=>"Parameter: $p", :arg_type=>Int64))
     end
+    add_arg_table(s, ["--active_mutate"], Dict(:help=>"Parameter: active_mutate",
+                                               :arg_type=>Bool))
     s
 end
 
