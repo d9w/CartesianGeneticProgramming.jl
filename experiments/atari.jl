@@ -1,9 +1,9 @@
 using ArcadeLearningEnvironment
 using CGP
 using Logging
-using Images
+using ArgParse
 
-function play_atari(c::Chromosome, game::Game, display::Bool, frame_dir::String)
+function play_atari(c::Chromosome, game::Game)#, display::Bool, frame_dir::String)
     reset_game(game.ale)
     reward = 0.0
     frames = 0
@@ -13,9 +13,9 @@ function play_atari(c::Chromosome, game::Game, display::Bool, frame_dir::String)
         for i in 1:4
             reward += act(game.ale, action)
             frames += 1
-            if display
-                save(@sprintf("%s/frame_%05d.png", frame_dir, frames), draw(game))
-            end
+            # if display
+            #     save(@sprintf("%s/frame_%05d.png", frame_dir, frames), draw(game))
+            # end
         end
         if frames > 108000
             println("Termination due to frame count")
@@ -32,31 +32,49 @@ function play_and_draw(c::Chromosome, game::Game, display::Bool, frame_dir::Stri
     play_atari(c, game, display, frame_dir)
 end
 
-seed = 0
-log = "log"
-ea = oneplus
-ctype = CGPChromo
-game_name = "qbert"
-frame_dir = "frames"
-if length(ARGS) > 0; seed = parse(Int64, ARGS[1]); end
-if length(ARGS) > 1; log = ARGS[2]; end
-if length(ARGS) > 2; ea = eval(parse(ARGS[3])); end
-if length(ARGS) > 3; ctype = eval(parse(ARGS[4])); end
-if length(ARGS) > 4; game_name = ARGS[5]; end
-if length(ARGS) > 5; frame_dir = ARGS[6]; end
+function get_args()
+    s = ArgParseSettings()
 
-CGP.Config.init("cfg/base.yaml")
-CGP.Config.init("cfg/atari.yaml")
-CGP.Config.init("cfg/images.yaml")
+    @add_arg_table s begin
+        "--seed"
+        arg_type = Int
+        default = 0
+        "--log"
+        arg_type = String
+        required = true
+        "--id"
+        arg_type = String
+        default = "qbert"
+        "--ea"
+        arg_type = String
+        required = true
+        "--chromosome"
+        arg_type = String
+        required = true
+    end
 
-Logging.configure(filename=log, level=INFO)
-Logging.info("I: $seed $ea $ctype $game_name")
-srand(seed)
+    CGP.Config.add_arg_settings!(s)
+end
 
-game = Game(game_name)
+CGP.Config.init("base.yaml")
+CGP.Config.init("classic.yaml")
+CGP.Config.init("atari.yaml")
+
+args = parse_args(get_args())
+println(args)
+CGP.Config.init(Dict([k=>args[k] for k in setdiff(
+    keys(args), ["seed", "log", "id", "ea", "chromosome"])]...))
+
+srand(args["seed"])
+Logging.configure(filename=args["log"], level=INFO)
+ea = eval(parse(args["ea"]))
+ctype = eval(parse(args["chromosome"]))
+
+game = Game(args["id"])
 nin = 3 # r g b
 nout = length(game.actions)
-fit = x->play_atari(x, game, false, frame_dir)
-record = x->play_and_draw(x, game, true, frame_dir)
-maxfit, best = ea(ctype, nin, nout, fit; seed=seed, record_best=true, record_fitness=record)
+fit = x->play_atari(x, game)
+
+maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"])
 close!(game)
+Logging.info(@sprintf("E%0.6f", -maxfit))
