@@ -47,7 +47,11 @@ end
 
 function mapf(i::Int64, df, xmax::Int64)
     if i > length(df[:eval])
-        return df[:fit][end] * ones(xmax - df[:eval][end])
+        if df[:eval][end] < xmax
+            return df[:fit][end] * ones(xmax - df[:eval][end])
+        else
+            return []
+        end
     end
     lower = 0
     if i >= 2
@@ -63,6 +67,7 @@ function get_stats(res::DataFrame; xmax::Int64 = maximum(res[:eval]))
     stats = by(filled, [:xs, :ea, :chromosome],
                df->DataFrame(stds=std(df[:x1]), means=mean(df[:x1]), mins=minimum(df[:x1]),
                              maxs=maximum(df[:x1])))
+    stats[:stds][isnan.(stats[:stds])] = 0;
     stats[:lower] = stats[:means]-0.5*stats[:stds]
     stats[:upper] = stats[:means]+0.5*stats[:stds]
     stats[:id] = string.(stats[:ea], ",", stats[:chromosome])
@@ -94,14 +99,17 @@ function plot_sweep(stats::DataFrame, title::String, filename::String="training"
                     xmin=minimum(stats[:xs]),
                     xmax=maximum(stats[:xs]),
                     ymin=minimum(stats[:lower]),
-                    ymax=maximum(stats[:upper]))
+                    ymax=maximum(stats[:upper]),
+                    ylabel="Fitness",
+                    key_position=:right)
     plt = plot(stats, x="xs", y="means", ymin="lower", ymax="upper", color="id",
                Geom.line, Geom.ribbon,
                Scale.color_discrete_manual(colors...),
                Guide.title(title),
                Guide.xlabel("Evaluations"),
-               Guide.ylabel("Fitness"),
-               Coord.cartesian(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax))
+               Guide.ylabel(ylabel),
+               Coord.cartesian(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax),
+               style(key_position=key_position))
     draw(PDF(string(filename, ".pdf"), 8inch, 6inch), plt)
     plt
 end
@@ -121,21 +129,23 @@ function plot_tests(tests::Array{Float64}, labels::Array{String}, title::String)
                Guide.yticks(ticks=[0:0.2:1.0;]),
                Guide.ylabel("Accuracy"), Guide.xlabel(nothing),
                Guide.title(title));
-    draw(PDF("tests.pdf", 8inch, 6inch), plt)
+    draw(PDF("tests.pdf", 8inch, 8inch), plt)
     plt
 end
 
 function get_cmaes_results(log::String)
     res = readtable(log, header=false, separator=' ',
-                    names=[:date, :time, :seed, :eval, :fit, :active, :nodes, :ea,
-                           :chromo, :mutation, :crossover, :lambda, :input_start, :recurrency,
-                           :input_mutation_rate, :output_mutation_rate, :node_mutation_rate,
-                           :add_node_rate, :delete_node_rate, :add_mutation_rate,
-                           :delete_mutation_rate, :ga_population, :ga_elitism_rate,
-                           :ga_crossover_rate, :ga_mutation_rate])
+                    names=[:date, :time, :seed, :eval, :fit, :nactive, :nodes,
+                           :ea, :chromo, :mutation, :active, :crossover,
+                           :input_start, :recurrency, :input_mutation_rate,
+                           :output_mutation_rate, :node_mutation_rate,
+                           :node_size_delta, :modify_mutation_rate, :lambda,
+                           :ga_population, :ga_elitism_rate, :ga_crossover_rate,
+                           :ga_mutation_rate])
     res[:chromosome] = map(x->String(split(split(x, '.')[2], "Chromo")[1]), res[:chromo])
     res[:ind] = 1:size(res,1)
     res[:ea][res[:ea].=="NEAT"] = "GA+s"
+    res[:ea][res[:ea].=="oneplus"] = "1+λ"
     # inds = find(diff(res[:eval]) .< 0);
     # runs = @from i in res begin
     #     @where i.ind in inds
@@ -185,11 +195,11 @@ function plot_top_runs(top_runs::DataFrame, ti::String, filename::String;
 
     yticks = [ymin:step:ymax;]
 
-    plt = plot(top_runs, xgroup=:chromosome,
-               x=:ea, y=:fit, color=:ea,
+    plt = plot(top_runs, xgroup=:ea,
+               x=:chromosome, y=:fit,
                Geom.subplot_grid(Coord.cartesian(ymin=ymin, ymax=ymax),
                                  Geom.violin),
-               Scale.color_discrete_manual(colors...),
+               # Scale.color_discrete_manual(colors...),
                Guide.ylabel(nothing), Guide.xlabel(nothing),
                Guide.title(ti))
     draw(PDF(string(filename, "_fitness.pdf"), 8inch, 6inch), plt)
