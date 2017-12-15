@@ -3,7 +3,7 @@ using CGP
 using Logging
 using ArgParse
 
-function play_atari(c::Chromosome, game::Game)#, display::Bool, frame_dir::String)
+function play_atari(c::Chromosome, game::Game, id::String)
     reset_game(game.ale)
     reward = 0.0
     frames = 0
@@ -13,23 +13,13 @@ function play_atari(c::Chromosome, game::Game)#, display::Bool, frame_dir::Strin
         for i in 1:4
             reward += act(game.ale, action)
             frames += 1
-            # if display
-            #     save(@sprintf("%s/frame_%05d.png", frame_dir, frames), draw(game))
-            # end
         end
         if frames > 108000
-            println("Termination due to frame count")
+            println("Termination due to frame count on ", id)
             break
         end
     end
     reward
-end
-
-function play_and_draw(c::Chromosome, game::Game, display::Bool, frame_dir::String)
-    mkpath(frame_dir)
-    rm(frame_dir, recursive=true)
-    mkpath(frame_dir)
-    play_atari(c, game, display, frame_dir)
 end
 
 function get_args()
@@ -57,7 +47,6 @@ function get_args()
 end
 
 CGP.Config.init("base.yaml")
-CGP.Config.init("classic.yaml")
 CGP.Config.init("atari.yaml")
 
 args = parse_args(get_args())
@@ -73,7 +62,7 @@ ctype = eval(parse(args["chromosome"]))
 game = Game(args["id"])
 nin = 3 # r g b
 nout = length(game.actions)
-fit = x->play_atari(x, game)
+fit = x->play_atari(x, game, args["id"])
 
 maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"])
 close!(game)
