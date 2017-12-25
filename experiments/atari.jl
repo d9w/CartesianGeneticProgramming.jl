@@ -46,8 +46,8 @@ function get_args()
     CGP.Config.add_arg_settings!(s)
 end
 
-CGP.Config.init("base.yaml")
-CGP.Config.init("atari.yaml")
+CGP.Config.init("cfg/base.yaml")
+CGP.Config.init("cfg/atari.yaml")
 
 args = parse_args(get_args())
 println(args)

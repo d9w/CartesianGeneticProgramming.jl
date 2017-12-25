@@ -64,8 +64,8 @@ function get_args()
     CGP.Config.add_arg_settings!(s)
 end
 
-CGP.Config.init("base.yaml")
-CGP.Config.init("classic.yaml")
+CGP.Config.init("cfg/base.yaml")
+CGP.Config.init("cfg/classic.yaml")
 # CGP.Config.init("../cfg/test.yaml")
 
 args = parse_args(get_args())
