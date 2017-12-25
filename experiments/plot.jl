@@ -136,7 +136,7 @@ end
 function get_cmaes_results(log::String)
     res = readtable(log, header=false, separator=' ',
                     names=[:date, :time, :seed, :eval, :fit, :nactive, :nodes,
-                           :ea, :chromo, :mutation, :active, :crossover,
+                           :ea, :chromo, :mutation, :active, :crossover, :weights,
                            :input_start, :recurrency, :input_mutation_rate,
                            :output_mutation_rate, :node_mutation_rate,
                            :node_size_delta, :modify_mutation_rate, :lambda,
