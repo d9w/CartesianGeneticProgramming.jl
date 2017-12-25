@@ -8,6 +8,5 @@ RESULTS_DIR=$HOME/results
 for proc in $JOB_DIR/*.log
 do
     cat $proc | grep 'R:' >> $RESULTS_DIR/$JOB_ID.log
-    cat $proc | grep 'CMAES' >> $RESULTS_DIR/cmaes_$JOB_ID.log
     echo $proc
 done

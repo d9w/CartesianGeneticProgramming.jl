@@ -46,7 +46,11 @@ function process(c::Chromosome, inps::Array)::Array{Float64}
             if n.f == Config.f_input
                 output = Config.index_in(inps, (n.p+1.0)/2.0)
             else
-                output = CGP.Config.scaled(n.p * n.f(c.nodes[n.connections[1]].output,
+                p = n.p
+                if ~CGP.Config.weights
+                    p = 1.0
+                end
+                output = CGP.Config.scaled(p * n.f(c.nodes[n.connections[1]].output,
                                                      c.nodes[n.connections[2]].output,
                                                      n.p))
             end

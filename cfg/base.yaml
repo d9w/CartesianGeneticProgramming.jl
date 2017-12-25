@@ -4,6 +4,7 @@ static_node_size: 100
 node_size_cap: 150
 node_inputs: 2
 save_best: False
+weights: False
 mutate_method: ":gene_mutate"
 crossover_method: ":single_point_crossover"
 recurrency: 0.0
