@@ -1,14 +1,14 @@
 # General settings
-starting_nodes: 50
-static_node_size: 100
-node_size_cap: 150
+starting_nodes: 100
+static_node_size: 200
+node_size_cap: 300
 node_inputs: 2
 save_best: False
-weights: False
+weights: True
 mutate_method: ":gene_mutate"
 crossover_method: ":single_point_crossover"
 recurrency: 0.0
-total_evals: 2000
+total_evals: 50000
 input_start: -1.0
 # Mutation
 active_mutate: True

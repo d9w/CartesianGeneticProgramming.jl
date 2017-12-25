@@ -1,7 +1,6 @@
-atari.jl --id boxing
-atari.jl --id centipede
-atari.jl --id fishing_derby
-atari.jl --id frostbite
-atari.jl --id ms_pacman
-atari.jl --id space_invaders
-atari.jl --id pong
+classify.jl --data /tmpdir/wilson/data/julia/glass.dt --ea GA --chromosome PCGPChromo
+classify.jl --data /tmpdir/wilson/data/julia/cancer.dt --ea GA --chromosome PCGPChromo
+classify.jl --data /tmpdir/wilson/data/julia/diabetes.dt --ea GA --chromosome PCGPChromo
+#classify.jl --data /tmpdir/wilson/data/julia/abalone.dt --fitness regression --ea GA --chromosome PCGPChromo
+#classify.jl --data /tmpdir/wilson/data/julia/fires.dt --fitness regression --ea GA --chromosome PCGPChromo
+#classify.jl --data /tmpdir/wilson/data/julia/quality.dt --fitness regression --ea GA --chromosome PCGPChromo
