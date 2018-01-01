@@ -21,7 +21,8 @@ function init(config::Dict)
 end
 
 function bloat()
-    ((mutate_method in [:mixed_node_mutate, :mixed_subtree_mutate]) ||
+    ((mutate_method in [:mixed_node_mutate, :adaptive_node_mutate,
+                        :mixed_subtree_mutate, :adaptive_subtree_mutate]) ||
      (crossover_method in [:output_graph_crossover, :subgraph_crossover]))
 end
 
