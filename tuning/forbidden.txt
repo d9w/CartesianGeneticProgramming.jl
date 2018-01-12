@@ -10,3 +10,5 @@
 ##
 ## Examples of valid logical operators are: ==  !=  >=  <=  >  <  &  |  !  %in%
 (ga_elitism_rate + ga_crossover_rate + ga_mutation_rate) > 1.0
+(chromosome == "CGPChromo") & ((mutate_method == ":mixed_subtree_mutate") | (mutate_method == ":adaptive_subtree_mutate"))
+(chromosome == "CGPChromo") & ((crossover_method == ":aligned_node_crossover") | (crossover_method == ":output_graph_crossover") | (crossover_method == ":subgraph_crossover"))
