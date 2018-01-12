@@ -1,7 +1,9 @@
 atari.jl --id boxing
 atari.jl --id centipede
-atari.jl --id fishing_derby
-atari.jl --id frostbite
-atari.jl --id ms_pacman
+atari.jl --id demon_attack
+atari.jl --id enduro
+atari.jl --id freeway
+atari.jl --id kung_fu_master
 atari.jl --id space_invaders
+atari.jl --id riverraid
 atari.jl --id pong

@@ -14,7 +14,7 @@ function play_atari(c::Chromosome, game::Game, id::String)
             reward += act(game.ale, action)
             frames += 1
         end
-        if frames > 108000
+        if frames > 5000
             println("Termination due to frame count on ", id)
             break
         end
