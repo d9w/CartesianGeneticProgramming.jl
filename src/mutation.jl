@@ -142,7 +142,7 @@ function adaptive_mutate(c::Chromosome, add_f::Function, del_f::Function)
     # Adaptive modify add and delete rates
     method = rand()
     x = length(c.nodes); a = Config.starting_nodes; b = Config.node_size_cap
-    d = 2.0/(a-b) * (x-(a+b)/2.0)^2 + 1
+    d = -1/(a - (a + b) / 2)^2 * (x - (a + b) / 2)^2 + 1
     modify_rate = d/(d+1)
     add_rate = (x-b)/((d+1)*(a-b))
     if method < modify_rate
