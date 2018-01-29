@@ -1,7 +1,7 @@
 #!/bin/sh
 #SBATCH -J PCGP
-#SBATCH -N 1
-#SBATCH -n 20
+#SBATCH -N 10
+#SBATCH -n 200
 #SBATCH --mail-user=dennisgwilson@gmail.com
 #SBATCH --mail-type=ALL
 
@@ -15,4 +15,4 @@ cp -r $CGP/tuning/* $WORK_DIR/
 cp -r $CGP/experiments/atari.jl $WORK_DIR/
 cd $WORK_DIR
 
-irace --parallel 20 2>&1 > irace.log
+irace --parallel 200 2>&1 > irace.log
