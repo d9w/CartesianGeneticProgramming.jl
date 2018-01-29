@@ -90,9 +90,10 @@ end
 
 function to_string()
     @sprintf(
-        "%s %s %s %s %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %d %d %0.3f %0.3f %0.3f",
+        "%s %s %s %s %d %d %d %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %0.3f %d %d %0.3f %0.3f %0.3f",
         string(mutate_method), string(active_mutate), string(crossover_method),
-        string(weights), input_start, recurrency, input_mutation_rate,
+        string(weights), stating_nodes, static_node_size, node_size_cap,
+        input_start, recurrency, input_mutation_rate,
         output_mutation_rate, node_mutation_rate, node_size_delta,
         modify_mutation_rate, lambda, ga_population, ga_elitism_rate,
         ga_crossover_rate, ga_mutation_rate)
