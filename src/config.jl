@@ -71,7 +71,8 @@ function add_arg_settings!(s::ArgParseSettings)
         add_arg_table(s, ["--$p"], Dict(:help=>"Parameter: $p", :arg_type=>Float64))
     end
 
-    for p in ["lambda", "ga_population"]
+    for p in ["lambda", "ga_population", "starting_nodes", "static_node_size",
+              "node_size_cap"]
         add_arg_table(s, ["--$p"], Dict(:help=>"Parameter: $p", :arg_type=>Int64))
     end
     add_arg_table(s, ["--active_mutate"], Dict(:help=>"Parameter: active_mutate",
