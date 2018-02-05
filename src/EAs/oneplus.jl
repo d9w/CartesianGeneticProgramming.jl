@@ -32,6 +32,9 @@ function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
                     log_gen = true
                     break
                 end
+                if fit >= 50000
+                    break
+                end
             end
         end
 
@@ -49,6 +52,7 @@ function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
                                   #Config.to_string()))
             if Config.save_best
                 Logging.info(@sprintf("C: %s", string(best.genes)))
+                Logging.info(@sprintf("G: %s", string(best)))
             end
         end
 

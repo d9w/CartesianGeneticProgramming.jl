@@ -2,6 +2,7 @@ using ArcadeLearningEnvironment
 using CGP
 using Logging
 using ArgParse
+using Images
 
 function play_atari(c::Chromosome, game::Game, id::String)
     reset_game(game.ale)
@@ -31,6 +32,11 @@ function play_atari(c::Chromosome, game::Game, id::String)
             println("Termination due to frame count on ", id)
             break
         end
+    end
+    if reward >= 50000
+        draw_graph(c, "kfm1/graph.pdf")
+        screen = draw(game)
+        Images.save(@sprintf("kfm1/frame_%06d.png", frames), screen)
     end
     reward
 end
@@ -72,6 +78,7 @@ Logging.configure(filename=args["log"], level=INFO)
 ea = eval(parse(args["ea"]))
 ctype = eval(parse(args["chromosome"]))
 
+include("../draw.jl")
 game = Game(args["id"])
 nin = 3 # r g b
 nout = length(game.actions)
