@@ -7,14 +7,27 @@ function play_atari(c::Chromosome, game::Game, id::String)
     reset_game(game.ale)
     reward = 0.0
     frames = 0
+    p_action = game.actions[1]
+    act_count = 0
     while ~game_over(game.ale)
         output = process(c, get_rgb(game))
         action = game.actions[indmax(output)]
-        for i in 1:4
+#       if action == p_action
+#           act_count += 1
+#       else
+#           p_action = action
+#           act_count = 0
+#       end
+#       if act_count > 500
+#           println("Termination due to repetitive action ", id)
+#           return -Inf
+#       end
+        reward += act(game.ale, action)
+        frames += 1
+        if rand() < 0.25
             reward += act(game.ale, action)
-            frames += 1
         end
-        if frames > 5000
+        if frames > 18000
             println("Termination due to frame count on ", id)
             break
         end
@@ -37,10 +50,10 @@ function get_args()
         default = "qbert"
         "--ea"
         arg_type = String
-        required = true
+        default = "oneplus"
         "--chromosome"
         arg_type = String
-        required = true
+        default = "CGPChromo"
     end
 
     CGP.Config.add_arg_settings!(s)
@@ -64,6 +77,6 @@ nin = 3 # r g b
 nout = length(game.actions)
 fit = x->play_atari(x, game, args["id"])
 
-maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"])
+maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"], id=args["id"])
 close!(game)
 Logging.info(@sprintf("E%0.6f", -maxfit))

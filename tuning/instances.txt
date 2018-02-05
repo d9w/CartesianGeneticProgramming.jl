@@ -1,9 +1,4 @@
-atari.jl --id boxing
-atari.jl --id centipede
-atari.jl --id demon_attack
-atari.jl --id enduro
-atari.jl --id freeway
-atari.jl --id kung_fu_master
-atari.jl --id space_invaders
-atari.jl --id riverraid
-atari.jl --id pong
+atari.jl --ea oneplus --chromosome CGPChromo --mutate_method :gene_mutate --id boxing
+atari.jl --ea oneplus --chromosome CGPChromo --mutate_method :gene_mutate --id centipede
+atari.jl --ea oneplus --chromosome CGPChromo --mutate_method :gene_mutate --id space_invaders
+atari.jl --ea oneplus --chromosome CGPChromo --mutate_method :gene_mutate --id pong

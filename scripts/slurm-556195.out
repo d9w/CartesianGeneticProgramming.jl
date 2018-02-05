@@ -1,2 +1,0 @@
-slurmstepd: *** JOB 556195 ON eoscomp195 CANCELLED AT 2018-01-12T21:05:20 ***
-slurmstepd: task_p_post_term: rmdir(/dev/cpuset/slurm556195/slurm556195.4294967294_0) failed Device or resource busy
