@@ -117,7 +117,7 @@ functions:
     - "Float64.(x.>y)"
     - "Float64.(.>(eqsize(x,y,c)...))"
   # Statistical
-  f_standarddeviation:
+  f_stddev:
     - "0.0"
     - "scaled(std(x[:]))"
   f_skew:
