@@ -1,6 +1,7 @@
+using Images
 using TikzGraphs
 using LightGraphs
-using TikzPictures
+import TikzPictures
 using LaTeXStrings
 using CGP
 
@@ -47,6 +48,6 @@ function draw_graph(c::Chromosome, filename::String)
 
     t = TikzGraphs.plot(g, Layouts.Layered(), names)
 
-    TikzPictures.save(PDF(filename), t)
+    TikzPictures.save(TikzPictures.PDF(filename), t)
     t
 end

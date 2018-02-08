@@ -3,46 +3,6 @@ using CGP
 using Logging
 using ArgParse
 
-function play_atari(c::Chromosome, game::Game, id::String, make_draw::Bool=false, folder::String="", max_frames=18000, max_act_count=1000)
-    reset_game(game.ale)
-    reward = 0.0
-    frames = 0
-    p_action = game.actions[1]
-    act_count = 0
-    while ~game_over(game.ale)
-        output = process(c, get_rgb(game))
-        action = game.actions[indmax(output)]
-        if action == p_action
-            act_count += 1
-        else
-            p_action = action
-            act_count = 0
-        end
-        if act_count > max_act_count
-            println("Termination due to repetitive action ", id)
-            return -Inf
-        end
-        reward += act(game.ale, action)
-        frames += 1
-        if rand() < 0.25
-            reward += act(game.ale, action)
-        end
-        if make_draw
-            screen = draw(game)
-            filename = string(folder, "/", @sprintf("frame_%06d.png", frames))
-            save(filename, screen)
-        end
-        if frames > max_act_count
-            println("Termination due to frame count on ", id)
-            break
-        end
-    end
-    if make_draw
-        draw_graph(c, string(folder, "/graph.pdf"))
-    end
-    reward
-end
-
 function get_args()
     s = ArgParseSettings()
 
@@ -54,7 +14,7 @@ function get_args()
         arg_type = String
         required = true
         "--draw"
-        arg_type = Boolean
+        arg_type = Bool
         default = false
         "--folder"
         arg_type = String
@@ -68,6 +28,12 @@ function get_args()
         "--chromosome"
         arg_type = String
         default = "CGPChromo"
+        "--frames"
+        arg_type = Int
+        default = 18000
+        "--act_count"
+        arg_type = Int
+        default = 1000
     end
 
     CGP.Config.add_arg_settings!(s)
@@ -75,33 +41,39 @@ end
 
 CGP.Config.init("cfg/base.yaml")
 CGP.Config.init("cfg/atari.yaml")
+include("play_atari.jl")
 
 args = parse_args(get_args())
 CGP.Config.init(Dict([k=>args[k] for k in setdiff(
-    keys(args), ["seed", "log", "id", "ea", "chromosome", "folder", "draw"])]...))
+    keys(args), ["seed", "log", "id", "ea", "chromosome", "folder", "draw",
+                 "frames", "act_count"])]...))
 
 srand(args["seed"])
 Logging.configure(filename=args["log"], level=INFO)
 ea = eval(parse(args["ea"]))
 ctype = eval(parse(args["chromosome"]))
 
-if args.draw
-    using Images
-    include("../draw.jl")
+if args["draw"]
+    include("draw.jl")
 end
 game = Game(args["id"])
 nin = 3 # r g b
 nout = length(game.actions)
-fit = x->play_atari(x, game, args["id"])
-if args.draw
-    record_fit = x->play_atari(x, game, args["id"], true, args["folder"])
+fit = x->play_atari(x, game, args["id"]; max_frames=args["frames"],
+                    max_act_count=args["act_count"])
+if args["draw"]
+    record_fit = x->play_atari(x, game, args["id"];
+                        make_draw=true, folder=args["folder"],
+                        max_frames=args["frames"],
+                        max_act_count=args["act_count"])
 end
 
-if args.draw
-    maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"], id=args["id"], record_best=true, record_fitness=record_fit)
-    Logging.info(@sprintf("E%0.6f", -maxfit))
+maxfit = -Inf
+if args["draw"]
+    maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"], id=args["id"],
+                      record_best=true, record_fitness=record_fit)
 else
     maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"], id=args["id"])
-    Logging.info(@sprintf("E%0.6f", -maxfit))
 end
+Logging.info(@sprintf("E%0.6f", -maxfit))
 close!(game)

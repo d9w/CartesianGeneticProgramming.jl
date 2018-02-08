@@ -1,4 +1,24 @@
-atari.jl --ea oneplus --chromosome CGPChromo --mutate_method :gene_mutate --id boxing
-atari.jl --ea oneplus --chromosome CGPChromo --mutate_method :gene_mutate --id centipede
-atari.jl --ea oneplus --chromosome CGPChromo --mutate_method :gene_mutate --id space_invaders
-atari.jl --ea oneplus --chromosome CGPChromo --mutate_method :gene_mutate --id pong
+atari.jl --id beam_rider --max-frames 500
+atari.jl --id beam_rider --max-frames 1000
+atari.jl --id beam_rider --max-frames 5000
+atari.jl --id beam_rider --max-frames 10000
+atari.jl --id breakout --max-frames 500
+atari.jl --id breakout --max-frames 1000
+atari.jl --id breakout --max-frames 5000
+atari.jl --id breakout --max-frames 10000
+atari.jl --id seaquest --max-frames 500
+atari.jl --id seaquest --max-frames 1000
+atari.jl --id seaquest --max-frames 5000
+atari.jl --id seaquest --max-frames 10000
+atari.jl --id qbert --max-frames 500
+atari.jl --id qbert --max-frames 1000
+atari.jl --id qbert --max-frames 5000
+atari.jl --id qbert --max-frames 10000
+atari.jl --id space_invaders --max-frames 500
+atari.jl --id space_invaders --max-frames 1000
+atari.jl --id space_invaders --max-frames 5000
+atari.jl --id space_invaders --max-frames 10000
+atari.jl --id pong --max-frames 500
+atari.jl --id pong --max-frames 1000
+atari.jl --id pong --max-frames 5000
+atari.jl --id pong --max-frames 10000

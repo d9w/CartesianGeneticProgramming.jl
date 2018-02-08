@@ -12,6 +12,7 @@ DATA_DIR=/tmpdir/wilson/data/julia
 mkdir -p $WORK_DIR
 cp -r $CGP/cfg $WORK_DIR/
 cp -r $CGP/tuning/* $WORK_DIR/
+cp -r $CGP/experiments/play_atari.jl $WORK_DIR/
 cp -r $CGP/experiments/atari.jl $WORK_DIR/
 cd $WORK_DIR
 
