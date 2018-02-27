@@ -1,0 +1,21 @@
+# General settings
+starting_nodes: 100
+static_node_size: 200
+node_size_cap: 300
+node_inputs: 2
+save_best: False
+weights: False
+mutate_method: ":gene_mutate"
+crossover_method: ":proportional_crossover"
+recurrency: 0.3
+total_evals: 50000
+input_start: -0.1
+# Mutation
+active_mutate: True
+input_mutation_rate: 0.1
+output_mutation_rate: 0.5
+node_mutation_rate: 0.1
+ga_population: 20
+ga_elitism_rate: 0.3
+ga_crossover_rate: 0.1
+ga_mutation_rate: 0.2

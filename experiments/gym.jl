@@ -45,19 +45,21 @@ function get_args()
         "--chromosome"
         arg_type = String
         required = true
+        "--cfg"
+        arg_type = String
+        required = true
     end
 
     CGP.Config.add_arg_settings!(s)
 end
 
-CGP.Config.init("../cfg/base.yaml")
-CGP.Config.init("../cfg/classic.yaml")
-# CGP.Config.init("cfg/test.yaml")
-
 args = parse_args(get_args())
 println(args)
 CGP.Config.init(Dict([k=>args[k] for k in setdiff(
-    keys(args), ["seed", "log", "id", "ea", "chromosome"])]...))
+    keys(args), ["seed", "log", "id", "ea", "chromosome", "cfg"])]...))
+
+CGP.Config.init(args["cfg"])
+CGP.Config.init("cfg/classic.yaml")
 
 srand(args["seed"])
 Logging.configure(filename=args["log"], level=INFO)

@@ -3,6 +3,7 @@ starting_nodes: 10
 static_node_size: 20
 node_size_cap: 30
 save_best: False
+weights: False
 mutate_method: ":gene_mutate"
 crossover_method: ":single_point_crossover"
 distance_method: ":genetic_distance"

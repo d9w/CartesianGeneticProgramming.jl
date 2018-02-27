@@ -60,8 +60,8 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
             if record_best
                 refit = record_fitness(best)
             end
-            Logging.info(@sprintf("R: %d %d %0.5f %d %d %s %s %s",
-                                  seed, eval_count, max_fit,
+            Logging.info(@sprintf("R: %d %d %0.5f %0.5f %d %d %s %s %s",
+                                  seed, eval_count, max_fit, refit,
                                   sum([n.active for n in best.nodes]),
                                   length(best.nodes),
                                   "GA", string(ctype),

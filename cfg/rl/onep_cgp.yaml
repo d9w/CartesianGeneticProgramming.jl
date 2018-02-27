@@ -1,0 +1,18 @@
+# General settings
+starting_nodes: 100
+static_node_size: 200
+node_size_cap: 300
+node_inputs: 2
+save_best: False
+weights: True
+mutate_method: ":gene_mutate"
+recurrency: 0.6
+total_evals: 50000
+input_start: -1.0
+# Mutation
+active_mutate: False
+input_mutation_rate: 0.0
+output_mutation_rate: 0.3
+node_mutation_rate: 0.1
+# Oneplus settings
+lambda: 4
