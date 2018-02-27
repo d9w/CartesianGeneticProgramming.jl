@@ -57,7 +57,12 @@ function mapf(i::Int64, df, xmax::Int64)
     if i >= 2
         lower = df[:eval][i-1]
     end
-    df[:fit][i] * ones(df[:eval][i] - lower)
+    if df[:eval][i] >= lower
+        return df[:fit][i] * ones(df[:eval][i] - lower)
+    else
+        println(df[:ea][i], " ", df[:chromosome][i], " ", df[:eval][i], " ", df[:seed][i], " ", lower)
+        return []
+    end
 end
 
 function get_stats(res::DataFrame; xmax::Int64 = maximum(res[:eval]))
