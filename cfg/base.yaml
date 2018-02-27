@@ -4,7 +4,7 @@ static_node_size: 100
 node_size_cap: 150
 node_inputs: 2
 save_best: True
-weights: True
+weights: False
 mutate_method: ":gene_mutate"
 crossover_method: ":single_point_crossover"
 recurrency: 0.25
@@ -15,8 +15,8 @@ active_mutate: False
 input_mutation_rate: 0.1
 output_mutation_rate: 0.1
 node_mutation_rate: 0.1
-node_size_delta: 0.1
-modify_mutation_rate: 0.25
+node_size_delta: 0.0
+modify_mutation_rate: 0.0
 # Oneplus settings
 lambda: 5
 # GA settings

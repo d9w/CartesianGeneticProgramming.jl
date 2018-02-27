@@ -59,19 +59,21 @@ function get_args()
         "--chromosome"
         arg_type = String
         required = true
+        "--cfg"
+        arg_type = String
+        required = true
     end
 
     CGP.Config.add_arg_settings!(s)
 end
 
-CGP.Config.init("cfg/base.yaml")
-CGP.Config.init("cfg/classic.yaml")
-# CGP.Config.init("../cfg/test.yaml")
-
 args = parse_args(get_args())
 println(args)
 CGP.Config.init(Dict([k=>args[k] for k in setdiff(
-    keys(args), ["seed", "data", "log", "fitness", "ea", "chromosome"])]...))
+    keys(args), ["seed", "data", "log", "fitness", "ea", "chromosome", "cfg"])]...))
+
+CGP.Config.init(args["cfg"])
+CGP.Config.init("cfg/classic.yaml")
 
 srand(args["seed"])
 Logging.configure(filename=args["log"], level=INFO)
@@ -81,6 +83,15 @@ ea = eval(parse(args["ea"]))
 ctype = eval(parse(args["chromosome"]))
 
 fit = x->fitness(x, train, nin, nout)
-maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"])
+refit = x->fitness(x, test, nin, nout)
+maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"],
+                  record_best=true, record_fitness=refit)
+
+best_ind = ctype(best, nin, nout)
+test_fit = fitness(best_ind, test, nin, nout)
+Logging.info(@sprintf("T: %d %0.8f %0.8f %d %d %s %s",
+                      args["seed"], maxfit, test_fit,
+                      sum([n.active for n in best_ind.nodes]),
+                      length(best_ind.nodes), args["ea"], args["chromosome"]))
 
 Logging.info(@sprintf("E%0.8f", -maxfit))
