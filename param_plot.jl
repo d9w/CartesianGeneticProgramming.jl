@@ -46,7 +46,59 @@ function get_param_results(log::String)
     res[:ea][res[:ea].=="oneplus"] = "1+λ"
     res[:chromosome] = map(x->String(split(split(x, '.')[2], "Chromo")[1]),
                                    res[:chromo])
+    res[:mutation] = map(x->(findfirst(x.==mutations)-1)/(length(mutations)-1),
+                                 res[:mut])
+    res[:crossover] = map(x->(findfirst(x.==crossovers)-1)/(length(crossovers)-1),
+                                  res[:cross])
+    res[:class] = map(x->shortclass[(findfirst(x.==pclasses))], res[:pclass])
+    res[:active] = Int64.(res[:active])
+    res[:weights] = Int64.(res[:weights])
+    res[:lambda] = res[:lambda] / 10
+    res[:ga_population] = res[:ga_population] / 200
+    res[:input_start] = 1.0.+res[:input_start]
+    gene_mutate_ids = res[:mut] .== "gene_mutate"
+    res[:modify_mutation_rate][gene_mutate_ids] = NaN
+    res[:node_size_delta][gene_mutate_ids] = NaN
+    res[:uuid] = string.(res[:id], "_", res[:pclass], "_", res[:ea], "_", res[:chromosome])
     res
+end
+
+function get_top_by_pareto(res::DataFrame, nbests::Int64=10)
+    full_ranks = DataFrame()
+    for subdf in groupby(res, :pclass)
+        pmeans = by(subdf, [:uuid, :problem], df->DataFrame(mfit=mean(df[:fit])))
+        if split(pmeans[:uuid][1], "_")[2] == "classification"
+            pmeans[:prob_id] = string.("p", map(x->findfirst(
+                x.==["cancer", "diabetes", "glass"]), pmeans[:problem]))
+        elseif split(pmeans[:uuid][1], "_")[2] == "regression"
+            pmeans[:prob_id] = string.("p", map(x->findfirst(
+                x.==["abalone", "fires", "quality"]), pmeans[:problem]))
+        else
+            pmeans[:prob_id] = string.("p", map(x->findfirst(
+                x.==["ant", "cheetah", "humanoid"]), pmeans[:problem]))
+        end
+        fits = unstack(pmeans, :uuid, :prob_id, :mfit)
+        fits = fits[((!isna.(fits[:p1])).&(!isna.(fits[:p2])).&(!isna.(fits[:p3]))), :]
+        fits[:ea] = map(x->split(x, "_")[3], fits[:uuid])
+        fits[:chromosome] = map(x->split(x, "_")[4], fits[:uuid])
+        for subfits_ea in groupby(fits, :ea)
+            for scres in groupby(subfits_ea, :chromosome)
+                ranks = DataFrame()
+                ranks[:uuid] = scres[:uuid]
+                ranks[:score] = map(
+                    x->sum((scres[:p1][x].>scres[:p1]).&(scres[:p2][x].>scres[:p2]).&
+                          (scres[:p3][x].>scres[:p3])), 1:size(scres, 1))
+                sort!(ranks, cols=(order(:score, rev=true)))
+                ranks[:rank] = 1:size(ranks, 1)
+                full_ranks = vcat(full_ranks, head(ranks, nbests))
+            end
+        end
+    end
+    joined = join(full_ranks, res, on=:uuid, kind=:inner)
+    best_params = aggregate(joined, :uuid, first)
+    names!(best_params, names(joined))
+    sort!(best_params, cols=(:pclass, :ea, :chromosome, :rank))
+    best_params
 end
 
 function get_norm_means(res::DataFrame)
@@ -106,19 +158,6 @@ function get_best_params(nmeans::DataFrame, top::Int64=20)
             end
         end
     end
-    best_params[:mutation] = map(x->(findfirst(x.==mutations)-1)/(length(mutations)-1),
-                                 best_params[:mut])
-    best_params[:crossover] = map(x->(findfirst(x.==crossovers)-1)/(length(crossovers)-1),
-                                  best_params[:cross])
-    best_params[:class] = map(x->shortclass[(findfirst(x.==pclasses))], best_params[:pclass])
-    best_params[:active] = Int64.(best_params[:active])
-    best_params[:weights] = Int64.(best_params[:weights])
-    best_params[:lambda] = best_params[:lambda] / 10
-    best_params[:ga_population] = best_params[:ga_population] / 200
-    best_params[:input_start] = 1.0.+best_params[:input_start]
-    gene_mutate_ids = best_params[:mut] .== "gene_mutate"
-    best_params[:modify_mutation_rate][gene_mutate_ids] = NaN
-    best_params[:node_size_delta][gene_mutate_ids] = NaN
     best_params
 end
 
@@ -186,7 +225,7 @@ function plot_params(bests::DataFrame, ea::String, chromosome::String, cols::Arr
         @select i
         @collect DataFrame
     end
-    cres[:rank] = Int64.(repmat(1:(size(cres,1)/3), 3))
+    # cres[:rank] = Int64.(repmat(1:(size(cres,1)/3), 3))
     melted = melt(cres, [:rank, :class], cols)
     melted = rename_melted!(melted)
     plt = plot(melted, x=:names, ygroup=:class, y=:value, color=:rank,
