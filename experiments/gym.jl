@@ -58,8 +58,9 @@ println(args)
 CGP.Config.init(Dict([k=>args[k] for k in setdiff(
     keys(args), ["seed", "log", "id", "ea", "chromosome", "cfg"])]...))
 
-CGP.Config.init(args["cfg"])
+CGP.Config.init("cfg/base.yaml")
 CGP.Config.init("cfg/classic.yaml")
+CGP.Config.init(args["cfg"])
 
 srand(args["seed"])
 Logging.configure(filename=args["log"], level=INFO)
