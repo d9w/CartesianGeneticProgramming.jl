@@ -6,13 +6,13 @@ node_inputs: 2
 save_best: False
 weights: False
 mutate_method: ":gene_mutate"
-recurrency: 0.2
+recurrency: 0.1
 total_evals: 50000
 input_start: -1.0
 # Mutation
-active_mutate: False
+active_mutate: True
 input_mutation_rate: 0.0
-output_mutation_rate: 0.5
+output_mutation_rate: 0.1
 node_mutation_rate: 0.1
 # Oneplus settings
-lambda: 10
+lambda: 9

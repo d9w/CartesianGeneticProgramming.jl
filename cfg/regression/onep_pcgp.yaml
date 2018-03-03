@@ -5,14 +5,16 @@ node_size_cap: 300
 node_inputs: 2
 save_best: False
 weights: False
-mutate_method: ":gene_mutate"
-recurrency: 0.5
+mutate_method: ":mixed_node_mutate"
+recurrency: 0.4
 total_evals: 50000
-input_start: -1.0
+input_start: -0.5
 # Mutation
-active_mutate: True
-input_mutation_rate: 0.1
+active_mutate: False
+input_mutation_rate: 0.0
 output_mutation_rate: 0.2
 node_mutation_rate: 0.1
+node_size_delta: 0.2
+modify_mutation_rate: 0.9
 # Oneplus settings
-lambda: 6
+lambda: 3
