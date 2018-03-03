@@ -6,17 +6,17 @@ node_inputs: 2
 save_best: False
 weights: False
 mutate_method: ":gene_mutate"
-crossover_method: ":single_point_crossover"
-recurrency: 0.6
+crossover_method: ":proportional_crossover"
+recurrency: 0.5
 total_evals: 50000
 input_start: -0.9
 # Mutation
 active_mutate: False
-input_mutation_rate: 0.2
-output_mutation_rate: 0.7
-node_mutation_rate: 0.2
+input_mutation_rate: 0.0
+output_mutation_rate: 0.2
+node_mutation_rate: 0.1
 # GA settings
-ga_population: 40
-ga_elitism_rate: 0.3
+ga_population: 120
+ga_elitism_rate: 0.2
 ga_crossover_rate: 0.1
-ga_mutation_rate: 0.4
+ga_mutation_rate: 0.7
