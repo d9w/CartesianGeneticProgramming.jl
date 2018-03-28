@@ -16,7 +16,7 @@ function PCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::PCGPChromo
     rgenes = reshape(genes[(nin+nout+1):end], (5, num_nodes))
     rgenes = sortcols(rgenes)'
     genes[1:nin] = sort(genes[1:nin], rev=true)
-    genes[nin+(1:nout)] = sort(genes[nin+(1:nout)])
+    # genes[nin+(1:nout)] = sort(genes[nin+(1:nout)])
     positions = [Config.input_start .* genes[1:nin]; rgenes[:, 1]]
     fc = deepcopy(hcat(zeros(2, nin), [rgenes[:, 2]'; rgenes[:, 3]']))
     e = (1.0 .- positions) .* Config.recurrency .+ positions
