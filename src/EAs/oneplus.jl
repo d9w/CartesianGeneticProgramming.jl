@@ -2,11 +2,14 @@ export oneplus
 
 function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
                  seed::Int64=0, record_best::Bool=false, record_fitness::Function=fitness,
-		 id::String="")
+                 expert::Any=nothing)
 
     population = Array{ctype}(Config.lambda)
     for i in eachindex(population)
         population[i] = ctype(nin, nout)
+    end
+    if expert != nothing
+        population[1] = expert
     end
     best = population[1]
     max_fit = -Inf
