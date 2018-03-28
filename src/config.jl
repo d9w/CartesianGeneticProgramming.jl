@@ -100,6 +100,6 @@ function to_string()
 
 end
 
-append!(functions, [f_input])
+# append!(functions, [f_input])
 export init, reset
 end
