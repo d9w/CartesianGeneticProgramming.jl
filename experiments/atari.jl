@@ -31,9 +31,6 @@ function get_args()
         "--frames"
         arg_type = Int
         default = 18000
-        "--act_count"
-        arg_type = Int
-        default = 1000
     end
 
     CGP.Config.add_arg_settings!(s)
@@ -59,13 +56,11 @@ end
 game = Game(args["id"])
 nin = 3 # r g b
 nout = length(game.actions)
-fit = x->play_atari(x, game, args["id"]; max_frames=args["frames"],
-                    max_act_count=args["act_count"])
+fit = x->play_atari(x, game, args["id"]; max_frames=args["frames"])
 if args["draw"]
     record_fit = x->play_atari(x, game, args["id"];
                         make_draw=true, folder=args["folder"],
-                        max_frames=args["frames"],
-                        max_act_count=args["act_count"])
+                        max_frames=args["frames"])
 end
 
 maxfit = -Inf

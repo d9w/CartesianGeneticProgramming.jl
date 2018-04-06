@@ -8,7 +8,8 @@ function selection(fits::Array{Float64}, n::Int64=3)
 end
 
 function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
-            seed::Int64=0, record_best::Bool=false, record_fitness::Function=fitness)
+            seed::Int64=0, record_best::Bool=false, record_fitness::Function=fitness,
+            id::String="")
     population = Array{ctype}(Config.ga_population)
     fits = -Inf*ones(Float64, Config.ga_population)
     population = [ctype(nin, nout) for i in 1:Config.ga_population]
@@ -60,8 +61,8 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
             if record_best
                 refit = record_fitness(best)
             end
-            Logging.info(@sprintf("R: %d %d %0.5f %0.5f %d %d %s %s %s",
-                                  seed, eval_count, max_fit, refit,
+            Logging.info(@sprintf("R: %s %d %d %0.5f %0.5f %d %d %s %s %s",
+                                  id, seed, eval_count, max_fit, refit,
                                   sum([n.active for n in best.nodes]),
                                   length(best.nodes),
                                   "GA", string(ctype),

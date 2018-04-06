@@ -13,7 +13,7 @@
 # This script should print a single numerical value (the value to be minimized).
 ###############################################################################
 
-EXE=/usr/local/julia/0.5.0_stand/julia-3c9d75391c/bin/julia
+EXE=/usr/bin/julia
 
 CONFIG_ID="$1"
 INSTANCE_ID="$2"

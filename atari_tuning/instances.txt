@@ -1,7 +1,4 @@
-atari.jl --id boxing
-atari.jl --id centipede
-atari.jl --id fishing_derby
-atari.jl --id frostbite
-atari.jl --id ms_pacman
-atari.jl --id space_invaders
-atari.jl --id pong
+atari.jl --frames 2000 --id frostbite
+atari.jl --frames 2000 --id kung_fu_master
+atari.jl --frames 2000 --id space_invaders
+atari.jl --frames 2000 --id pong

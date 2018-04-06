@@ -2,7 +2,7 @@ export oneplus
 
 function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
                  seed::Int64=0, record_best::Bool=false, record_fitness::Function=fitness,
-                 expert::Any=nothing)
+                 expert::Any=nothing, id::String="")
 
     population = Array{ctype}(Config.lambda)
     for i in eachindex(population)
@@ -43,13 +43,12 @@ function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
             if record_best
                 refit = record_fitness(best)
             end
-            Logging.info(@sprintf("R: %d %d %0.5f %0.5f %d %d %s %s %s",
-                                  seed, eval_count, max_fit, refit,
+            Logging.info(@sprintf("R: %s %d %d %0.5f %0.5f %d %d %s %s %s",
+                                  id, seed, eval_count, max_fit, refit,
                                   sum([n.active for n in best.nodes]),
                                   length(best.nodes),
                                   "oneplus", string(ctype),
-				  id))
-                                  #Config.to_string()))
+                                  Config.to_string()))
             if Config.save_best
                 Logging.info(@sprintf("C: %s", string(best.genes)))
             end
