@@ -1,3 +1,35 @@
+# General settings
+starting_nodes: 50
+static_node_size: 70
+node_size_cap: 150
+node_inputs: 2
+save_best: True
+weights: False
+mutate_method: ":gene_mutate"
+crossover_method: ":single_point_crossover"
+recurrency: 0.5
+total_evals: 10000
+input_start: -1.0
+# Mutation
+active_mutate: False
+input_mutation_rate: 0.1
+output_mutation_rate: 0.5
+node_mutation_rate: 0.1
+node_size_delta: 0.0
+modify_mutation_rate: 0.0
+# Oneplus settings
+lambda: 5
+# GA settings
+ga_population: 50
+ga_elitism_rate: 0.1
+ga_crossover_rate: 0.25
+ga_mutation_rate: 0.65
+# Speciation settings
+speciation_thresh: 0.8
+init_species: 5
+# CMAES settings
+cmaes_population: 5
+cmaes_stopeval: 5000
 functions:
   # list processing
   f_split_before:

@@ -36,7 +36,6 @@ function get_args()
     CGP.Config.add_arg_settings!(s)
 end
 
-CGP.Config.init("cfg/base.yaml")
 CGP.Config.init("cfg/atari.yaml")
 include("play_atari.jl")
 
