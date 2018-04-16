@@ -9,3 +9,4 @@
 ## then the configuration is discarded.
 ##
 ## Examples of valid logical operators are: ==  !=  >=  <=  >  <  &  |  !  %in%
+(ga_elitism_rate + ga_crossover_rate + ga_mutation_rate) > 1.0

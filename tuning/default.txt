@@ -11,13 +11,3 @@
 ## parameter conditions (NA should be used for those parameters that
 ## are not enabled for a given configuration) and, if given, the
 ## constraints that describe forbidden configurations.
-static_node_size active_mutate weights recurrency output_mutation_rate node_mutation_rate lambda 
-20 false false 0.800 0.300 0.100 1
-100 false false 0.700 0.300 0.200 1
-20 false true 0.900 0.400 0.400 5
-60 true true 0.700 0.100 0.100 5
-80 false true 0.500 0.600 0.100 2
-60 true true 0.800 0.200 0.100 8
-80 true true 0.800 0.400 0.200 7
-80 true false 0.300 0.900 0.100 1
-20 false true 0.300 0.400 0.100 4
