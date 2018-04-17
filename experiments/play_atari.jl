@@ -1,6 +1,7 @@
 using ArcadeLearningEnvironment
 using Logging
 using CGP
+using Images
 
 function play_atari(c::Chromosome, game::Game, id::String;
                     make_draw::Bool=false, folder::String="",
@@ -9,8 +10,10 @@ function play_atari(c::Chromosome, game::Game, id::String;
     reward = 0.0
     frames = 0
     p_action = game.actions[1]
+    out_counts = zeros(Int64, c.nout)
     while ~game_over(game.ale)
         output = process(c, get_rgb(game))
+        out_counts[indmax(output)] += 1
         action = game.actions[indmax(output)]
         reward += act(game.ale, action)
         if rand() < 0.25
@@ -19,7 +22,7 @@ function play_atari(c::Chromosome, game::Game, id::String;
         if make_draw
             screen = draw(game)
             filename = string(folder, "/", @sprintf("frame_%06d.png", frames))
-            save(filename, screen)
+            Images.save(filename, screen)
         end
         frames += 1
         if frames > max_frames
@@ -27,5 +30,5 @@ function play_atari(c::Chromosome, game::Game, id::String;
             break
         end
     end
-    reward
+    reward, out_counts
 end
