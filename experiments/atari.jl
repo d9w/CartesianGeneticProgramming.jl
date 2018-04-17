@@ -80,12 +80,13 @@ if length(args["examine"]) > 0
         reward, out_counts = play_atari(chromo, game, args["id"]; make_draw=true,
                                         folder=folder, max_frames=args["frames"])
         Logging.info(@sprintf("0: %s", string(out_counts)))
+        new_genes = get_graph_genes(to_graph(chromo), nin, nout)
         for o in 1:nout
             if out_counts[o] == 0
-                genes[nin+o] == 0.0
+                new_genes[nin+o] == 0.0
             end
         end
-        chromo2 = CGPChromo(genes, nin, nout)
+        chromo2 = PCGPChromo(new_genes, nin, nout)
         chromo_draw(chromo2, string("graphs/", args["id"], "_", args["seed"], "_",
                                   expert_count, ".pdf"))
         Logging.info(@sprintf("R: %s %d %d %0.5f %0.5f %d %d",

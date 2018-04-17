@@ -71,7 +71,7 @@ function con_to_gene(x::Float64, pos::Float64)::Float64
     gene
 end
 
-function get_genes(mg::MetaDiGraph, nin::Int64, nout::Int64)
+function get_graph_genes(mg::MetaDiGraph, nin::Int64, nout::Int64)
     genes = rand(nin)
     sort!(genes, rev=true)
     node_positions = rand(nv(mg) - nout - nin)
@@ -130,7 +130,7 @@ function to_chromo(mg::MetaDiGraph)::PCGPChromo
     types = [get_prop(mg, i, :type) for i in vertices(mg)]
     nin = sum(types .== 0)
     nout = sum(types .== 1)
-    genes = get_genes(mg, nin, nout)
+    genes = get_graph_genes(mg, nin, nout)
     CGP.PCGPChromo(genes, nin, nout)
 end
 
