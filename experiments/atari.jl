@@ -66,33 +66,32 @@ end
 if length(args["examine"]) > 0
     include("../graph_utils.jl")
     expert_count = 0
+    genes = Array{Float64}()
     for line in readlines(args["examine"])
         if contains(line, ":C:")
             genes = eval(parse(split(line, ":C: ")[2]))
-            chromo = CGPChromo(genes, nin, nout)
-            folder = string(args["id"], "_", args["seed"], "_", expert_count)
-            mkdir(folder)
-            reward, out_counts = play_atari(chromo, game, args["id"];
-                        make_draw=true, folder=folder, max_frames=args["frames"])
-            Logging.info(@sprintf("R: %s %d %d %0.5f %0.5f %d %d",
-                                  args["id"], args["seed"], expert_count, reward, reward,
-                                  sum([n.active for n in chromo.nodes]),
-                                  length(chromo.nodes)))
-            chromo_draw(chromo, string("graph_", args["id"], "_", args["seed"], "_",
-                                       expert_count, ".pdf"))
-            for o in 1:nout
-                if out_counts[o] == 0
-                    genes[nin+o] == 0.0
-                end
-            end
-            chromo2 = CGPChromo(genes, nin, nout)
-            reward2 = fit(chromo2)
-            if reward == reward2
-                chromo_draw(chromo2, string("graph_", args["id"], "_", args["seed"], "_",
-                                          expert_count, "_active.pdf"))
+        end
+    end
+    orig_genes = deepcopy(genes)
+    for expert_count in 0:9
+        chromo = CGPChromo(orig_genes, nin, nout)
+        folder = string("frames/", args["id"], "_", args["seed"], "_", expert_count)
+        mkdir(folder)
+        reward, out_counts = play_atari(chromo, game, args["id"]; make_draw=true,
+                                        folder=folder, max_frames=args["frames"])
+        Logging.info(@sprintf("0: %s", string(out_counts)))
+        for o in 1:nout
+            if out_counts[o] == 0
+                genes[nin+o] == 0.0
             end
         end
-        expert_count += 1
+        chromo2 = CGPChromo(genes, nin, nout)
+        chromo_draw(chromo2, string("graphs/", args["id"], "_", args["seed"], "_",
+                                  expert_count, ".pdf"))
+        Logging.info(@sprintf("R: %s %d %d %0.5f %0.5f %d %d",
+                              args["id"], args["seed"], expert_count, reward, reward,
+                              sum([n.active for n in chromo2.nodes]),
+                              length(chromo2.nodes)))
     end
 else
     maxfit = -Inf
