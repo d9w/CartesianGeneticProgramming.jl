@@ -6,7 +6,7 @@ using TikzPictures
 using LaTeXStrings
 using Base.Test
 
-function to_graph(c::Chromosome)
+function to_graph(c::Chromosome; active_outputs=trues(c.nout))
     actives = [n.active for n in c.nodes]
     actives[1:c.nin] = true
     vids = find(actives)
@@ -42,17 +42,19 @@ function to_graph(c::Chromosome)
         end
     end
     for o in 1:c.nout
-        nid = length(vids)+o
-        set_prop!(mg, nid, :name, LaTeXString(string("\$out_{", o, "}\$")))
-        set_prop!(mg, nid, :type, 1)
-        oid = findfirst(vids .== c.outputs[o])
-        add_edge!(mg, Edge(oid, nid))
-        set_prop!(mg, nid, oid, :ci, 0)
+        if active_outputs[o]
+            nid = length(vids)+o
+            set_prop!(mg, nid, :name, LaTeXString(string("\$out_{", o, "}\$")))
+            set_prop!(mg, nid, :type, 1)
+            oid = findfirst(vids .== c.outputs[o])
+            add_edge!(mg, Edge(oid, nid))
+            set_prop!(mg, nid, oid, :ci, 0)
+        end
     end
     mg
 end
 
-function chromo_draw(c::Chromosome, file::String="graph.pdf")
+function chromo_draw(c::Chromosome, file::String="graph.pdf"; active_outputs=trues(c.nout))
     mg = to_graph(c)
     names = map(x->get_prop(mg, x, :name), 1:nv(mg))
     t = TikzGraphs.plot(mg.graph, names)
