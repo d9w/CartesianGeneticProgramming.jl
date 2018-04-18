@@ -3,17 +3,21 @@ using Logging
 using CGP
 using Images
 
-function play_atari(c::Chromosome, game::Game, id::String;
+function play_atari(c::Chromosome, id::String, seed::Int64;
                     make_draw::Bool=false, folder::String="",
                     max_frames=18000)
-    reset_game(game.ale)
+    game = Game(id, seed)
+    seed_reset = rand(Int64)
+    srand(seed)
     reward = 0.0
     frames = 0
     p_action = game.actions[1]
-    out_counts = zeros(Int64, c.nout)
+    outputs = zeros(Float64, c.nout)
     while ~game_over(game.ale)
         output = process(c, get_rgb(game))
-        out_counts[indmax(output)] += 1
+        for i in 1:c.nout
+            outputs[i] += output[i]
+        end
         action = game.actions[indmax(output)]
         reward += act(game.ale, action)
         if rand() < 0.25
@@ -30,5 +34,7 @@ function play_atari(c::Chromosome, game::Game, id::String;
             break
         end
     end
-    reward, out_counts
+    close!(game)
+    srand(seed_reset)
+    reward, outputs
 end
