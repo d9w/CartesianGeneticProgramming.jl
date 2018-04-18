@@ -7,17 +7,15 @@ function play_atari(c::Chromosome, id::String, seed::Int64;
                     make_draw::Bool=false, folder::String="",
                     max_frames=18000)
     game = Game(id, seed)
-    seed_reset = rand(Int64)
+    seed_reset = rand(0:100000)
     srand(seed)
     reward = 0.0
     frames = 0
     p_action = game.actions[1]
-    outputs = zeros(Float64, c.nout)
+    outputs = zeros(Int64, c.nout)
     while ~game_over(game.ale)
         output = process(c, get_rgb(game))
-        for i in 1:c.nout
-            outputs[i] += output[i]
-        end
+        outputs[indmax(output)] += 1
         action = game.actions[indmax(output)]
         reward += act(game.ale, action)
         if rand() < 0.25

@@ -87,7 +87,7 @@ if length(args["examine"]) > 0
                     new_genes[nin+o] = 0.00001
                 end
             end
-            active_outputs = out_counts .> 0.0
+            active_outputs = out_counts .> 0
             chromo2 = CGPChromo(new_genes, nin, nout)
             chromo_draw(chromo2, string("graphs/", args["id"], "_", args["seed"], "_",
                                         expert_count, ".pdf");

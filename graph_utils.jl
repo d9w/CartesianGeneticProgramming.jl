@@ -12,7 +12,7 @@ function to_graph(c::Chromosome; active_outputs=trues(c.nout))
     vids = find(actives)
     pos = get_positions(c)
     mg = MetaDiGraph(SimpleDiGraph())
-    add_vertices!(mg, length(vids)+c.nout)
+    add_vertices!(mg, length(vids)+sum(active_outputs))#c.nout)
     for i in 1:c.nin
         set_prop!(mg, i, :name, LaTeXString(string("\$in_{", i, "}\$")))
         set_prop!(mg, i, :type, 0)
@@ -41,21 +41,23 @@ function to_graph(c::Chromosome; active_outputs=trues(c.nout))
             set_prop!(mg, cy, vi, :ci, 2)
         end
     end
+    nid_count = 1
     for o in 1:c.nout
         if active_outputs[o]
-            nid = length(vids)+o
+            nid = length(vids)+nid_count
             set_prop!(mg, nid, :name, LaTeXString(string("\$out_{", o, "}\$")))
             set_prop!(mg, nid, :type, 1)
             oid = findfirst(vids .== c.outputs[o])
             add_edge!(mg, Edge(oid, nid))
             set_prop!(mg, nid, oid, :ci, 0)
+            nid_count += 1
         end
     end
     mg
 end
 
 function chromo_draw(c::Chromosome, file::String="graph.pdf"; active_outputs=trues(c.nout))
-    mg = to_graph(c)
+    mg = to_graph(c, active_outputs=active_outputs)
     names = map(x->get_prop(mg, x, :name), 1:nv(mg))
     t = TikzGraphs.plot(mg.graph, names)
     TikzPictures.save(TikzPictures.PDF(file), t)
