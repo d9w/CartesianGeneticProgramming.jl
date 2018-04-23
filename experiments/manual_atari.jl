@@ -5,7 +5,7 @@ using Images
 
 
 function play_qbert()
-    game = Game("qbert")
+    game = Game("qbert", 0)
     reward = 0
     frames = 0
     while ~game_over(game.ale)
@@ -14,7 +14,7 @@ function play_qbert()
         if inputs[13076] > 0
             action = 2
         end
-        reward += act(game.ale, action)
+        reward += act(game.ale, Cint(action))
         frames += 1
         screen = draw(game)
         for pixel_i in -1:1:1
