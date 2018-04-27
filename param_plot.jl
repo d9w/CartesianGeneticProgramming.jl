@@ -9,7 +9,7 @@ Gadfly.push_theme(Theme(major_label_font="Helvetica",
                         minor_label_font="Helvetica",
                         major_label_font_size=18pt, minor_label_font_size=16pt,
                         line_width=0.8mm, key_label_font="Droid Sans",
-                        point_size=1.15mm,
+                        point_size=1.0mm,
                         lowlight_color=c->RGBA{Float32}(c.r, c.g, c.b, 0.2),
                         key_label_font_size=14pt,
                         default_color=colorant"#000000"))
@@ -36,8 +36,9 @@ end
 
 function get_param_results(log::String)
     res = readtable(log, header=false, separator=' ',
-                    names=[:id, :problem, :pclass, :seed, :eval, :fit, :nactive, :nodes,
-                           :ea, :chromo, :mut, :active, :cross, :weights,
+                    names=[:id, :problem, :pclass, :seed, :eval, :fit, :refit,
+                           :nactive, :nodes, :ea, :chromo, :mut, :active,
+                           :cross, :weights, :node_min, :node_static, :node_max,
                            :input_start, :recurrency, :input_mutation_rate,
                            :output_mutation_rate, :node_mutation_rate,
                            :node_size_delta, :modify_mutation_rate, :lambda,
@@ -59,7 +60,8 @@ function get_param_results(log::String)
     gene_mutate_ids = res[:mut] .== "gene_mutate"
     res[:modify_mutation_rate][gene_mutate_ids] = NaN
     res[:node_size_delta][gene_mutate_ids] = NaN
-    res[:uuid] = string.(res[:id], "_", res[:pclass], "_", res[:ea], "_", res[:chromosome])
+    res[:uuid] = string.(res[:id], "_", res[:pclass], "_", res[:ea], "_",
+                         res[:chromosome])
     res
 end
 
@@ -85,12 +87,17 @@ function get_top_by_pareto(res::DataFrame, nbests::Int64=10)
             for scres in groupby(subfits_ea, :chromosome)
                 ranks = DataFrame()
                 ranks[:uuid] = scres[:uuid]
-                ranks[:score] = map(
-                    x->sum((scres[:p1][x].>scres[:p1]).&(scres[:p2][x].>scres[:p2]).&
-                          (scres[:p3][x].>scres[:p3])), 1:size(scres, 1))
+                # ranks[:score] = map(
+                #     x->sum((scres[:p1][x].>scres[:p1]).&(scres[:p2][x].>scres[:p2]).&
+                #           (scres[:p3][x].>scres[:p3])), 1:size(scres, 1))
+                ranks[:score] = (scres[:p1] + scres[:p2] + scres[:p3]) / 3.0
                 sort!(ranks, cols=(order(:score, rev=true)))
-                ranks[:rank] = 1:size(ranks, 1)
-                full_ranks = vcat(full_ranks, head(ranks, nbests))
+                rranks = head(ranks, nbests)
+                maxscore = maximum(rranks[:score])
+                minscore = minimum(rranks[:score])
+                rranks[:rank] = 1:size(rranks[:score], 1)
+                rranks[:nscore] = (rranks[:score] - minscore) / (maxscore - minscore)
+                full_ranks = vcat(full_ranks, rranks)
             end
         end
     end
@@ -149,7 +156,8 @@ function get_best_params(nmeans::DataFrame, top::Int64=20)
         for ea in unique(nmeans[:ea])
             for chromosome in unique(nmeans[:chromosome])
                 class_res = @from i in nmeans begin
-                    @where ((i.pclass == class) && (i.ea==ea) && (i.chromosome == chromosome))
+                    @where ((i.pclass == class) && (i.ea==ea) &&
+                            (i.chromosome == chromosome))
                     @select i
                     @collect DataFrame
                 end
@@ -218,6 +226,106 @@ function get_title(pclass::String)
     sclass
 end
 
+function to_yaml(best_params::DataFrame, class::String, ea::String,
+                 chromosome::String)
+    ps = @from i in best_params begin;
+        @where ((i.class==class)&(i.ea==ea)&(i.chromosome==chromosome))
+        @select i; @collect DataFrame
+    end
+    melted = melt(ps, [:uuid])
+    cols = [:mut, :cross, :lambda, :ga_population, :input_start,
+            :node_min, :node_static, :node_max, :eval, :recurrency, :weights,
+            :active, :input_mutation_rate, :output_mutation_rate,
+            :node_mutation_rate, :node_size_delta, :modify_mutation_rate,
+            :ga_elitism_rate, :ga_crossover_rate, :ga_mutation_rate]
+    cfg = ""
+    # cfg = Dict([("save_best", false), ("node_inputs", 2)])
+    cfg = string(cfg, "save_best: false\nnode_inputs: 2")
+    for i in 1:size(melted, 1)
+        var = melted[:variable][i]
+        val = melted[:value][i]
+        if var in cols
+            if var == :node_min
+                cfg = string(cfg, "\nstarting_nodes: ", val)
+            elseif var == :node_static
+                cfg = string(cfg, "\nstatic_node_size: ", val)
+            elseif var == :node_max
+                cfg = string(cfg, "\nnode_size_cap: ", val)
+            elseif var == :eval
+                cfg = string(cfg, "\ntotal_evals: ", val)
+            elseif var == :mut
+                cfg = string(cfg, "\nmutate_method: \":", val, "\"")
+            elseif var == :cross
+                cfg = string(cfg, "\ncrossover_method: \":", val, "\"")
+            elseif var == :active
+                cfg = string(cfg, "\nactive_mutate: ", Bool(val))
+            elseif var == :weights
+                cfg = string(cfg, "\nweights: ", Bool(val))
+            elseif var == :lambda
+                cfg = string(cfg, "\nlambda: ", Int64(10*val))
+            elseif var == :ga_population
+                cfg = string(cfg, "\nga_population: ", Int64(200*val))
+            elseif var == :input_start
+                cfg = string(cfg, "\ninput_start: ", val-1.0)
+            else
+                if isnan(val); val = 0.0; end
+                cfg = string(cfg, "\n", var, ": ", val)
+            end
+        end
+    end
+    string(cfg, "\n")
+end
+
+function get_correlation(res::DataFrame)
+    all_cors = DataFrame()
+    cols = [:mutation, :crossover, :lambda, :ga_population, :input_start,
+            :recurrency, :weights, :active, :input_mutation_rate,
+            :output_mutation_rate, :node_mutation_rate, :node_size_delta,
+            :modify_mutation_rate, :ga_elitism_rate, :ga_crossover_rate,
+            :ga_mutation_rate]
+    pmeans = by(res, [:uuid, :problem], df->DataFrame(mfit=mean(df[:fit])))
+    joined = join(pmeans, res, on=:uuid, kind=:inner)
+    for c in cols
+        joined[c][isnan(joined[c])] = 0.0
+        cdf = by(joined, [:ea, :chromosome, :pclass, :class],
+                 df->DataFrame(cors=abs(cor(df[:mfit], df[c])), variable=c))
+        cdf[:cors][isnan(cdf[:cors])] = 0.0
+        all_cors = vcat(all_cors, cdf)
+    end
+    all_cors = rename_melted!(all_cors)
+    all_cors[:method] = string.(all_cors[:ea], " ", all_cors[:chromosome])
+    sort!(all_cors, cols=(:class, :ea, :chromosome))
+    all_cors
+end
+
+function plot_correlations(cors::DataFrame)
+    plts = []
+    methods = unique(cors[:method])
+    cl = sortcolorscheme(ColorSchemes.fuchsia, rev=true)
+    for method in methods
+        cres = @from i in cors begin
+            @where (i.method==method)
+            @select i
+            @collect DataFrame
+        end
+        sort!(cres, cols=(order(:pclass, rev=true)))
+        maxcor = maximum(cres[:cors])
+        # mincor = minimum(cres[:cors])
+        cres[:cor] = maxcor - cres[:cors]
+        # println(cres[:cor])
+        # cres[:cor][isinf(cres[:cor])] = 100.0
+        plt = plot(cres, x=:names, y=:class, color=:cors, Geom.rectbin,
+                   Guide.colorkey(title="cor"),
+                   Scale.ContinuousColorScale(p -> get(cl, p)),
+                   Guide.xlabel(nothing), Guide.ylabel(nothing),
+                   Guide.title(method));
+        append!(plts, [plt])
+    end
+    plt = vstack(plts...)
+    draw(PDF("correlations.pdf", 20inch, 10inch), plt)
+    nothing
+end
+
 function plot_params(bests::DataFrame, ea::String, chromosome::String, cols::Array{Symbol})
     plts = []
     cres = @from i in bests begin
@@ -226,13 +334,14 @@ function plot_params(bests::DataFrame, ea::String, chromosome::String, cols::Arr
         @collect DataFrame
     end
     # cres[:rank] = Int64.(repmat(1:(size(cres,1)/3), 3))
-    melted = melt(cres, [:rank, :class], cols)
+    melted = melt(cres, [:nscore, :class], cols)
     melted = rename_melted!(melted)
-    plt = plot(melted, x=:names, ygroup=:class, y=:value, color=:rank,
-                Geom.subplot_grid(Geom.beeswarm),
-                Guide.xlabel(nothing), Guide.ylabel(nothing),
+    plt = plot(melted, x=:names, ygroup=:class, y=:value, color=:nscore,
+               Geom.subplot_grid(Geom.beeswarm),
+               Guide.xlabel(nothing), Guide.ylabel(nothing),
+               Guide.colorkey(title="score"),
                 # Guide.xticks(orientation=:vertical),
-               Scale.ContinuousColorScale(p -> get(ColorSchemes.fuchsia, p)),
+               Scale.ContinuousColorScale(p -> get(ColorSchemes.fuchsia, 1.0-p)),
                # Scale.color_discrete_manual(colors...),
                Guide.title(string(ea, " ", chromosome)))
     draw(PDF(get_filename(ea, chromosome), 24inch, 10inch), plt)
