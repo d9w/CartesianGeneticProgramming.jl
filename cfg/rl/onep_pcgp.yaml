@@ -1,20 +1,22 @@
-# General settings
+save_best: false
+node_inputs: 2
+total_evals: 10000
+mutate_method: ":mixed_node_mutate"
+active_mutate: true
+crossover_method: ":single_point_crossover"
+weights: true
 starting_nodes: 50
 static_node_size: 100
 node_size_cap: 150
-node_inputs: 2
-save_best: False
-weights: True
-mutate_method: ":mixed_node_mutate"
-recurrency: 0.1
-total_evals: 10000
-input_start: -0.5
-# Mutation
-active_mutate: False
-input_mutation_rate: 0.3
-output_mutation_rate: 0.8
+input_start: -0.9
+recurrency: 0.5
+input_mutation_rate: 0.9
+output_mutation_rate: 0.2
 node_mutation_rate: 0.2
 node_size_delta: 0.2
-modify_mutation_rate: 0.5
-# Oneplus settings
-lambda: 8
+modify_mutation_rate: 0.9
+lambda: 1
+ga_population: 50
+ga_elitism_rate: 0.1
+ga_crossover_rate: 0.25
+ga_mutation_rate: 0.65
