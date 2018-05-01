@@ -5,20 +5,22 @@ using DataFrames
 using Query
 using ColorSchemes
 
-Gadfly.push_theme(Theme(major_label_font="Helvetica",
-                        minor_label_font="Helvetica",
-                        major_label_font_size=18pt, minor_label_font_size=16pt,
-                        line_width=0.8mm, key_label_font="Droid Sans",
-                        point_size=1.0mm,
+Gadfly.push_theme(Theme(major_label_font="Helvetica", major_label_font_size=28pt,
+                        minor_label_font="Helvetica", minor_label_font_size=24pt,
+                        key_title_font="Helvetica", key_title_font_size=20pt,
+                        key_label_font="Helvetica", key_label_font_size=16pt,
+                        line_width=0.8mm, point_size=2.0mm,
                         lowlight_color=c->RGBA{Float32}(c.r, c.g, c.b, 0.2),
-                        key_label_font_size=14pt,
                         default_color=colorant"#000000"))
 
 colors = [colorant"#e41a1c", colorant"#377eb8", colorant"#4daf4a",
           colorant"#984ea3", colorant"#ff7f00", colorant"#ffff33"]
-
+allmethods = ["1+λ CGP", "1+λ PCGP", "GA CGP", "GA PCGP"]
+colorschemes = [ColorSchemes.Reds_9, ColorSchemes.Blues_9,
+                ColorSchemes.Greens_9,
+                sortcolorscheme(ColorSchemes.fuchsia, rev=true)]
 pclasses = ["classification", "regression", "rl"]
-shortclass = ["Classification", "Regression", "Reinforcement Learning"]
+shortclass = ["Classification", "Regression", "RL"]
 
 mutations = ["gene_mutate", "mixed_node_mutate", "mixed_subtree_mutate"]
 
@@ -108,67 +110,6 @@ function get_top_by_pareto(res::DataFrame, nbests::Int64=10)
     best_params
 end
 
-function get_norm_means(res::DataFrame)
-    problem_stats = by(res, [:problem], df->DataFrame(
-        pmax=maximum(df[:fit]), pmin=minimum(df[:fit])))
-
-    norm_fit = zeros(size(res,1))
-    for problem in unique(problem_stats[:problem])
-        stat_id = findfirst(problem_stats[:problem].==problem)
-        pmax = problem_stats[:pmax][stat_id]
-        pmin = problem_stats[:pmin][stat_id]
-        println(problem, " ", pmin, " ", pmax)
-        pinds = res[:problem] .== problem
-        norm_fit[pinds] = (res[:fit][pinds] - pmin)./(pmax - pmin)
-    end
-
-    res[:norm_fit] = norm_fit
-
-    full_nmeans = by(res, [:id, :pclass, :ea, :chromosome], df->DataFrame(
-        mfit=mean(df[:norm_fit]), sfit=std(df[:norm_fit]),
-        nprob=length(unique(df[:problem])), mut=df[:mut][1],
-        active=df[:active][1], cross=df[:cross][1], weights=df[:weights][1],
-        input_start=df[:input_start][1], recurrency=df[:recurrency][1],
-        input_mutation_rate=df[:input_mutation_rate][1],
-        output_mutation_rate=df[:output_mutation_rate][1],
-        node_mutation_rate=df[:node_mutation_rate][1],
-        node_size_delta=df[:node_size_delta][1],
-        modify_mutation_rate=df[:modify_mutation_rate][1],
-        lambda=df[:lambda][1], ga_population=df[:ga_population][1],
-        ga_elitism_rate=df[:ga_elitism_rate][1],
-        ga_crossover_rate=df[:ga_crossover_rate][1],
-        ga_mutation_rate=df[:ga_mutation_rate][1]))
-
-    nmeans = @from i in full_nmeans begin
-        @where i.nprob == 3
-        @select i
-        @collect DataFrame
-    end
-
-    nmeans
-end
-
-function get_best_params(nmeans::DataFrame, top::Int64=20)
-    best_params = DataFrame()
-    # best 20 per pclass, ea, chromo
-    # 20 * 3 * 2 * 2
-    for class in unique(nmeans[:pclass])
-        for ea in unique(nmeans[:ea])
-            for chromosome in unique(nmeans[:chromosome])
-                class_res = @from i in nmeans begin
-                    @where ((i.pclass == class) && (i.ea==ea) &&
-                            (i.chromosome == chromosome))
-                    @select i
-                    @collect DataFrame
-                end
-                sort!(class_res, cols=(order(:mfit, rev=true)))
-                best_params = vcat(best_params, head(class_res, top))
-            end
-        end
-    end
-    best_params
-end
-
 function plot_fits(best_params::DataFrame)
     plts = []
     for class in shortclass
@@ -184,7 +125,7 @@ function plot_fits(best_params::DataFrame)
         append!(plts, [plt])
     end
     final_plt = hstack(plts...)
-    draw(PDF("best_fits.pdf", 12inch, 4inch), final_plt)
+    draw(PDF("plots/best_fits.pdf", 12inch, 4inch), final_plt)
 end
 
 function rename_melted!(melted::DataFrame)
@@ -208,22 +149,6 @@ function rename_melted!(melted::DataFrame)
     names[melted[:variable].==:ga_mutation_rate] = "GA<sub>mutation</sub>"
     melted[:names] = names
     melted
-end
-
-function get_filename(ea::String, chromo::String)
-    sea = ea
-    if ea == "1+λ"
-        sea = "oneplus"
-    end
-    string(sea, "_", chromo, "_params.pdf")
-end
-
-function get_title(pclass::String)
-    sclass = string(uppercase(pclass[1]), pclass[2:end])
-    if pclass == "rl"
-        sclass = "Reinforcement Learning"
-    end
-    sclass
 end
 
 function to_yaml(best_params::DataFrame, class::String, ea::String,
@@ -276,13 +201,8 @@ function to_yaml(best_params::DataFrame, class::String, ea::String,
     string(cfg, "\n")
 end
 
-function get_correlation(res::DataFrame)
+function get_correlation(res::DataFrame, cols::Array{Symbol})
     all_cors = DataFrame()
-    cols = [:mutation, :crossover, :lambda, :ga_population, :input_start,
-            :recurrency, :weights, :active, :input_mutation_rate,
-            :output_mutation_rate, :node_mutation_rate, :node_size_delta,
-            :modify_mutation_rate, :ga_elitism_rate, :ga_crossover_rate,
-            :ga_mutation_rate]
     pmeans = by(res, [:uuid, :problem], df->DataFrame(mfit=mean(df[:fit])))
     joined = join(pmeans, res, on=:uuid, kind=:inner)
     for c in cols
@@ -298,36 +218,41 @@ function get_correlation(res::DataFrame)
     all_cors
 end
 
-function plot_correlations(cors::DataFrame)
-    plts = []
-    methods = unique(cors[:method])
-    cl = sortcolorscheme(ColorSchemes.fuchsia, rev=true)
-    for method in methods
-        cres = @from i in cors begin
-            @where (i.method==method)
-            @select i
-            @collect DataFrame
-        end
-        sort!(cres, cols=(order(:pclass, rev=true)))
-        maxcor = maximum(cres[:cors])
-        # mincor = minimum(cres[:cors])
-        cres[:cor] = maxcor - cres[:cors]
-        # println(cres[:cor])
-        # cres[:cor][isinf(cres[:cor])] = 100.0
-        plt = plot(cres, x=:names, y=:class, color=:cors, Geom.rectbin,
-                   Guide.colorkey(title="cor"),
-                   Scale.ContinuousColorScale(p -> get(cl, p)),
-                   Guide.xlabel(nothing), Guide.ylabel(nothing),
-                   Guide.title(method));
-        append!(plts, [plt])
+function plot_correlations(cors::DataFrame, method::String)
+    m = findfirst(allmethods .== method)
+    method = allmethods[m]
+    cl = colorschemes[m]
+    cres = @from i in cors begin
+        @where (i.method==method)
+        @select i
+        @collect DataFrame
     end
-    plt = vstack(plts...)
-    draw(PDF("correlations.pdf", 20inch, 10inch), plt)
-    nothing
+    sort!(cres, cols=(order(:pclass, rev=true)))
+    maxcor = maximum(cres[:cors])
+    # mincor = minimum(cres[:cors])
+    cres[:cor] = maxcor - cres[:cors]
+    # println(cres[:cor])
+    # cres[:cor][isinf(cres[:cor])] = 100.0
+    plt = plot(cres, x=:names, y=:class, color=:cors, Geom.rectbin,
+                Guide.colorkey(title="cor"),
+                Scale.ContinuousColorScale(p->get(cl, p)),
+                Guide.xlabel(nothing), Guide.ylabel(nothing),
+                Guide.title(method));
+    plt
 end
 
-function plot_params(bests::DataFrame, ea::String, chromosome::String, cols::Array{Symbol})
+function get_filename(ea::String, chromo::String)
+    sea = ea
+    if ea == "1+λ"
+        sea = "oneplus"
+    end
+    string("plots/", sea, "_", chromo, "_params.pdf")
+end
+
+function plot_params(bests::DataFrame, m::Int64, ea::String, chromosome::String,
+                     cols::Array{Symbol})
     plts = []
+    cl = colorschemes[m]
     cres = @from i in bests begin
         @where ((i.ea==ea) && (i.chromosome==chromosome))
         @select i
@@ -340,31 +265,48 @@ function plot_params(bests::DataFrame, ea::String, chromosome::String, cols::Arr
                Geom.subplot_grid(Geom.beeswarm),
                Guide.xlabel(nothing), Guide.ylabel(nothing),
                Guide.colorkey(title="score"),
-                # Guide.xticks(orientation=:vertical),
-               Scale.ContinuousColorScale(p -> get(ColorSchemes.fuchsia, 1.0-p)),
+               # Guide.xticks(orientation=:vertical),
+               Scale.ContinuousColorScale(p -> get(cl, p)),
+                # Scale.ContinuousColorScale(p->cl[ceil(Int64, p*99)+1]),
                # Scale.color_discrete_manual(colors...),
                Guide.title(string(ea, " ", chromosome)))
     draw(PDF(get_filename(ea, chromosome), 24inch, 10inch), plt)
     nothing
 end
 
-function plot_all(bests::DataFrame)
-    plot_params(bests, "1+λ", "CGP",
-                [:mutation, :lambda, :recurrency, :weights,
-                 :active, :output_mutation_rate, :node_mutation_rate,
-                 :node_size_delta, :modify_mutation_rate]);
-    plot_params(bests, "1+λ", "PCGP",
-                [:mutation, :lambda, :input_start, :recurrency, :weights,
-                 :active, :input_mutation_rate, :output_mutation_rate, :node_mutation_rate,
-                 :node_size_delta, :modify_mutation_rate])
-    plot_params(bests, "GA", "CGP",
-                [:mutation, :crossover, :ga_population, :recurrency, :weights,
-                 :active, :output_mutation_rate, :node_mutation_rate,
-                 :node_size_delta, :modify_mutation_rate,
-                 :ga_elitism_rate, :ga_crossover_rate, :ga_mutation_rate])
-    plot_params(bests, "GA", "PCGP",
-                [:mutation, :crossover, :ga_population, :input_start, :recurrency,
-                 :weights, :active, :input_mutation_rate, :output_mutation_rate,
-                 :node_mutation_rate, :node_size_delta, :modify_mutation_rate,
-                 :ga_elitism_rate, :ga_crossover_rate, :ga_mutation_rate])
+function plot_all_params(res::DataFrame)
+    bests = get_top_by_pareto(res, 20);
+    cor_plts = []
+    cols = [:mutation, :lambda, :recurrency, :weights,
+            :active, :output_mutation_rate, :node_mutation_rate,
+            :node_size_delta, :modify_mutation_rate]
+    cors = get_correlation(res, cols)
+    plt = plot_correlations(cors, "1+λ CGP")
+    append!(cor_plts, [plt])
+    plot_params(bests, 1, "1+λ", "CGP", cols)
+    cols = [:mutation, :lambda, :input_start, :recurrency, :weights,
+            :active, :input_mutation_rate, :output_mutation_rate,
+            :node_mutation_rate, :node_size_delta, :modify_mutation_rate]
+    cors = get_correlation(res, cols)
+    plt = plot_correlations(cors, "1+λ PCGP")
+    append!(cor_plts, [plt])
+    plot_params(bests, 2, "1+λ", "PCGP", cols)
+    cols = [:mutation, :crossover, :ga_population, :recurrency, :weights,
+            :active, :output_mutation_rate, :node_mutation_rate,
+            :node_size_delta, :modify_mutation_rate,
+            :ga_elitism_rate, :ga_crossover_rate, :ga_mutation_rate]
+    cors = get_correlation(res, cols)
+    plt = plot_correlations(cors, "GA CGP")
+    append!(cor_plts, [plt])
+    plot_params(bests, 3, "GA", "CGP", cols)
+    cols = [:mutation, :crossover, :ga_population, :input_start, :recurrency,
+            :weights, :active, :input_mutation_rate, :output_mutation_rate,
+            :node_mutation_rate, :node_size_delta, :modify_mutation_rate,
+            :ga_elitism_rate, :ga_crossover_rate, :ga_mutation_rate]
+    cors = get_correlation(res, cols)
+    plt = plot_correlations(cors, "GA PCGP")
+    append!(cor_plts, [plt])
+    plot_params(bests, 4, "GA", "PCGP", cols)
+    plt = vstack(cor_plts...)
+    draw(PDF("plots/correlations.pdf", 20inch, 10inch), plt)
 end
