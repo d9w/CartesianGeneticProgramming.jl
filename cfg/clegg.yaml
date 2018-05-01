@@ -13,8 +13,8 @@ input_start: -1.0
 # Mutation
 active_mutate: False
 input_mutation_rate: 0.0
-output_mutation_rate: 0.1
-node_mutation_rate: 0.1
+output_mutation_rate: 0.2
+node_mutation_rate: 0.2
 node_size_delta: 0.0
 modify_mutation_rate: 0.0
 # Oneplus settings
