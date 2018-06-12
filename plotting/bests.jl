@@ -16,7 +16,8 @@ Gadfly.push_theme(Theme(major_label_font="Helvetica",
                         default_color=colorant"#000000"))
 
 colors = [colorant"#e41a1c", colorant"#377eb8", colorant"#4daf4a",
-          colorant"#984ea3", colorant"#ff7f00", colorant"#ffff33"]
+          colorant"#984ea3", colorant"#ff7f00", colorant"#a65628",
+          colorant"#ffff33", colorant"#a65628"]
 
 function reducef(df, xmax)
     r = 1:length(df[:eval])
@@ -67,16 +68,22 @@ function get_problem_stats(res::DataFrame, problem::String;
 end
 
 function to_id(ea::String, chromosome::String)
-    id = "e<sub>1</sub>"
-    if ea == "1+λ"
-        if chromosome == "PCGP"
-            id = "e<sub>2</sub>"
-        end
-    else
+    id = ""
+    if ea == "clegg"
+        id = "e<sub>5</sub>"
+    elseif ea == "default"
+        id = "e<sub>4</sub>"
+    elseif ea == "1+λ"
         if chromosome == "CGP"
-            id = "e<sub>3</sub>"
+            id = "e<sub>0</sub>"
         else
-            id = "e<sub>4</sub>"
+            id = "e<sub>1</sub>"
+        end
+    elseif ea == "GA"
+        if chromosome == "CGP"
+            id = "e<sub>2</sub>"
+        else
+            id = "e<sub>3</sub>"
         end
     end
     id
@@ -126,8 +133,8 @@ function plot_bests(res::DataFrame, pclass::String, tstr::String,
             @select i; @collect DataFrame;
         end
 
-        plt = plot(cres, x=:id, y=:refit, color=:id,
-                   Geom.boxplot,
+        plt = plot(cres, x=:id, y=:fit, color=:id,
+                   Geom.beeswarm,
                    Scale.color_discrete_manual(colors...),
                    Guide.title(labels[p]),
                    Guide.xlabel(nothing),
@@ -148,47 +155,53 @@ function pvalues(res::DataFrame, pclass::String; xmax::Int64=maximum(res[:eval])
         @select i; @collect DataFrame;
     end
     pv = DataFrame()
-    methods = unique(res[:method])
+    ids = unique(res[:id])
     problems = Array{String}(unique(cres[:problem]))
     for p in eachindex(problems)
         pres = @from i in cres begin
             @where (i.problem==problems[p])
             @select i; @collect DataFrame;
         end
-        s = string(problems[p], "\n& ")
-        for n in eachindex(methods)
-            s = string(s, L"$e_", n, L"$", " & ")
+        s1 = string(problems[p], "\n& ")
+        s2 = string(problems[p], "\n& mean & std\\\\")
+        for n in eachindex(ids)
+            s1 = string(s1, L"$e_", n-1, L"$", " & ")
         end
-        s = string(s, "\n\\hline\n")
-        for n in eachindex(methods)
-            s = string(s, L"$e_", n, L"$", " & ")
+        s1 = string(s1, "\n\\hline\n")
+        s2 = string(s2, "\n\\hline\n")
+        for n in eachindex(ids)
+            s1 = string(s1, L"$e_", n-1, L"$", " & ")
+            s2 = string(s2, L"$e_", n-1, L"$", " & ")
             nres = @from i in pres begin
-                @where (i.method==methods[n])
+                @where (i.id==ids[n])
                 @select i.refit; @collect
             end
             nres = Array{Float64}(nres)
-            for m in eachindex(methods)
+            s2 = string(s2, @sprintf("%0.3f", mean(nres)), " & ",
+                        @sprintf("%0.3f", std(nres)), "\\\\\n")
+            for m in eachindex(ids)
                 mres = @from i in pres begin
-                    @where (i.method==methods[m])
+                    @where (i.id==ids[m])
                     @select i.refit; @collect
                 end
                 mres = Array{Float64}(mres)
-                # println(methods[n], methods[m], pvalue(OneSampleTTest(mres, nres)))
+                # println(ids[n], ids[m], pvalue(OneSampleTTest(mres, nres)))
                 pval = pvalue(OneSampleTTest(mres, nres))
-                sval = @sprintf("%0.3f", pval)
+                sval = @sprintf("%0.2f", pval)
                 if isnan(pval)
-                    pval = 0.0
                     sval = " "
+                elseif pval > 0.05
+                    sval = string("{\\color{gray}", sval, "}")
                 end
-                s = string(s, sval, " & ")
-                pv = vcat(pv, DataFrame(problem=problems[p], m1=methods[n],
-                                        m2=methods[m], p=pval))
+                s1 = string(s1, sval, " & ")
+                pv = vcat(pv, DataFrame(problem=problems[p], m1=ids[n],
+                                        m2=ids[m], p=pval))
             end
-            s = string(s, "\n")
+            s1 = string(s1, "\n")
         end
-        s = replace(s, "1+λ", L"$1+\lambda$")
-        s = replace(s, " & \n", "\\\\\n")
-        println(s)
+        s1 = replace(s1, " & \n", "\\\\\n")
+        println(s2)
+        println(s1)
     end
     pv
 end

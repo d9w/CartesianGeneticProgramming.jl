@@ -7,9 +7,9 @@ using ColorSchemes
 
 Gadfly.push_theme(Theme(major_label_font="Helvetica", major_label_font_size=28pt,
                         minor_label_font="Helvetica", minor_label_font_size=24pt,
-                        key_title_font="Helvetica", key_title_font_size=20pt,
-                        key_label_font="Helvetica", key_label_font_size=16pt,
-                        line_width=0.8mm, point_size=2.0mm,
+                        key_title_font="Helvetica", key_title_font_size=16pt,
+                        key_label_font="Helvetica", key_label_font_size=14pt,
+                        line_width=0.8mm, point_size=1.1mm,
                         lowlight_color=c->RGBA{Float32}(c.r, c.g, c.b, 0.2),
                         default_color=colorant"#000000"))
 
@@ -308,5 +308,5 @@ function plot_all_params(res::DataFrame)
     append!(cor_plts, [plt])
     plot_params(bests, 4, "GA", "PCGP", cols)
     plt = vstack(cor_plts...)
-    draw(PDF("plots/correlations.pdf", 20inch, 10inch), plt)
+    # draw(PDF("plots/correlations.pdf", 20inch, 10inch), plt)
 end
