@@ -10,6 +10,8 @@ export gene_mutate,
     delete_subtree,
     mixed_subtree_mutate,
     mixed_node_mutate,
+    adaptive_node_mutate,
+    adaptive_subtree_mutate,
     mutate
 
 function base_gene_mutate(c::Chromosome)

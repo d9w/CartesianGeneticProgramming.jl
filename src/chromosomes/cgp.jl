@@ -2,7 +2,7 @@ export CGPChromo, node_genes, get_positions
 
 # vanilla CGP
 
-type CGPChromo <: Chromosome
+struct CGPChromo <: Chromosome
     genes::Array{Float64}
     nodes::Array{CGPNode}
     outputs::Array{Int64}

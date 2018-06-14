@@ -6,12 +6,10 @@ export Chromosome,
     forward_connections,
     get_output_trace
 
-# abstract type Chromosome end
-abstract Chromosome
-# abstract type Node end
-abstract Node
+abstract type Chromosome end
+abstract type Node end
 
-type CGPNode <: Node
+mutable struct CGPNode <: Node
     connections::Array{Int64}
     f::Function
     active::Bool

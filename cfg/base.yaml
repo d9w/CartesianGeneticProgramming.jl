@@ -2,14 +2,16 @@
 starting_nodes: 50
 static_node_size: 100
 node_size_cap: 150
-node_inputs: 2
-save_best: False
 weights: False
 mutate_method: ":gene_mutate"
 crossover_method: ":proportional_crossover"
 recurrency: 0.0
 total_evals: 20000
 input_start: -1.0
+# Logging settings
+save_best: False
+log_config: False
+log_function: ":log_best"
 # Mutation
 active_mutate: False
 input_mutation_rate: 0.0

@@ -7,8 +7,8 @@ function selection(fits::Array{Float64}, n::Int64=3)
     fshuffle[winner]
 end
 
-function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
-            seed::Int64=0, record_best::Bool=false, record_fitness::Function=fitness,
+function GA(nin::Int64, nout::Int64, fitness::Function;
+            ctype::DataType=CGPChromo, seed::Int64=0, expert::Any=nothing,
             id::String="")
     population = Array{ctype}(Config.ga_population)
     fits = -Inf*ones(Float64, Config.ga_population)
@@ -21,7 +21,8 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
     ncross = Int64(round(Config.ga_population * Config.ga_crossover_rate))
     nmutate = Int64(round(Config.ga_population * Config.ga_mutation_rate))
     if (nelite + ncross + nmutate) > Config.ga_population
-        rates = [Config.ga_elitism_rate, Config.ga_crossover_rate, Config.ga_mutation_rate]
+        rates = [Config.ga_elitism_rate, Config.ga_crossover_rate,
+                 Config.ga_mutation_rate]
         norm_rates = rates ./ sum(rates)
         nelite = Int64(floor(Config.ga_population * norm_rates[1]))
         ncross = Int64(floor(Config.ga_population * norm_rates[2]))
@@ -33,11 +34,8 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
 
     @assert (nelite + ncross + nmutate + ncopy) == Config.ga_population
 
-    Logging.debug(@sprintf("population: %d %d %d %d", nelite, ncross, nmutate, ncopy))
-
     while eval_count < Config.total_evals
         # evaluation
-        Logging.debug("evaluation $eval_count")
         log_gen = false
         for p in eachindex(population)
             if fits[p] == -Inf
@@ -56,28 +54,14 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
             end
         end
 
-        if log_gen
-            refit = max_fit
-            if record_best
-                refit = record_fitness(best)
-            end
-            Logging.info(@sprintf("R: %s %d %d %0.5f %0.5f %d %d %s %s %s",
-                                  id, seed, eval_count, max_fit, refit,
-                                  sum([n.active for n in best.nodes]),
-                                  length(best.nodes),
-                                  "GA", string(ctype),
-                                  Config.to_string()))
-            if Config.save_best
-                Logging.info(@sprintf("C: %s", string(best.genes)))
-            end
-        end
+        eval(Config.log_function)(id, seed, eval_count, max_fit, best, GA,
+                                  ctype, log_gen)
 
         if eval_count == Config.total_evals
             break
         end
 
         # create new population
-        Logging.debug("new population $eval_count")
         new_pop = Array{ctype}(Config.ga_population)
         new_fits = -Inf*ones(Float64, Config.ga_population)
         popi = 1
@@ -113,7 +97,6 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
             popi += 1
         end
 
-        Logging.debug("variable set $eval_count")
         population = new_pop
         fits = new_fits
 
@@ -124,8 +107,6 @@ function GA(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
                 fits[i] = -Inf
             end
         end
-
-        Logging.debug("done $eval_count")
     end
 
     max_fit, best.genes

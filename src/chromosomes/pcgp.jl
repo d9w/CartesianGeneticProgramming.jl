@@ -2,7 +2,7 @@ export PCGPChromo, node_genes, get_positions
 
 # PCGP with mutated positions and constant scalar inputs and evolved params
 
-type PCGPChromo <: Chromosome
+struct PCGPChromo <: Chromosome
     genes::Array{Float64}
     nodes::Array{CGPNode}
     outputs::Array{Int64}

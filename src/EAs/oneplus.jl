@@ -1,9 +1,8 @@
 export oneplus
 
-function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
-                 seed::Int64=0, record_best::Bool=false, record_fitness::Function=fitness,
-                 expert::Any=nothing, id::String="")
-
+function oneplus(nin::Int64, nout::Int64, fitness::Function;
+                 ctype::DataType=CGPChromo, seed::Int64=0, expert::Any=nothing,
+                 id::String="")
     population = Array{ctype}(Config.lambda)
     for i in eachindex(population)
         population[i] = ctype(nin, nout)
@@ -38,21 +37,8 @@ function oneplus(ctype::DataType, nin::Int64, nout::Int64, fitness::Function;
             end
         end
 
-        if log_gen
-            refit = max_fit
-            if record_best
-                refit = record_fitness(best)
-            end
-            Logging.info(@sprintf("R: %s %d %d %0.5f %0.5f %d %d %s %s %s",
-                                  id, seed, eval_count, max_fit, refit,
-                                  sum([n.active for n in best.nodes]),
-                                  length(best.nodes),
-                                  "oneplus", string(ctype),
-                                  Config.to_string()))
-            if Config.save_best
-                Logging.info(@sprintf("C: %s", string(best.genes)))
-            end
-        end
+        eval(Config.log_function)(id, seed, eval_count, max_fit, best, GA,
+                                  ctype, log_gen)
 
         if eval_count == Config.total_evals
             break

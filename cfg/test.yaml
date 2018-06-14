@@ -2,7 +2,6 @@
 starting_nodes: 10
 static_node_size: 20
 node_size_cap: 30
-save_best: False
 weights: False
 mutate_method: ":gene_mutate"
 crossover_method: ":single_point_crossover"
@@ -10,6 +9,10 @@ distance_method: ":genetic_distance"
 recurrency: 0.5
 total_evals: 500
 input_start: -1.0
+# Logging settings
+save_best: False
+log_config: False
+log_function: ":log_best"
 # Mutation
 active_mutate: True
 input_mutation_rate: 0.5

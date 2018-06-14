@@ -40,41 +40,31 @@ end
 function get_args()
     s = ArgParseSettings()
 
-    @add_arg_table s begin
-        "--seed"
-        arg_type = Int
-        default = 0
-        "--data"
-        arg_type = String
-        required = true
-        "--log"
-        arg_type = String
-        required = true
-        "--fitness"
-        arg_type = String
-        default = "classify"
-        "--ea"
-        arg_type = String
-        required = true
-        "--chromosome"
-        arg_type = String
-        required = true
-        "--cfg"
-        arg_type = String
-        required = true
-    end
+    @add_arg_table(
+        s,
+        "--seed", arg_type = Int, default = 0,
+        "--data", arg_type = String, required = true,
+        "--log", arg_type = String, required = true,
+        "--fitness", arg_type = String, default = "classify",
+        "--ea", arg_type = String, default = "oneplus",
+        "--chromosome", arg_type = String, default = "CGPChromo",
+        "--cfg", arg_type = String, required = false
+    )
 
     CGP.Config.add_arg_settings!(s)
 end
 
 args = parse_args(get_args())
-println(args)
-CGP.Config.init(Dict([k=>args[k] for k in setdiff(
-    keys(args), ["seed", "data", "log", "fitness", "ea", "chromosome", "cfg"])]...))
 
 CGP.Config.init("cfg/base.yaml")
 CGP.Config.init("cfg/classic.yaml")
-CGP.Config.init(args["cfg"])
+if args["cfg"] != nothing
+    CGP.Config.init(args["cfg"])
+end
+
+CGP.Config.init(Dict([k=>args[k] for k in setdiff(
+    keys(args), ["seed", "data", "log", "fitness", "ea",
+                 "chromosome", "cfg"])]...))
 
 srand(args["seed"])
 Logging.configure(filename=args["log"], level=INFO)
@@ -85,8 +75,8 @@ ctype = eval(parse(args["chromosome"]))
 
 fit = x->fitness(x, train, nin, nout)
 refit = x->fitness(x, test, nin, nout)
-maxfit, best = ea(ctype, nin, nout, fit; seed=args["seed"],
-                  record_best=true, record_fitness=refit)
+maxfit, best = ea(nin, nout, fit; seed=args["seed"], ctype=ctype,
+                  id=args["data"])
 
 best_ind = ctype(best, nin, nout)
 test_fit = fitness(best_ind, test, nin, nout)

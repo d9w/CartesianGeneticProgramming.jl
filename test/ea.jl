@@ -24,7 +24,7 @@ CGP.Config.init("cfg/test.yaml")
                                              "distance_method" => string("\"", dist, "\"")))
                         println(ea, ", ", ct, ", ", mut, ", ", cross, ", ", dist)
                         @testset "$ea $ct $mut $cross $dist" begin
-                            max_fit, genes = ea(ct, 1, 1, simple_fit)
+                            max_fit, genes = ea(1, 1, simple_fit; ctype=ct)
                             @test max_fit == 1.0
                             c = ct(genes, 1, 1)
                             @test process(c, [1.0])[1] == 1.0
@@ -55,7 +55,7 @@ end
             @testset "$ea $ct" begin
                 randc = ct(4, 1)
                 randfit = rosenbrock_fit(randc)
-                max_fit, genes = ea(ct, 4, 1, rosenbrock_fit)
+                max_fit, genes = ea(4, 1, rosenbrock_fit; ctype=ct)
                 @test max_fit > randfit
                 c = ct(genes, 4, 1)
                 @test rosenbrock_fit(c) == max_fit
@@ -91,7 +91,8 @@ end
                 outs[correct] = 1.0
                 randc = ct(3, 3)
                 randfit = find_the_mandrill(randc, inps, outs)
-                max_fit, genes = ea(ct, 3, 3, c->find_the_mandrill(c, inps, outs))
+                max_fit, genes = ea(3, 3, c->find_the_mandrill(c, inps, outs);
+                                    ctype=ct)
                 @test max_fit > randfit
             end
         end

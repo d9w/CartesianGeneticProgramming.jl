@@ -72,13 +72,13 @@ function add_arg_settings!(s::ArgParseSettings)
     end
 
     for p in ["lambda", "ga_population", "starting_nodes", "static_node_size",
-              "node_size_cap"]
+              "node_size_cap", "total_evals"]
         add_arg_table(s, ["--$p"], Dict(:help=>"Parameter: $p", :arg_type=>Int64))
     end
-    add_arg_table(s, ["--active_mutate"], Dict(:help=>"Parameter: active_mutate",
-                                               :arg_type=>Bool))
-    add_arg_table(s, ["--weights"], Dict(:help=>"Parameter: weights",
-                                         :arg_type=>Bool))
+
+    for p in ["active_mutate", "weights", "save_best"]
+        add_arg_table(s, ["--$p"], Dict(:help=>"Parameter: $p", :arg_type=>Bool))
+    end
     s
 end
 
