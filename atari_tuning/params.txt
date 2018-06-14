@@ -1,9 +1,0 @@
-### Parameter file for the ACOTSP software
-# name		switch		     type	values			[conditions (using R syntax)]
-static_node_size         "--static_node_size "         c    (50, 60, 70, 80, 90, 100)
-active_mutate            "--active_mutate "            c    (true, false)
-weights                  "--weights "                  c    (true, false)
-recurrency               "--recurrency "               r    (0.0, 1.0)
-output_mutation_rate     "--output_mutation_rate "     r    (0.1, 1.0)
-node_mutation_rate       "--node_mutation_rate "       r    (0.1, 1.0)
-lambda                   "--lambda "                   i    (1, 10)

@@ -1,6 +1,0 @@
-classify.jl --data /tmpdir/wilson/data/julia/glass.dt --ea GA --chromosome PCGPChromo
-classify.jl --data /tmpdir/wilson/data/julia/cancer.dt --ea GA --chromosome PCGPChromo
-classify.jl --data /tmpdir/wilson/data/julia/diabetes.dt --ea GA --chromosome PCGPChromo
-#classify.jl --data /tmpdir/wilson/data/julia/abalone.dt --fitness regression --ea GA --chromosome PCGPChromo
-#classify.jl --data /tmpdir/wilson/data/julia/fires.dt --fitness regression --ea GA --chromosome PCGPChromo
-#classify.jl --data /tmpdir/wilson/data/julia/quality.dt --fitness regression --ea GA --chromosome PCGPChromo

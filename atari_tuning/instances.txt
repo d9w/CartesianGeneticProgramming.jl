@@ -1,4 +1,0 @@
-../experiments/atari.jl --frames 2000 --id frostbite
-../experiments/atari.jl --frames 2000 --id kung_fu_master
-../experiments/atari.jl --frames 2000 --id space_invaders
-../experiments/atari.jl --frames 2000 --id pong
