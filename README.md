@@ -94,10 +94,12 @@ julia experiments/gym.jl --total_evals 200 --seed 1
 
 ### Atari
 
-`atari.jl` uses the `ArcadeLearningEnvironment.jl` to evolve programs which play
-Atari games. This is a more complex example, as it uses Mixed-Type CGP by
-default (program inputs are RGB Arrays, and outputs are scalar actions.) ROMs
-are available from
+`atari.jl`
+uses
+[`ArcadeLearningEnvironment.jl`](https://github.com/nowozin/ArcadeLearningEnvironment.jl)
+to evolve programs which play Atari games. This is a more complex example, as it
+uses Mixed-Type CGP by default (program inputs are RGB Arrays, and outputs are
+scalar actions.) ROMs are available from
 [Atari-py](https://github.com/openai/atari-py/tree/master/atari_py/atari_roms).
 Once ROMs have been configured, a CGP agent can be evolved using:
 
@@ -131,9 +133,9 @@ for mixed type CGP by defining a function for both scalar and vector node
 inputs. The function ordering is:
 
 - (x, y)
-- (x, *y*)
-- (*x*, y)
-- (*x*, *y*)
+- (x, **y**)
+- (**x**, y)
+- (**x**, **y**)
 
 As shorthand, a single function can be specified for all four input types. If
 two function definitions are provided, the first will apply to the two first two
