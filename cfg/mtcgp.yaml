@@ -1,0 +1,158 @@
+functions:
+  # list processing
+  f_vectorize:
+    - "x"
+    - "x[:]"
+  f_head:
+    - "x"
+    - "x[1]"
+  f_last:
+    - "x"
+    - "x[end]"
+  f_differences:
+    - "x"
+    - "if length(x) > 1; return scaled(diff(x[:])); else; return 0.0; end"
+  f_avgdifferences:
+    - "x"
+    - "if length(x) > 1; return scaled(mean(diff(x[:]))); else; return 0.0; end"
+  f_rotate:
+    - "x"
+    - "circshift(x, ceil(c))"
+  f_reverse:
+    - "x"
+    - "reverse(x[:])"
+  f_pushback:
+    - "[x; y]"
+    - "[x; y[:]]"
+    - "[x[:]; y]"
+    - "[x[:]; y[:]]"
+  f_pushfront:
+    - "[y; x]"
+    - "[y[:]; x]"
+    - "[y; x[:]]"
+    - "[y[:]; x[:]]"
+  f_set:
+    - "x"
+    - "x*ones(size(y))"
+    - "y*ones(size(x))"
+    - "mean(x)*ones(size(y))"
+  f_sum:
+    - "x"
+    - "scaled(sum(x))"
+  # mathematical
+  f_add:
+    - "(x+y)/2.0"
+    - "(x.+y)/2.0"
+    - "(x.+y)/2.0"
+    - ".+(eqsize(x,y,c)...)/2.0"
+  f_aminus:
+    - "abs(x-y)/2.0"
+    - "abs.(x.-y)/2.0"
+    - "abs.(x.-y)/2.0"
+    - "abs.(.-(eqsize(x,y,c)...))/2.0"
+  f_mult:
+    - "x*y"
+    - "x.*y"
+    - "x.*y"
+    - ".*(eqsize(x,y,c)...)"
+  f_inv:
+    - "scaled(1./x)"
+  f_abs:
+    - "abs.(x)"
+  f_sqrt:
+    - "sqrt.(abs.(x))"
+  f_cpow:
+    - "abs.(x).^abs(c)"
+  f_ypow:
+    - "abs(x)^abs(y)"
+    - "abs.(x).^abs.(y)"
+    - "abs.(x).^abs.(y)"
+    - ".^(eqsize(abs.(x),abs.(y),c)...)"
+  f_expx:
+    - "(exp.(x)-1.0)/(exp(1.0)-1.0)"
+  f_sinx:
+    - "sin.(x)"
+  f_cosx:
+    - "cos.(x)"
+  # Comparison
+  f_lt:
+    - "Float64(x < y)"
+    - "Float64.(x.<y)"
+    - "Float64.(x.<y)"
+    - "Float64.(.<(eqsize(x,y,c)...))"
+  f_gt:
+    - "Float64(x > y)"
+    - "Float64.(x.>y)"
+    - "Float64.(x.>y)"
+    - "Float64.(.>(eqsize(x,y,c)...))"
+  f_not:
+    - "Float64(~Bool(round(abs(x))))"
+    - "Float64(~Bool(round(abs(x))))"
+    - "Float64.(.~(BitArray(round.(abs.(x)))))"
+    - "Float64.(.~(BitArray(round.(abs.(x)))))"
+  f_and:
+    - "Float64(Bool(round(abs(x)))&Bool(round(abs(y))))"
+    - "Float64.(Bool(round(abs(x))).&BitArray(round.(abs.(y))))"
+    - "Float64.(BitArray(round.(abs.(x))).&Bool(round(abs(y))))"
+    - "Float64.(BitArray(round.(abs.(eqsize(x,y,c)[1]))).&BitArray(round.(abs.(eqsize(x,y,c)[2]))))"
+  f_or:
+    - "Float64(Bool(round(abs(x)))|Bool(round(abs(y))))"
+    - "Float64.(Bool(round(abs(x))).|BitArray(round.(abs.(y))))"
+    - "Float64.(BitArray(round.(abs.(x))).|Bool(round(abs(y))))"
+    - "Float64.(BitArray(round.(abs.(eqsize(x,y,c)[1]))).|BitArray(round.(abs.(eqsize(x,y,c)[2]))))"
+  f_xor:
+    - "Float64(xor(Bool(round(abs(x))), Bool(round(abs(y)))))"
+    - "Float64.(xor.(Bool(round(abs(x))), BitArray(round.(abs.(y)))))"
+    - "Float64.(xor.(BitArray(round.(abs.(x))), Bool(round(abs(y)))))"
+    - "Float64.(xor.(map(i->BitArray(round.(abs.(i))), eqsize(x,y,c))...))"
+  # Statistical
+  f_standarddeviation:
+    - "0.0"
+    - "scaled(std(x[:]))"
+  f_skew:
+    - "x"
+    - "scaled(skewness(x[:]))"
+  f_kurtosis:
+    - "x"
+    - "scaled(kurtosis(x[:]))"
+  f_mean:
+    - "x"
+    - "mean(x)"
+  f_median:
+    - "x"
+    - "median(x)"
+  f_range:
+    - "x"
+    - "maximum(x)-minimum(x)-1.0"
+  f_max1:
+    - "x"
+    - "maximum(x)"
+  f_max2:
+    - "max(x,y)"
+    - "max.(x,y)"
+    - "max.(x,y)"
+    - "max.(eqsize(x, y, c)...)"
+  f_min1:
+    - "x"
+    - "minimum(x)"
+  f_min2:
+    - "min(x,y)"
+    - "min.(x,y)"
+    - "min.(x,y)"
+    - "min.(eqsize(x, y, c)...)"
+  # Misc
+  f_vecfromdouble:
+    - "[x]"
+    - "x"
+  f_ywire:
+    - "y"
+  f_nop:
+    - "x"
+  f_const:
+    - "c"
+  f_constvectord:
+    - "c"
+    - "c.*ones(size(x))"
+  f_emptyvectord:
+    - "0.0"
+    - "zeros(size(x))"
