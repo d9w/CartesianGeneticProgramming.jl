@@ -129,7 +129,7 @@ configuration values to be passed via the command line.
 
 All node functions are contained in the `CGP.Config.functions` array and are
 populated in the configuration files. The syntax for function definitions allows
-for mixed type CGP by defining a function for both scalar and vector node
+for mixed type CGP by defining a function for both scalar and **vector** node
 inputs. The function ordering is:
 
 - (x, y)
