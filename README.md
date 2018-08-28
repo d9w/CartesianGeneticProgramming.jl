@@ -16,7 +16,9 @@ the [CGP site](http://www.cartesiangp.co.uk/resources.html).
 
 ## Installation
 
-#### Install Julia v0.6 on Mac
+Note currently only known to work with Julia v0.6
+
+#### Mac specific install of Julia v0.6
 
 - download it
 ```
