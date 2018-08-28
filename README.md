@@ -1,6 +1,6 @@
 # CGP.jl
 
-[Cartesian Genetic Programming](http://www.cartesiangp.co.uk/) for 
+[Cartesian Genetic Programming](http://www.cartesiangp.co.uk/) for
 [julia](http://julialang.org/).
 
 This implementation of CGP includes various extensions,
@@ -16,10 +16,26 @@ the [CGP site](http://www.cartesiangp.co.uk/resources.html).
 
 ## Installation
 
+#### Install Julia v0.6 on Mac
+
+- download it
+```
+wget -P ~/Downloads https://julialang-s3.julialang.org/bin/mac/x64/0.6/julia-0.6.4-mac64.dmg
+sudo hdiutil attach ~/Downloads/julia-0.6.4-mac64.dmg
+```
+- double click the newly mounted drive and drag Julia-0.6 to the Applications directory.
+
+- add julia to your path so you can use the commandline (change .zshrc to .bashrc if using bash)
+```
+echo export "PATH=/Applications/Julia-0.6.app/Contents/Resources/julia/bin:\$PATH" >> ~/.zshrc
+```
+
+#### General
 From the julia REPL call:
 
 ```julialang
 Pkg.clone("https://github.com/d9w/CGP.jl")
+Pkg.add.(["Logging", "PaddedViews", "Distributions", "YAML", "ArgParse", "TestImages", "Colors", "QuartzImageIO"])
 ```
 
 ## Tests
@@ -30,6 +46,8 @@ of the different genetic operators and CGP extensions. To run all tests, use
 ```bash
 julia run_tests.jl
 ```
+
+**Note** you may currently need to run the tests a few times to get through them successfully.
 
 ## Examples
 
@@ -125,7 +143,7 @@ careful about ordering of configuration files. The example files also show usage
 of the `CGP.Config.add_arg_settings!` function, which allows for all
 configuration values to be passed via the command line.
 
-### Function set configuration 
+### Function set configuration
 
 All node functions are contained in the `CGP.Config.functions` array and are
 populated in the configuration files. The syntax for function definitions allows
