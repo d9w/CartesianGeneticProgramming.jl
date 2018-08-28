@@ -5,12 +5,7 @@ const global D = 2
 const global smax = 1000
 const global snum = 4
 
-files = ["cfg/test.yaml", "cfg/classic.yaml", "cfg/mtcgp.yaml", "cfg/atari.yaml"]
-# files = ["cfg/test.yaml"]
-# files = ["cfg/classic.yaml"]
-# files = ["cfg/mtcgp.yaml"]
-# files = ["cfg/atari.yaml"]
-# files = ["cfg/images.yaml"]
+files = ["cfg/default.yaml", "cfg/base.yaml", "cfg/test.yaml", "cfg/classic.yaml", "cfg/atari.yaml"]
 
 function test_inps(f, inps)
     out = f(inps...)
