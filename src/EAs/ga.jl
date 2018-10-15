@@ -1,3 +1,5 @@
+using SharedArrays
+using Distributed
 export GA
 
 function selection(fits::Array{Float64}, n::Int64=3)
@@ -37,20 +39,23 @@ function GA(nin::Int64, nout::Int64, fitness::Function;
     while eval_count < Config.total_evals
         # evaluation
         log_gen = false
+        dfits = SharedArray{Float64}(Config.ga_population)
+        dfits .= fits
+        @sync @distributed for p=1:Config.ga_population
+            dfits[p] = fitness(population[p])
+        end
+        fits .= dfits
         for p in eachindex(population)
-            if fits[p] == -Inf
-                fit = fitness(population[p])
-                fits[p] = fit
-                eval_count += 1
-                if fit > max_fit
-                    max_fit = fit
-                    best = clone(population[p])
-                    log_gen = true
-                end
-                if eval_count == Config.total_evals
-                    log_gen = true
-                    break
-                end
+            fit = fits[p]
+            eval_count += 1
+            if fit > max_fit
+                max_fit = fit
+                best = clone(population[p])
+                log_gen = true
+            end
+            if eval_count == Config.total_evals
+                log_gen = true
+                break
             end
         end
 

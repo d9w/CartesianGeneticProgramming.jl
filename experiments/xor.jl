@@ -1,10 +1,10 @@
-using CGP
 using Logging
 using ArgParse
+@everywhere using CGP
 
-CGP.Config.init("cfg/test.yaml")
+@everywhere CGP.Config.init("cfg/test.yaml")
 
-function xorfit(c::Chromosome, nbits::Int64, nsamples::Int64)
+@everywhere function xorfit(c::Chromosome, nbits::Int64, nsamples::Int64)
     accuracy = 0
     for d in 1:nsamples
         ins = bitrand(nbits)
@@ -31,11 +31,11 @@ end
 
 function run_xor(args::Dict)
     srand(args["seed"])
-    Logging.configure(filename="xor.log", level=INFO)
+    global_logger(SimpleLogger(open(args["log"], "a+")))
     nin = args["nbits"]
     nout = 1
     fitness = x->xorfit(x, args["nbits"], args["nsamples"])
-    maxfit, best = oneplus(nin, nout, fitness; id="xor")
+    maxfit, best = GA(nin, nout, fitness; id="xor")
 end
 
 if ~isinteractive()
