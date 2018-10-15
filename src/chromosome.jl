@@ -30,6 +30,7 @@ function CGPNode(ins::Array{Int64}, f::Function, active::Bool, p::Float64)
 end
 
 function snap(fc::Array{Float64}, p::Array{Float64})::Array{Int64}
+    # TODO: make this floor
     map(x->indmin(abs.(p-x)), fc)
 end
 

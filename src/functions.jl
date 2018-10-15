@@ -146,7 +146,7 @@ function load_functions(funs::Dict)
     newfuns = []
     for k in keys(funs)
         if isdefined(Config, parse(k))
-            debug("Loading functions: $k is already defined, skipping")
+            @debug("Loading functions: $k is already defined, skipping")
         else
             if length(funs[k])==1
                 sgen(k, funs[k][1], funs[k][1], funs[k][1], funs[k][1])

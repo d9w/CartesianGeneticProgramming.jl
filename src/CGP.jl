@@ -4,8 +4,6 @@ using Logging
 using PaddedViews
 using Distributions
 
-Logging.configure(level=INFO)
-
 include("config.jl")
 include("chromosome.jl")
 include("distance.jl")

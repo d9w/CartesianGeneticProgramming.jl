@@ -3,7 +3,6 @@ using Logging
 using Base.Test
 
 CGP.Config.init("cfg/test.yaml")
-Logging.configure(level=INFO)
 
 info("Chromosome tests")
 include("test/chromosome.jl")

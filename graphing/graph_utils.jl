@@ -20,7 +20,7 @@ function to_graph(c::Chromosome; active_outputs=trues(c.nout))
     for vi in (c.nin+1):length(vids)
         v = vids[vi]
         n = c.nodes[v]
-        f_name = split(split(repr(n.f), ".")[end], "_")[end]
+        f_name = split(split(repr(n.f), ".")[end], "_")[end] # TODO: names with _ in them
         if f_name == "const"
             set_prop!(mg, vi, :name, LaTeXString(@sprintf("%0.2f", n.p)))
         else
