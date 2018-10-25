@@ -12,7 +12,7 @@ and more.
 
 Development is still ongoing, so be warned that major changes might happen.
 Stable resources in other languages can be found on
-the [CGP site](http://www.cartesiangp.co.uk/resources.html).
+the [CGP site](https://www.cartesiangp.com/).
 
 ## Installation
 
