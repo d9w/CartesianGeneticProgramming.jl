@@ -3,6 +3,7 @@ module CGP
 using Logging
 using PaddedViews
 using Distributions
+using Printf
 
 include("config.jl")
 include("chromosome.jl")

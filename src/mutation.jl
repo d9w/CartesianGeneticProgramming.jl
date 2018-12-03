@@ -80,8 +80,8 @@ function add_subtree(c::Chromosome)
     poses = rand(n_adds)
     sort!(poses)
     cpos = get_positions(c)
-    c1 = Array{Float64,1}(n_adds)
-    c2 = Array{Float64,1}(n_adds)
+    c1 = Array{Float64,1}(undef, n_adds)
+    c2 = Array{Float64,1}(undef, n_adds)
     for n in 1:n_adds
         pos_set = [poses[1:n]; rand(cpos[cpos .< poses[n]], n)]
         c1[n] = rand(pos_set)
@@ -176,5 +176,5 @@ function adaptive_node_mutate(c::Chromosome)
 end
 
 function mutate(c::Chromosome)
-    eval(parse(string(Config.mutate_method)))(c)
+    eval(Meta.parse(string(Config.mutate_method)))(c)
 end

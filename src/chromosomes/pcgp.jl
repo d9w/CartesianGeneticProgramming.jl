@@ -12,9 +12,9 @@ end
 
 function PCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::PCGPChromo
     num_nodes = Int64(ceil((length(genes)-nin-nout)/5))
-    nodes = Array{CGPNode}(nin+num_nodes)
+    nodes = Array{CGPNode}(undef, nin+num_nodes)
     rgenes = reshape(genes[(nin+nout+1):end], (5, num_nodes))
-    rgenes = sortcols(rgenes)'
+    rgenes = sortslices(rgenes, dims=2)'
     genes[1:nin] = sort(genes[1:nin], rev=true)
     # genes[nin+(1:nout)] = sort(genes[nin+(1:nout)])
     positions = [Config.input_start .* genes[1:nin]; rgenes[:, 1]]
@@ -31,11 +31,11 @@ function PCGPChromo(genes::Array{Float64}, nin::Int64, nout::Int64)::PCGPChromo
         end
     end
     connections = snap(fc, positions)
-    outputs = snap(genes[nin+(1:nout)], positions)
-    functions = Array{Function}(nin+num_nodes)
-    functions[1:nin] = Config.f_input
+    outputs = snap(genes[nin .+ (1:nout)], positions)
+    functions = Array{Function}(undef, nin+num_nodes)
+    functions[1:nin] .= Config.f_input
     functions[(nin+1):end] = map(i->Config.index_in(Config.functions, i), rgenes[:, 4])
-    params = [zeros(nin); 2.0*rgenes[:, 5]-1.0]
+    params = [zeros(nin); 2.0*rgenes[:, 5] .- 1.0]
     active = find_active(nin, outputs, connections)
     for i in 1:(nin+num_nodes)
         nodes[i] = CGPNode(connections[:, i], functions[i], active[i], params[i])

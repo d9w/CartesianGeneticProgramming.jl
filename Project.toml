@@ -1,0 +1,14 @@
+name = "CGP"
+uuid = "bf6f04c4-f4b8-11e8-04d6-e164386ce798"
+authors = ["Dennis Wilson <dennis@d9w.xyz>"]
+version = "0.1.0"
+
+[deps]
+ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
+Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+PaddedViews = "5432bcbf-9aad-5242-b902-cca2824c8663"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+SharedArrays = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
+YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"

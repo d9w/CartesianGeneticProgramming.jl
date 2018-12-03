@@ -3,7 +3,7 @@ export oneplus
 function oneplus(nin::Int64, nout::Int64, fitness::Function;
                  ctype::DataType=CGPChromo, seed::Int64=0, expert::Any=nothing,
                  id::String="")
-    population = Array{ctype}(Config.lambda)
+    population = Array{ctype}(undef, Config.lambda)
     for i in eachindex(population)
         population[i] = ctype(nin, nout)
     end

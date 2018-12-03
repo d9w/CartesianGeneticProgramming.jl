@@ -55,8 +55,8 @@ function aligned_node_crossover(c1::Chromosome, c2::Chromosome)
     p2_pos = get_positions(c2)
     min_nodes = min(length(c1.nodes)-c1.nin, length(c2.nodes)-c2.nin)
     p1_inds = c1.nin + collect(1:min_nodes)
-    p1_nodes = Array{Int64}(0)
-    p2_nodes = Array{Int64}(0)
+    p1_nodes = Array{Int64}(undef, 0)
+    p2_nodes = Array{Int64}(undef, 0)
     for node in c1.nin+(1:min_nodes)
         if rand() < 0.5
             i = indmin(abs.(p1_pos[p1_inds] - p2_pos[node]))
@@ -72,7 +72,7 @@ function aligned_node_crossover(c1::Chromosome, c2::Chromosome)
 end
 
 function proportional_crossover(c1::Chromosome, c2::Chromosome)
-    genes = Array{Float64}(0)
+    genes = Array{Float64}(undef, 0)
     if length(c1.genes) == length(c2.genes)
         r = rand(length(c1.genes))
         genes = ((1 .- r) .* c1.genes) .+ (r .* c2.genes)
@@ -91,9 +91,9 @@ end
 function output_graph_crossover(c1::Chromosome, c2::Chromosome)
     # split outputs equally between parents, then construct a child from their
     # corresponding input graphs
-    p1_nodes = Array{Int64}(0)
-    p2_nodes = Array{Int64}(0)
-    output_genes = Array{Float64}(0)
+    p1_nodes = Array{Int64}(undef, 0)
+    p2_nodes = Array{Int64}(undef, 0)
+    output_genes = Array{Float64}(undef, 0)
     for output in 1:c1.nout
         if rand() < 0.5
             append!(p1_nodes, get_output_trace(c1, output))
@@ -105,7 +105,7 @@ function output_graph_crossover(c1::Chromosome, c2::Chromosome)
     end
     p1_nodes = sort!(unique(p1_nodes))
     p2_nodes = sort!(unique(p2_nodes))
-    input_genes = Array{Float64}(0)
+    input_genes = Array{Float64}(undef, 0)
     # take inputs from either parent trace, if they are in the parent traces
     for input in 1:c1.nin
         gene = c1.genes[input]
@@ -158,8 +158,10 @@ function subgraph_crossover(c1::Chromosome, c2::Chromosome)
             end
         end
     end
-    c1_nodes = Array{Int64}(unique(intersect(collect((c1.nin+1):length(c1.nodes)), c1_nodes)))
-    c2_nodes = Array{Int64}(unique(intersect(collect((c2.nin+1):length(c2.nodes)), c2_nodes)))
+    c1_nodes = Array{Int64}(
+        undef, unique(intersect(collect((c1.nin+1):length(c1.nodes)), c1_nodes)))
+    c2_nodes = Array{Int64}(
+        undef, unique(intersect(collect((c2.nin+1):length(c2.nodes)), c2_nodes)))
     genes = zeros(c1.nin+c1.nout)
     for i in 1:(c1.nin+c1.nout)
         if rand(Bool)
@@ -178,5 +180,5 @@ function subgraph_crossover(c1::Chromosome, c2::Chromosome)
 end
 
 function crossover(c1::Chromosome, c2::Chromosome)
-    eval(parse(string(Config.crossover_method)))(c1, c2)
+    eval(Meta.parse(string(Config.crossover_method)))(c1, c2)
 end

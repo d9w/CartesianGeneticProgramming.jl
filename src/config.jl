@@ -4,9 +4,10 @@ using Logging
 using PaddedViews
 using Distributions
 using ArgParse
+using Printf
 
 include("functions.jl")
-functions = Array{Function}(0)
+functions = Array{Function}(undef, 0)
 
 function init(config::Dict)
     for k in keys(config)
@@ -14,7 +15,7 @@ function init(config::Dict)
             append!(functions, load_functions(config["functions"]))
         else
             if config[k] != nothing
-                eval(parse(string(k, "=", config[k])))
+                eval(Meta.parse(string(k, "=", config[k])))
             end
         end
     end

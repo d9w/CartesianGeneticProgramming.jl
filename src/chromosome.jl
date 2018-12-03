@@ -31,7 +31,7 @@ end
 
 function snap(fc::Array{Float64}, p::Array{Float64})::Array{Int64}
     # TODO: make this floor
-    map(x->indmin(abs.(p-x)), fc)
+    map(x->argmin(abs.(p .- x)), fc)
 end
 
 function process(c::Chromosome, inps::Array)::Array{Float64}
@@ -61,14 +61,14 @@ function process(c::Chromosome, inps::Array)::Array{Float64}
             n.output = output
         end
     end
-    outs = Array{Float64}(c.nout)
+    outs = Array{Float64}(undef, c.nout)
     for i in eachindex(outs)
         outs[i] = mean(c.nodes[c.outputs[i]].output)
     end
     outs
 end
 
-function recur_active!(active::BitArray, connections::Array{Int64}, ind::Int64)::Void
+function recur_active!(active::BitArray, connections::Array{Int64}, ind::Int64)
     if ~active[ind]
         active[ind] = true
         for i in 1:2
@@ -79,11 +79,11 @@ end
 
 function find_active(nin::Int64, outputs::Array{Int64}, connections::Array{Int64})::BitArray
     active = falses(size(connections, 2)+nin)
-    active[1:nin] = true
+    active[1:nin] .= true
     for i in eachindex(outputs)
         recur_active!(active, connections, outputs[i])
     end
-    active[1:nin] = false
+    active[1:nin] .= false
     active
 end
 
@@ -119,14 +119,14 @@ end
 
 function get_output_trace(c::Chromosome, output_ind::Int64)
     # similar to decode, just return a list of node indices that determine the output
-    recur_output_trace(c, c.outputs[output_ind], Array{Int64}(0))
+    recur_output_trace(c, c.outputs[output_ind], Array{Int64}(undef, 0))
 end
 
 function get_output_trace(c::Chromosome, outputs::Array{Int64})
     if length(outputs) > 0
         return unique(reduce(vcat, map(x->get_output_trace(c, x), outputs)))
     else
-        return Array{Int64}(0)
+        return Array{Int64}(undef, 0)
     end
 end
 
@@ -148,7 +148,7 @@ function get_genes(c::Chromosome, nodes::Array{Int64})
     if length(nodes) > 0
         return reduce(vcat, map(x->get_genes(c, x), nodes))
     else
-        return Array{Int64}(0)
+        return Array{Int64}(undef, 0)
     end
 end
 

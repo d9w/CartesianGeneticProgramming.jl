@@ -12,7 +12,7 @@ end
 function GA(nin::Int64, nout::Int64, fitness::Function;
             ctype::DataType=CGPChromo, seed::Int64=0, expert::Any=nothing,
             id::String="")
-    population = Array{ctype}(Config.ga_population)
+    population = Array{ctype}(undef, Config.ga_population)
     fits = -Inf*ones(Float64, Config.ga_population)
     population = [ctype(nin, nout) for i in 1:Config.ga_population]
     best = population[1]
@@ -39,7 +39,7 @@ function GA(nin::Int64, nout::Int64, fitness::Function;
     while eval_count < Config.total_evals
         # evaluation
         log_gen = false
-        dfits = SharedArray{Float64}(Config.ga_population)
+        dfits = SharedArray{Float64}(undef, Config.ga_population)
         dfits .= fits
         @sync @distributed for p=1:Config.ga_population
             dfits[p] = fitness(population[p])
@@ -67,7 +67,7 @@ function GA(nin::Int64, nout::Int64, fitness::Function;
         end
 
         # create new population
-        new_pop = Array{ctype}(Config.ga_population)
+        new_pop = Array{ctype}(undef, Config.ga_population)
         new_fits = -Inf*ones(Float64, Config.ga_population)
         popi = 1
 
