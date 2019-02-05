@@ -1,6 +1,9 @@
 using CGP
 using Logging
 using ArgParse
+using DelimitedFiles
+using Random
+using Printf
 
 function read_data(dfile::String)
     df = open(dfile, "r")
@@ -8,7 +11,7 @@ function read_data(dfile::String)
     data = Float64.(readdlm(dfile, ' ', skipstart=4))
     training = data[1:meta[3], :]
     test = data[meta[3]+(1:meta[4]), :]
-    meta[1], meta[2], training', test'
+    meta[1], meta[2], Array{Float64}(training'), Array{Float64}(test')
 end
 
 function classify(c::Chromosome, data::Array{Float64}, nin::Int64, nout::Int64)
@@ -66,8 +69,10 @@ CGP.Config.init(Dict([k=>args[k] for k in setdiff(
     keys(args), ["seed", "data", "log", "fitness", "ea",
                  "chromosome", "cfg"])]...))
 
-srand(args["seed"])
-Logging.configure(filename=args["log"], level=INFO)
+Random.seed!(args["seed"])
+io = open(args["log"], "a+")
+logger = SimpleLogger(io)
+global_logger(logger)
 nin, nout, train, test = read_data(args["data"])
 fitness = eval(parse(args["fitness"]))
 ea = eval(parse(args["ea"]))
@@ -80,9 +85,10 @@ maxfit, best = ea(nin, nout, fit; seed=args["seed"], ctype=ctype,
 
 best_ind = ctype(best, nin, nout)
 test_fit = fitness(best_ind, test, nin, nout)
-Logging.info(@sprintf("T: %d %0.8f %0.8f %d %d %s %s",
+@info(@sprintf("T: %d %0.8f %0.8f %d %d %s %s",
                       args["seed"], maxfit, test_fit,
                       sum([n.active for n in best_ind.nodes]),
                       length(best_ind.nodes), args["ea"], args["chromosome"]))
 
-Logging.info(@sprintf("E%0.8f", -maxfit))
+@info(@sprintf("F: %0.8f", -maxfit))
+close(io)
