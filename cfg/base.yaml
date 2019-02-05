@@ -7,15 +7,15 @@ mutate_method: ":gene_mutate"
 crossover_method: ":proportional_crossover"
 recurrency: 0.0
 total_evals: 20000
-input_start: -1.0
+input_start: -0.5
 # Logging settings
 save_best: False
 log_config: False
 log_function: ":log_best"
 # Mutation
 active_mutate: False
-input_mutation_rate: 0.0
-output_mutation_rate: 0.1
+input_mutation_rate: 0.1
+output_mutation_rate: 0.2
 node_mutation_rate: 0.1
 node_size_delta: 0.0
 modify_mutation_rate: 0.0
