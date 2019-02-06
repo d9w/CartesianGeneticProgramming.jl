@@ -5,8 +5,8 @@ node_size_cap: 150
 weights: False
 mutate_method: ":gene_mutate"
 crossover_method: ":proportional_crossover"
-recurrency: 0.0
-total_evals: 20000
+recurrency: -1.0
+total_evals: 5000
 input_start: -0.5
 # Logging settings
 save_best: False
@@ -15,7 +15,7 @@ log_function: ":log_best"
 # Mutation
 active_mutate: False
 input_mutation_rate: 0.1
-output_mutation_rate: 0.2
+output_mutation_rate: 0.3
 node_mutation_rate: 0.1
 node_size_delta: 0.0
 modify_mutation_rate: 0.0

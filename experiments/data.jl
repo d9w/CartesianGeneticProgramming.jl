@@ -69,26 +69,29 @@ CGP.Config.init(Dict([k=>args[k] for k in setdiff(
     keys(args), ["seed", "data", "log", "fitness", "ea",
                  "chromosome", "cfg"])]...))
 
-Random.seed!(args["seed"])
-io = open(args["log"], "a+")
-logger = SimpleLogger(io)
-global_logger(logger)
-nin, nout, train, test = read_data(args["data"])
-fitness = eval(parse(args["fitness"]))
-ea = eval(parse(args["ea"]))
-ctype = eval(parse(args["chromosome"]))
+for r in 0.0:0.25:1.0
+    CGP.Config.init(Dict("recurrency"=>r))
+    Random.seed!(args["seed"])
+    io = open(args["log"], "a+")
+    logger = SimpleLogger(io)
+    global_logger(logger)
+    nin, nout, train, test = read_data(args["data"])
+    fitness = eval(parse(args["fitness"]))
+    ea = eval(parse(args["ea"]))
+    ctype = eval(parse(args["chromosome"]))
 
-fit = x->fitness(x, train, nin, nout)
-refit = x->fitness(x, test, nin, nout)
-maxfit, best = ea(nin, nout, fit; seed=args["seed"], ctype=ctype,
-                  id=args["data"])
+    fit = x->fitness(x, train, nin, nout)
+    refit = x->fitness(x, test, nin, nout)
+    maxfit, best = ea(nin, nout, fit; seed=args["seed"], ctype=ctype,
+                      id=string(args["data"], " "))
 
-best_ind = ctype(best, nin, nout)
-test_fit = fitness(best_ind, test, nin, nout)
-@info(@sprintf("T: %d %0.8f %0.8f %d %d %s %s",
-                      args["seed"], maxfit, test_fit,
-                      sum([n.active for n in best_ind.nodes]),
-                      length(best_ind.nodes), args["ea"], args["chromosome"]))
+    best_ind = ctype(best, nin, nout)
+    test_fit = fitness(best_ind, test, nin, nout)
+    @info(@sprintf("T: %d %0.8f %0.8f %d %d %s %s",
+                          args["seed"], maxfit, test_fit,
+                          sum([n.active for n in best_ind.nodes]),
+                          length(best_ind.nodes), args["ea"], args["chromosome"]))
 
-@info(@sprintf("F: %0.8f", -maxfit))
-close(io)
+    @info(@sprintf("F: %0.8f", -maxfit))
+    close(io)
+end
