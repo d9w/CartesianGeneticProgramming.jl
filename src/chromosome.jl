@@ -101,6 +101,11 @@ function reset!(c::Chromosome)
     end
 end
 
+function get_recurrent_active(c::Chromosome)
+    sum([any(c.nodes[i].connections .>= i) && i > c.nin for i in eachindex(c.nodes)]
+        .* [n.active for n in c.nodes])
+end
+
 function get_positions(c::Chromosome)
     error("Must be implemented in subclass")
 end

@@ -83,7 +83,7 @@ for r in 0.0:0.25:1.0
     fit = x->fitness(x, train, nin, nout)
     refit = x->fitness(x, test, nin, nout)
     maxfit, best = ea(nin, nout, fit; seed=args["seed"], ctype=ctype,
-                      id=string(args["data"], " "))
+                      id=string(args["data"], " ", r))
 
     best_ind = ctype(best, nin, nout)
     test_fit = fitness(best_ind, test, nin, nout)

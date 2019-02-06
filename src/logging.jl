@@ -3,9 +3,10 @@ export log_best, log_all
 function log_best(id::String, seed::Int64, eval_count::Int64, max_fit::Float64,
                   best::Chromosome, ea::Function, ctype::DataType, log_gen::Bool)
     if log_gen
-        logstr = @sprintf("E: %s %d %d %0.5f %d %d",
+        logstr = @sprintf("E: %s %d %d %0.5f %d %d %d",
                           id, seed, eval_count, max_fit,
                           sum([n.active for n in best.nodes]),
+                          get_recurrent_active(best),
                           length(best.nodes))
         if Config.log_config
             logstr = string(logstr,
