@@ -37,7 +37,7 @@ function oneplus(nin::Int64, nout::Int64, fitness::Function;
             end
         end
 
-        eval(Config.log_function)(id, seed, eval_count, max_fit, best, GA,
+        eval(Config.log_function)(id, seed, eval_count, max_fit, best, oneplus,
                                   ctype, log_gen)
 
         if eval_count == Config.total_evals

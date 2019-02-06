@@ -18,7 +18,7 @@ include("EAs/cgpneat.jl")
 include("EAs/ga.jl")
 include("EAs/cmaes.jl")
 
-EAs = [oneplus, GA]
+EAs = [oneplus, GA, cmaes]
 chromosomes = [CGPChromo, PCGPChromo]
 mutations = [:gene_mutate, :mixed_node_mutate, :mixed_subtree_mutate, :adaptive_node_mutate,
              :adaptive_subtree_mutate]

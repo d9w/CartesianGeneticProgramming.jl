@@ -1,11 +1,15 @@
 export cmaes, pure_cmaes
 
-function cmaes(ctype::DataType, nin::Int64, nout::Int64, fitness::Function)
+function cmaes(nin::Int64, nout::Int64, fitness::Function;
+               ctype::DataType=CGPChromo, seed::Int64=0, id::String="")
     randcgp = ctype(nin, nout)
     cgpfit(g::Array{Float64}) = -fitness(ctype(mod.(g, 1.0), nin, nout))
-    fitmin, best_genes = pure_cmaes(
-        cgpfit, randcgp.genes, 0.5*ones(length(randcgp.genes)),
-        lambda=Config.cmaes_population, stopeval=Config.cmaes_stopeval)
+    fitmin, best_genes = pure_cmaes(cgpfit, randcgp.genes,
+                                    0.5*ones(length(randcgp.genes)),
+                                    lambda=Config.lambda,
+                                    stopeval=Config.total_evals,
+                                    id=id, seed=seed, ctype=ctype,
+                                    nin=nin, nout=nout)
     -fitmin, best_genes
 end
 
@@ -30,8 +34,9 @@ end
 # References: See end of file. Last change: October, 21, 2010
 
 function pure_cmaes(objFun::Function, pinit::Array{Float64}, sigma::Array{Float64};
-                    lambda=0,stopeval=0,stopDeltaFitness=1e-12)
-
+                    lambda=0,stopeval=0,stopDeltaFitness=1e-12,
+                    ctype::DataType=CGPChromo, seed::Int64=0,
+                    id::String="", nin=0, nout=0)
 #   objFun(x) = sum( (x-linspace(0,100,length(x))).^2 )
 #   objFun(x) = sum( 0.1*(x[1]-1).^2 + (x[2]-2).^2 )
 #    N = 3                # number of objective variables/problem dimension
@@ -109,8 +114,6 @@ function pure_cmaes(objFun::Function, pinit::Array{Float64}, sigma::Array{Float6
 
     iter = 0
 
-    @printf("%i-%i CMA-ES\n",lambda,mu);
-
     # -------------------- Generation Loop --------------------------------
     counteval = 0  # the next 40 lines contain the 20 lines of interesting code
     while counteval < stopeval
@@ -129,8 +132,9 @@ function pure_cmaes(objFun::Function, pinit::Array{Float64}, sigma::Array{Float6
             if arfitness[k] < min_fit
                 min_fit = arfitness[k]
                 xbest = deepcopy(arx[:,k])
-                Logging.info(@sprintf("CMAES: %d %0.4f %s", counteval, -min_fit,
-                                      string(mod.(xbest, 1.0))))
+                eval(Config.log_function)(id, seed, counteval, -min_fit,
+                                          ctype(mod.(xbest, 1.0), nin, nout),
+                                          cmaes, ctype, true)
             end
         end
 
