@@ -5,10 +5,10 @@ function get_config(config::Dict)
     functions = Array{Function}(undef, length(config["functions"]))
     for i in eachindex(config["functions"])
         fname = config["functions"][i]
-        if arity[fname] == 2
+        if CGPFunctions.arity[fname] == 2
             two_arity[i] = true
         end
-        functions[i] = eval(Meta.parse(fname))
+        functions[i] = eval(Meta.parse(string("CGPFunctions.", fname)))
     end
     config["two_arity"] = two_arity
     config["functions"] = functions

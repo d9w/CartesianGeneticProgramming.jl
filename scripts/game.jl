@@ -18,7 +18,7 @@ struct Game
     actions::Array{Int32}
 end
 
-function Game(romfile::String, seed::Int64)
+function Game(romfile::String, seed::Int)
     ale = ALE_new()
     setInt(ale, "random_seed", Cint(seed))
     loadROM(ale, romfile)

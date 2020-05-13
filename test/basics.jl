@@ -43,12 +43,4 @@ end
             @test ind.buffer[i] == 1.0
         end
     end
-
-    output = process(ind, Array{MType}([ones(3) for i in 1:4]))
-    @test all(output[1] .== ones(3))
-    for i in eachindex(ind.nodes)
-        if ind.nodes[i].active
-            @test all(ind.buffer[i] == ones(3))
-        end
-    end
 end

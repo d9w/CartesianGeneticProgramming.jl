@@ -42,7 +42,7 @@ seed = args["seed"]
 Random.seed!(seed)
 cfg["nsteps"] = 0
 
-function play_env(ind::CGPInd; seed::Int64=0)
+function play_env(ind::CGPInd; seed::Int=0)
     env = gym.make(cfg["env"])
     env.seed(seed)
     obs = env.reset()

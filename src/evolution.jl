@@ -56,7 +56,3 @@ end
 function interpret(i::CGPInd)
     x::AbstractArray->process(i, x)
 end
-
-function mean_interpret(i::CGPInd)
-    x::AbstractArray->mean_process(i, x)
-end

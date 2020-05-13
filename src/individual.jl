@@ -17,7 +17,7 @@ struct CGPInd <: Cambrian.Individual
     genes::Array{Int16}
     outputs::Array{Int16}
     nodes::Array{Node}
-    buffer::Array{MType}
+    buffer::Array{Float64}
     fitness::Array{Float64}
 end
 
@@ -39,8 +39,7 @@ function CGPInd(cfg::Dict, chromosome::Array{Float64}, genes::Array{Int16},
                             active[x, y])
         end
     end
-    buffer = Array{MType}(nothing, R * C + cfg["n_in"])
-    buffer .= 0.0
+    buffer = zeros(R * C + cfg["n_in"])
     fitness = -Inf .* ones(cfg["d_fitness"])
     CGPInd(chromosome, genes, outputs, nodes, buffer, fitness)
 end
@@ -73,7 +72,7 @@ function copy(n::Node)
 end
 
 function copy(ind::CGPInd)
-    buffer = Array{MType}(nothing, length(ind.buffer))
+    buffer = Array{Float64}(nothing, length(ind.buffer))
     nodes = Array{Node}(undef, length(ind.nodes))
     for i in eachindex(ind.nodes)
         nodes[i] = copy(ind.nodes[i])

@@ -1,8 +1,8 @@
-export get_outputs, set_inputs, process, mean_process
+export get_outputs, set_inputs, process
 
-function get_outputs(ind::CGPInd)::Array{<:MType}
+function get_outputs(ind::CGPInd)::Array{Float64}
     # doesn't re-process, just gives outputs
-    outputs = Array{MType}(undef, length(ind.outputs))
+    outputs = Array{Float64}(undef, length(ind.outputs))
     for i in eachindex(outputs)
         outputs[i] = ind.buffer[ind.outputs[i]]
     end
@@ -10,19 +10,12 @@ function get_outputs(ind::CGPInd)::Array{<:MType}
 end
 
 function set_inputs(ind::CGPInd, inputs::Array{Float64})::Nothing
-    # convenience method to not force conversion to Array{MType}
     for i in eachindex(inputs)
         ind.buffer[i] = inputs[i]
     end
 end
 
-function set_inputs(ind::CGPInd, inputs::Array{<:MType})::Nothing
-    for i in eachindex(inputs)
-        ind.buffer[i] = inputs[i]
-    end
-end
-
-function process(ind::CGPInd)::Array{MType}
+function process(ind::CGPInd)::Array{Float64}
     for i in eachindex(ind.nodes)
         n = ind.nodes[i]
         if n.active
@@ -32,18 +25,7 @@ function process(ind::CGPInd)::Array{MType}
     get_outputs(ind)
 end
 
-function process(ind::CGPInd, inputs::Array{Float64})::Array{<:MType}
+function process(ind::CGPInd, inputs::Array{Float64})::Array{Float64}
     set_inputs(ind, inputs)
     process(ind)
-end
-
-function process(ind::CGPInd, inputs::Array{<:MType})::Array{<:MType}
-    set_inputs(ind, inputs)
-    process(ind)
-end
-
-function mean_process(ind::CGPInd, inputs::Array{<:MType})::Array{Float64}
-    set_inputs(ind, inputs)
-    outputs = process(ind)
-    [Statistics.mean(i) for i in outputs]
 end

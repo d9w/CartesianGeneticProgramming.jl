@@ -1,4 +1,4 @@
-# Darwin.jl settings
+# Cambrian.jl settings
 seed: 0
 d_fitness: 1
 n_population: 5
@@ -7,7 +7,7 @@ n_gen: 100
 log_gen: 10
 save_gen: 0
 m_rate: 0.1
-# MTCGP.jl settings
+# CartesianGeneticProgramming.jl settings
 rows: 3
 columns: 10
 n_in: 4
@@ -19,4 +19,3 @@ functions:
   - f_mult
   - f_div
   - f_abs
-  - f_mean

@@ -75,7 +75,7 @@ function con_to_gene(x::Float64, pos::Float64)::Float64
     gene
 end
 
-function get_graph_genes(mg::MetaDiGraph, nin::Int64, nout::Int64)
+function get_graph_genes(mg::MetaDiGraph, nin::Int, nout::Int)
     genes = rand(nin)
     sort!(genes, rev=true)
     node_positions = rand(nv(mg) - nout - nin)
@@ -138,7 +138,7 @@ function to_chromo(mg::MetaDiGraph)::PCGPChromo
     CGP.PCGPChromo(genes, nin, nout)
 end
 
-function get_graph(nin::Int64, nout::Int64, nnodes::Int64)
+function get_graph(nin::Int, nout::Int, nnodes::Int)
     mg = MetaDiGraph(SimpleDiGraph())
     add_vertices!(mg, nin + nout + nnodes)
     types = [0*ones(nin); 2*ones(nnodes); 1*ones(nout)]
@@ -148,8 +148,8 @@ function get_graph(nin::Int64, nout::Int64, nnodes::Int64)
     mg
 end
 
-function add_node!(mg::MetaDiGraph, i::Int64, f::Function;
-                   x::Int64=rand(1:(i-1)), y::Int64=rand(1:(i-1)), p::Float64=rand())
+function add_node!(mg::MetaDiGraph, i::Int, f::Function;
+                   x::Int=rand(1:(i-1)), y::Int=rand(1:(i-1)), p::Float64=rand())
     set_prop!(mg, i, :function, f)
     set_prop!(mg, i, :param, p)
     if x != y
@@ -164,8 +164,8 @@ function add_node!(mg::MetaDiGraph, i::Int64, f::Function;
     mg
 end
 
-function set_outputs!(mg::MetaDiGraph, nin::Int64, nout::Int64, nnodes::Int64,
-                      outputs::Array{Int64})
+function set_outputs!(mg::MetaDiGraph, nin::Int, nout::Int, nnodes::Int,
+                      outputs::Array{Int})
     for i in eachindex(outputs)
         inp = outputs[i]
         out = nin + nnodes + i

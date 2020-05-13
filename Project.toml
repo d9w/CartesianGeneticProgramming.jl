@@ -1,0 +1,19 @@
+name = "CartesianGeneticProgramming"
+uuid = "a58c8383-ac42-4eac-b920-efb5a098c09c"
+authors = ["Dennis Wilson <dennis@d9w.xyz>"]
+version = "0.1.0"
+
+[deps]
+Cambrian = "7f27c84d-2d74-42e5-be5f-94f6748267f3"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
+
+[compat]
+Cambrian = "0.1.0"
+JSON = "0.21.0"
+StatsBase = "0.33.0"
+YAML = "0.4.0"
