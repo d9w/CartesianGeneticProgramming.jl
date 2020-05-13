@@ -10,3 +10,5 @@ os:
   # - osx
 notifications:
   email: false
+script:
+  - julia -e 'using Pkg; pkg"add https://github.com/d9w/Cambrian.jl"; Pkg.build(); Pkg.test(coverage=true);'
