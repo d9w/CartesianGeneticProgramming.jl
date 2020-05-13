@@ -1,16 +1,16 @@
 export mutate, goldman_mutate
 
-function mutate(cfg::Dict, ind::MTCGPInd)::MTCGPInd
+function mutate(cfg::Dict, ind::CGPInd)::CGPInd
     chromosome = copy(ind.chromosome)
     chance = rand(length(chromosome))
     ngenes = cfg["rows"]*cfg["columns"]*3
     change = [chance[1:ngenes] .<= cfg["m_rate"];
               chance[(ngenes+1):end] .<= cfg["out_m_rate"]]
     chromosome[change] = rand(sum(change))
-    MTCGPInd(cfg, chromosome)
+    CGPInd(cfg, chromosome)
 end
 
-function goldman_mutate(cfg::Dict, ind::MTCGPInd)::MTCGPInd
+function goldman_mutate(cfg::Dict, ind::CGPInd)::CGPInd
     changed = false
     while !changed
         global child = mutate(cfg, ind)
@@ -40,23 +40,23 @@ end
 
 function evolution(cfg::Dict, fitness::Function; kwargs...)
     function evaluate!(evo::Cambrian.Evolution)
-        fit = i::MTCGPInd->fitness(i; seed=evo.gen)
+        fit = i::CGPInd->fitness(i; seed=evo.gen)
         Cambrian.fitness_evaluate!(evo; fitness=fit)
     end
     function populate!(evo::Cambrian.Evolution)
-        mutation = i::MTCGPInd->goldman_mutate(cfg, i)
+        mutation = i::CGPInd->goldman_mutate(cfg, i)
         Cambrian.oneplus_populate!(evo; mutation=mutation)
     end
 
-    Cambrian.Evolution(MTCGPInd, cfg; evaluate=evaluate!,
+    Cambrian.Evolution(CGPInd, cfg; evaluate=evaluate!,
                      populate=populate!,
                      kwargs...)
 end
 
-function interpret(i::MTCGPInd)
+function interpret(i::CGPInd)
     x::AbstractArray->process(i, x)
 end
 
-function mean_interpret(i::MTCGPInd)
+function mean_interpret(i::CGPInd)
     x::AbstractArray->mean_process(i, x)
 end

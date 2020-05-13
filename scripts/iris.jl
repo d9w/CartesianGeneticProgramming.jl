@@ -1,4 +1,4 @@
-using MTCGP
+using CartesianGeneticProgramming
 import RDatasets
 import Cambrian
 
@@ -18,7 +18,7 @@ end
 
 X, Y = data_setup()
 
-function evaluate(ind::MTCGP.MTCGPInd)
+function evaluate(ind::CartesianGeneticProgramming.CGPInd)
     accuracy = 0.0
     for i in 1:size(X, 2)
         out = process(ind, X[:, i])
@@ -29,14 +29,14 @@ function evaluate(ind::MTCGP.MTCGPInd)
     [accuracy / size(X, 1)]
 end
 
-e = Cambrian.Evolution(MTCGPInd, cfg; id="iris")
-mutation = i::MTCGPInd->goldman_mutate(cfg, i)
+e = Cambrian.Evolution(CGPInd, cfg; id="iris")
+mutation = i::CGPInd->goldman_mutate(cfg, i)
 e.populate = x::Cambrian.Evolution->Cambrian.oneplus_populate!(
     x; mutation=mutation)
 e.evaluate = x::Cambrian.Evolution->Cambrian.fitness_evaluate!(
     x; fitness=evaluate)
 #e.evaluate = x::Cambrian.Evolution->Cambrian.lexicase_evaluate!(
-#    x, X, Y, MTCGP.interpret)
+#    x, X, Y, CartesianGeneticProgramming.interpret)
 
 Cambrian.run!(e)
 best = sort(e.population)[end]

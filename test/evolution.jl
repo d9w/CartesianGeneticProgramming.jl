@@ -1,5 +1,5 @@
 using Test
-using MTCGP
+using CartesianGeneticProgramming
 using RDatasets
 import Cambrian
 import Random
@@ -8,7 +8,7 @@ cfg = get_config("../cfg/test.yaml")
 
 @testset "Mutation" begin
 
-    parent = MTCGPInd(cfg)
+    parent = CGPInd(cfg)
 
     child = mutate(cfg, parent)
 
@@ -35,7 +35,7 @@ function rosenbrock(x::Array{Float64})
          for i in 1:(length(x)-1)])/200
 end
 
-function symbolic_evaluate(i::MTCGPInd; seed::Int64=0)
+function symbolic_evaluate(i::CGPInd; seed::Int64=0)
     Random.seed!(seed)
     inputs = rand(cfg["n_in"])
     output = process(i, inputs)
@@ -44,7 +44,7 @@ function symbolic_evaluate(i::MTCGPInd; seed::Int64=0)
 end
 
 @testset "Symbolic Regression Evolution" begin
-    e = MTCGP.evolution(cfg, symbolic_evaluate; id="rosenbrock")
+    e = CartesianGeneticProgramming.evolution(cfg, symbolic_evaluate; id="rosenbrock")
 
     Cambrian.step!(e)
     @test length(e.population) == cfg["n_population"]
@@ -82,12 +82,12 @@ end
     cfg = get_config("../cfg/iris.yaml")
     cfg["n_gen"] = 1000
 
-    e = Cambrian.Evolution(MTCGPInd, cfg; id="iris")
-    mutation = i::MTCGPInd->goldman_mutate(cfg, i)
+    e = Cambrian.Evolution(CGPInd, cfg; id="iris")
+    mutation = i::CGPInd->goldman_mutate(cfg, i)
     e.populate = x::Cambrian.Evolution->Cambrian.oneplus_populate!(
         x; mutation=mutation)
     e.evaluate = x::Cambrian.Evolution->Cambrian.lexicase_evaluate!(
-        x, X, Y, MTCGP.interpret)
+        x, X, Y, CartesianGeneticProgramming.interpret)
 
     Cambrian.step!(e)
     @test length(e.population) == cfg["n_population"]

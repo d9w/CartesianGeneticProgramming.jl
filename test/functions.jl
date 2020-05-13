@@ -1,5 +1,5 @@
 using Test
-using MTCGP
+using CartesianGeneticProgramming
 
 const global D = 3
 const global smax = 10
@@ -7,7 +7,7 @@ const global snum = 5
 
 function test_inputs(f::Function, inps::AbstractArray)
     out = copy(f(inps...))
-    @test typeof(out) <: MTCGP.MType
+    @test typeof(out) <: CartesianGeneticProgramming.MType
     @test all(out == f(inps...)) # functions are idempotent
     @test all(out .>= -1.0)
     @test all(out .<= 1.0)
@@ -58,121 +58,121 @@ end
 
 @testset "List processing functions" begin
     functions = [
-        MTCGP.f_head,
-        MTCGP.f_last,
-        MTCGP.f_tail,
-        MTCGP.f_diff,
-        MTCGP.f_avg_diff,
-        MTCGP.f_reverse,
-        MTCGP.f_push_back,
-        MTCGP.f_push_front,
-        MTCGP.f_set,
-        MTCGP.f_sum,
-        MTCGP.f_vectorize
+        CartesianGeneticProgramming.f_head,
+        CartesianGeneticProgramming.f_last,
+        CartesianGeneticProgramming.f_tail,
+        CartesianGeneticProgramming.f_diff,
+        CartesianGeneticProgramming.f_avg_diff,
+        CartesianGeneticProgramming.f_reverse,
+        CartesianGeneticProgramming.f_push_back,
+        CartesianGeneticProgramming.f_push_front,
+        CartesianGeneticProgramming.f_set,
+        CartesianGeneticProgramming.f_sum,
+        CartesianGeneticProgramming.f_vectorize
     ]
     test_functions(functions)
 end
 
 @testset "Mathematical functions" begin
     functions = [
-        MTCGP.f_add,
-        MTCGP.f_subtract,
-        MTCGP.f_mult,
-        MTCGP.f_div,
-        MTCGP.f_abs,
-        MTCGP.f_sqrt,
-        MTCGP.f_pow,
-        MTCGP.f_exp,
-        MTCGP.f_sin,
-        MTCGP.f_cos,
-        MTCGP.f_tanh,
-        MTCGP.f_sqrt_xy,
-        MTCGP.f_lt,
-        MTCGP.f_gt
+        CartesianGeneticProgramming.f_add,
+        CartesianGeneticProgramming.f_subtract,
+        CartesianGeneticProgramming.f_mult,
+        CartesianGeneticProgramming.f_div,
+        CartesianGeneticProgramming.f_abs,
+        CartesianGeneticProgramming.f_sqrt,
+        CartesianGeneticProgramming.f_pow,
+        CartesianGeneticProgramming.f_exp,
+        CartesianGeneticProgramming.f_sin,
+        CartesianGeneticProgramming.f_cos,
+        CartesianGeneticProgramming.f_tanh,
+        CartesianGeneticProgramming.f_sqrt_xy,
+        CartesianGeneticProgramming.f_lt,
+        CartesianGeneticProgramming.f_gt
     ]
     test_functions(functions)
 end
 
 @testset "Weight functions" begin
     functions = [
-        MTCGP.f_w_exp,
-        MTCGP.f_w_pow,
-        MTCGP.f_w_sqrt_xy,
-        MTCGP.f_w_subtract
+        CartesianGeneticProgramming.f_w_exp,
+        CartesianGeneticProgramming.f_w_pow,
+        CartesianGeneticProgramming.f_w_sqrt_xy,
+        CartesianGeneticProgramming.f_w_subtract
     ]
     test_functions(functions)
 end
 
 @testset "Statistical functions" begin
     functions = [
-        MTCGP.f_stddev,
-        MTCGP.f_skew,
-        MTCGP.f_kurtosis,
-        MTCGP.f_mean,
-        MTCGP.f_median,
-        MTCGP.f_range,
-        MTCGP.f_round,
-        MTCGP.f_ceil,
-        MTCGP.f_floor,
-        MTCGP.f_maximum,
-        MTCGP.f_max,
-        MTCGP.f_minimum,
-        MTCGP.f_min
+        CartesianGeneticProgramming.f_stddev,
+        CartesianGeneticProgramming.f_skew,
+        CartesianGeneticProgramming.f_kurtosis,
+        CartesianGeneticProgramming.f_mean,
+        CartesianGeneticProgramming.f_median,
+        CartesianGeneticProgramming.f_range,
+        CartesianGeneticProgramming.f_round,
+        CartesianGeneticProgramming.f_ceil,
+        CartesianGeneticProgramming.f_floor,
+        CartesianGeneticProgramming.f_maximum,
+        CartesianGeneticProgramming.f_max,
+        CartesianGeneticProgramming.f_minimum,
+        CartesianGeneticProgramming.f_min
     ]
     test_functions(functions)
 end
 
 @testset "Logical functions" begin
     functions = [
-        MTCGP.f_and,
-        MTCGP.f_or,
-        MTCGP.f_xor,
-        MTCGP.f_not
+        CartesianGeneticProgramming.f_and,
+        CartesianGeneticProgramming.f_or,
+        CartesianGeneticProgramming.f_xor,
+        CartesianGeneticProgramming.f_not
     ]
     test_functions(functions)
 end
 
 @testset "Miscellaneous functions" begin
     functions = [
-        MTCGP.f_vecfromdouble,
-        MTCGP.f_nop,
-        MTCGP.f_zeros,
-        MTCGP.f_ones,
-        MTCGP.f_normalize
+        CartesianGeneticProgramming.f_vecfromdouble,
+        CartesianGeneticProgramming.f_nop,
+        CartesianGeneticProgramming.f_zeros,
+        CartesianGeneticProgramming.f_ones,
+        CartesianGeneticProgramming.f_normalize
     ]
     test_functions(functions)
 end
 
 @testset "Image Processing functions" begin
     functions = [
-        MTCGP.f_corners,
-        MTCGP.f_filter,
-        MTCGP.f_gaussian,
-        MTCGP.f_laplacian,
-        MTCGP.f_sobelx,
-        MTCGP.f_sobely,
-        MTCGP.f_canny,
-        MTCGP.f_edge,
-        MTCGP.f_histogram,
-        MTCGP.f_dilate,
-        MTCGP.f_erode,
-        MTCGP.f_opening,
-        MTCGP.f_closing,
-        MTCGP.f_tophat,
-        MTCGP.f_bothat,
-        MTCGP.f_morphogradient,
-        MTCGP.f_morpholaplace,
-        MTCGP.f_rotate_right,
-        MTCGP.f_rotate_left,
-        MTCGP.f_shift_up,
-        MTCGP.f_shift_down,
-        MTCGP.f_shift_left,
-        MTCGP.f_shift_right,
-        MTCGP.f_min_window,
-        MTCGP.f_max_window,
-        MTCGP.f_mean_window,
-        MTCGP.f_restrict,
-        MTCGP.f_resize
+        CartesianGeneticProgramming.f_corners,
+        CartesianGeneticProgramming.f_filter,
+        CartesianGeneticProgramming.f_gaussian,
+        CartesianGeneticProgramming.f_laplacian,
+        CartesianGeneticProgramming.f_sobelx,
+        CartesianGeneticProgramming.f_sobely,
+        CartesianGeneticProgramming.f_canny,
+        CartesianGeneticProgramming.f_edge,
+        CartesianGeneticProgramming.f_histogram,
+        CartesianGeneticProgramming.f_dilate,
+        CartesianGeneticProgramming.f_erode,
+        CartesianGeneticProgramming.f_opening,
+        CartesianGeneticProgramming.f_closing,
+        CartesianGeneticProgramming.f_tophat,
+        CartesianGeneticProgramming.f_bothat,
+        CartesianGeneticProgramming.f_morphogradient,
+        CartesianGeneticProgramming.f_morpholaplace,
+        CartesianGeneticProgramming.f_rotate_right,
+        CartesianGeneticProgramming.f_rotate_left,
+        CartesianGeneticProgramming.f_shift_up,
+        CartesianGeneticProgramming.f_shift_down,
+        CartesianGeneticProgramming.f_shift_left,
+        CartesianGeneticProgramming.f_shift_right,
+        CartesianGeneticProgramming.f_min_window,
+        CartesianGeneticProgramming.f_max_window,
+        CartesianGeneticProgramming.f_mean_window,
+        CartesianGeneticProgramming.f_restrict,
+        CartesianGeneticProgramming.f_resize
     ]
     test_functions(functions)
 end

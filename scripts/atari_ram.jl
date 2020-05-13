@@ -1,4 +1,4 @@
-using MTCGP
+using CartesianGeneticProgramming
 using Cambrian
 using ArcadeLearningEnvironment
 using ArgParse
@@ -33,7 +33,7 @@ cfg = get_config(args["cfg"])
 cfg["game"] = args["game"]
 Random.seed!(args["seed"])
 
-function play_atari(ind::MTCGPInd; seed=0, max_frames=18000)
+function play_atari(ind::CGPInd; seed=0, max_frames=18000)
     game = Game(cfg["game"], seed)
     reward = 0.0
     frames = 0
@@ -59,18 +59,18 @@ function get_params()
 end
 
 function populate(evo::Cambrian.Evolution)
-    mutation = i::MTCGPInd->goldman_mutate(cfg, i)
+    mutation = i::CGPInd->goldman_mutate(cfg, i)
     Cambrian.oneplus_populate!(evo; mutation=mutation, reset_expert=false) # true
 end
 
 function evaluate(evo::Cambrian.Evolution)
-    fit = i::MTCGPInd->play_atari(i; max_frames=min(10*evo.gen, 18000)) #seed=evo.gen,
+    fit = i::CGPInd->play_atari(i; max_frames=min(10*evo.gen, 18000)) #seed=evo.gen,
     Cambrian.fitness_evaluate!(evo; fitness=fit)
 end
 
 cfg["n_in"], cfg["n_out"] = get_params()
 
-e = Cambrian.Evolution(MTCGPInd, cfg; id=string(cfg["game"], "_ram_", args["seed"]),
+e = Cambrian.Evolution(CGPInd, cfg; id=string(cfg["game"], "_ram_", args["seed"]),
                        populate=populate,
                        evaluate=evaluate)
 Cambrian.run!(e)

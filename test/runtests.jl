@@ -1,5 +1,5 @@
 using Test
-using MTCGP
+using CartesianGeneticProgramming
 
 include("functions.jl")
 include("basics.jl")

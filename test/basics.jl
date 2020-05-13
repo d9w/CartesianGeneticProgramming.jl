@@ -1,10 +1,10 @@
 using Test
-using MTCGP
+using CartesianGeneticProgramming
 import YAML
 
-@testset "MTCGPInd construction" begin
+@testset "CGPInd construction" begin
     cfg = get_config("../cfg/test.yaml")
-    ind = MTCGPInd(cfg)
+    ind = CGPInd(cfg)
 
     @test length(ind.nodes) == 3 * 10 + 4
     for node in ind.nodes
@@ -21,7 +21,7 @@ end
     cfg = YAML.load_file("../cfg/test.yaml")
     cfg["functions"] = ["f_abs", "f_add", "f_mult"]
     cfg = get_config(cfg)
-    ind = MTCGPInd(cfg)
+    ind = CGPInd(cfg)
 
     inputs = zeros(4)
     set_inputs(ind, inputs)

@@ -1,4 +1,4 @@
-using MTCGP
+using CartesianGeneticProgramming
 using PyCall
 using Cambrian
 using ArgParse
@@ -40,7 +40,7 @@ seed = args["seed"]
 Random.seed!(seed)
 cfg["nsteps"] = 0
 
-function play_env(ind::MTCGPInd; seed::Int64=0)
+function play_env(ind::CGPInd; seed::Int64=0)
     env = gym.make(cfg["env"])
     env.seed(seed)
     obs = env.reset()
@@ -62,17 +62,17 @@ function play_env(ind::MTCGPInd; seed::Int64=0)
 end
 
 function populate(evo::Cambrian.Evolution)
-    mutation = i::MTCGPInd->goldman_mutate(cfg, i)
+    mutation = i::CGPInd->goldman_mutate(cfg, i)
     Cambrian.oneplus_populate!(evo; mutation=mutation, reset_expert=true)
 end
 
 function evaluate(evo::Cambrian.Evolution)
-    fit = i::MTCGPInd->play_env(i, seed=evo.gen)
+    fit = i::CGPInd->play_env(i, seed=evo.gen)
     Cambrian.fitness_evaluate!(evo; fitness=fit)
     evo.text = Formatting.format("{1:e}", cfg["nsteps"])
 end
 
-e = Cambrian.Evolution(MTCGPInd, cfg; id=string(cfg["env"], "_", seed),
+e = Cambrian.Evolution(CGPInd, cfg; id=string(cfg["env"], "_", seed),
                      populate=populate,
                      evaluate=evaluate)
 Cambrian.run!(e)
