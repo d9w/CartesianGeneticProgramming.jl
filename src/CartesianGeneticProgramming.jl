@@ -1,8 +1,6 @@
 module CartesianGeneticProgramming
 
 import YAML
-import Statistics
-import StatsBase
 import Cambrian
 import JSON
 
