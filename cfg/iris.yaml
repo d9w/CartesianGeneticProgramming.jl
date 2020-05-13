@@ -3,15 +3,15 @@ seed: 0
 d_fitness: 1
 n_population: 5
 n_elite: 1
-n_gen: 100
-log_gen: 10
+n_gen: 100000
+log_gen: 100
 save_gen: 0
 m_rate: 0.1
 # MTCGP.jl settings
 rows: 3
-columns: 10
+columns: 100
 n_in: 4
-n_out: 1
+n_out: 3
 out_m_rate: 0.3
 functions:
   - f_add
@@ -19,4 +19,12 @@ functions:
   - f_mult
   - f_div
   - f_abs
-  - f_mean
+  - f_sqrt
+  - f_pow
+  - f_exp
+  - f_sin
+  - f_cos
+  - f_tanh
+  - f_sqrt_xy
+  - f_lt
+  - f_gt

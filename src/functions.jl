@@ -1,13 +1,12 @@
-function f_input(x::Any, y::Any, c::Any)
-    x
-end
 
-function f_output(x::Float64, y::Any, c::Any)
-    x
-end
-
-function f_output(x::Array{Float64}, y::Any, c::Any)
-    mean(x)
+function eqsize(x::AbstractArray, y::AbstractArray)
+    if ndims(x) != ndims(y)
+        maxdim = max(ndims(x), ndims(y))
+        x = repeat(x, ones(Int, maxdim)...)
+        y = repeat(y, ones(Int, maxdim)...)
+    end
+    newx, newy = Images.paddedviews(0, x, y)
+    (copy(newx), copy(newy))
 end
 
 function scaled(x::Float64)
@@ -18,145 +17,160 @@ function scaled(x::Float64)
 end
 
 function scaled(x::Array{Float64})
-    x[isnan.(x)] = 0.0
+    x[isnan.(x)] .= 0.0
     min.(max.(x, -1.0), 1.0)
 end
 
-function func2f(f::Function)
-    findfirst(CGP.Config.functions .== f) / length(CGP.Config.functions)
-end
-
-function f2ind(list::Tuple, i::Float64)
-    l = length(list)
-    min(max(Int64(ceil(i*l)), 1), l)
-end
-
-function f2ind(list::Tuple, i::Array{Float64})
-    l = length(list)
-    min.(max.(Int64.(ceil.(i.*l)), 1), l)
-end
-
-function f2ind(list::Array, i::Float64)
-    l = length(list)
-    min(max(Int64(ceil(i*l)), 1), l)
-end
-
-function f2ind(list::Array, i::Array{Float64})
-    l = length(list)
-    min.(max.(Int64.(ceil.(i.*l)), 1), l)
-end
-
-function index_in(list::Array, index::Float64)
-    list[f2ind(list, abs(index))]
-end
-
-function index_in(list::Array, index::Array{Float64})
-    index_in(list, mean(abs.(index)))
-end
-
-function index_in(list::Tuple, index::Float64)
-    list[f2ind(list, abs(index))]
-end
-
-function index_in(list::Tuple, index::Array{Float64})
-    index_in(list, mean(abs.(index)))
-end
-
-#TODO: n-dimensional square indexing
-
-function segmentation(x::Array{Float64}, p::Float64, f::Function)
-    if ndims(x) == 2
-        segments = f(x, p)
-        return segments.image_indexmap / maximum(segments.segment_labels)
-    else
-        return x
+function normalized(x::Array{Float64})
+    div = maximum(x) - minimum(x)
+    if div > 0
+        return (x .- minimum(x)) ./ div
     end
+    scaled(x)
 end
 
-function range_in(list::Array{Float64}, xi::Float64, yi::Float64)
-    # TODO: multi-dimensional
-    bounds = [min(xi, yi), max(xi, yi)]
-    bounds = f2ind(list, abs.(bounds))
-    if bounds[1] == bounds[2]
-        return 0.0
-    end
-    list[bounds[1]:bounds[2]]
-end
+# List processing
+fgen(:f_head, 1, :(x), :(x[1]))
+fgen(:f_last, 1, :(x), :(x[end]))
+fgen(:f_tail, 1, :(x), :(length(x) > 1 ? x[end-1:end] : x))
+fgen(:f_diff, 1, :(x), :(length(x) > 1 ? scaled(diff(x, dims=1)) : zeros(1)))
+fgen(:f_avg_diff, 1, :(x),
+     :(length(x) > 1 ? scaled(Statistics.mean(diff(x, dims=1))) : zeros(1)))
+fgen(:f_reverse, 1, :(x), :(reverse(x[:])))
+fgen(:f_push_back, 2, :([x; y]), :([x; y[:]]), :([x[:]; y]), :([x[:]; y[:]]))
+fgen(:f_push_front, 2, :([y; x]), :([y[:]; x]), :([y; x[:]]), :([y[:]; x[:]]))
+fgen(:f_set, 2, :(x), :(x * ones(size(y))), :(y * ones(size(x))),
+     :(Statistics.mean(x) * ones(size(y))))
+fgen(:f_sum, 1, :(x), :(scaled(sum(x))))
+fgen(:f_vectorize, 1, :(x), :(x[:]))
 
-function range_in(list::Array{Float64}, xi::Array{Float64}, yi::Float64)
-    range_in(list, mean(xi), yi)
-end
+# Mathematical
+fgen(:f_add, 2, :((x + y) / 2.0), :((x .+ y) / 2.0),
+     :(.+(eqsize(x, y)...) / 2.0))
+fgen(:f_subtract, 2, :(abs(x - y) / 2.0), :(abs.(x .- y) / 2.0),
+     :(abs.(.-(eqsize(x, y)...)) / 2.0))
+fgen(:f_mult, 2, :(x * y), :(x .* y), :(.*(eqsize(x, y)...)))
+fgen(:f_div, 2, :(scaled(x / y)), :(scaled(x ./ y)),
+     :(scaled(./(eqsize(x, y)...))))
+fgen(:f_abs, 1, :(abs(x)), :(abs.(x)))
+fgen(:f_sqrt, 1, :(sqrt(abs(x))), :(sqrt.(abs.(x))))
+fgen(:f_pow, 2, :(abs(x) ^ abs(y)), :(abs(x) .^ abs.(y)), :(abs.(x) .^ abs(y)),
+     :(.^(eqsize(abs.(x), abs.(y))...)))
+fgen(:f_exp, 1, :((exp(x) - 1.0) / (exp(1.0) - 1.0)),
+     :((exp.(x) .- 1.0) / (exp(1.0) - 1.0)))
+fgen(:f_sin, 1, :(sin(x)), :(sin.(x)))
+fgen(:f_cos, 1, :(cos(x)), :(cos.(x)))
+fgen(:f_tanh, 1, :(tanh(x)), :(tanh.(x)))
+fgen(:f_sqrt_xy, 2, :(sqrt(x^2 + y^2) / sqrt(2.0)),
+     :(sqrt.(x^2 .+ y.^2) ./ sqrt(2.0)),
+     :(sqrt.(x.^2 .+ y^2) ./ sqrt(2.0)),
+     :(sqrt.(.+(eqsize(x.^2, y.^2)...)) ./ sqrt(2.0)))
+fgen(:f_lt, 2, :(Float64(x < y)), :(Float64.(x .< y)),
+    :(Float64.(.<(eqsize(x, y)...))))
+fgen(:f_gt, 2, :(Float64(x > y)), :(Float64.(x .> y)),
+    :(Float64.(.>(eqsize(x, y)...))))
 
-function scaled_indmax(x::Array{Float64})
-    scaled(collect((ind2sub(x, indmax(x)) .- 1) ./ (size(x) .- 1)))
-end
+# GEGE weight functions
+fgen(:f_w_exp, 2, :(2 * exp(-(x - y)^2) - 1),
+     :(2 .* exp.(.-(x .- y).^2) .- 1),
+     :(2 .* exp.(.-((.-(eqsize(x, y)...)).^2) .- 1)))
+fgen(:f_w_pow, 2, :(1 - 2 * abs(x) ^ abs(y)),
+     :(1 .- 2 .* abs(x) .^ abs.(y)),
+     :(1 .- 2 .* abs.(x) .^ abs(y)),
+     :(1 .- 2 .* .^(eqsize(abs.(x), abs.(y))...)))
+fgen(:f_w_sqrt_xy, 2, :(1 - sqrt(x^2 + y^2)),
+     :(1 .- sqrt.(x^2 .+ y.^2)),
+     :(1 .- sqrt.(x.^2 .+ y^2)),
+     :(1 .- sqrt.(.+(eqsize(x.^2, y.^2)...))))
+fgen(:f_w_subtract, 2, :(1 - abs(x - y)), :(1 .- abs.(x .- y)),
+     :(1 .- abs.(.-(eqsize(x, y)...))))
 
-scaled_indmax(x::Array{Float64}, y::Array{Float64}) = scaled_indmax(x)
+# Statistical
+fgen(:f_stddev, 1, :(zeros(1)[1]), :(scaled(Statistics.std(x[:]))))
+fgen(:f_skew, 1, :(x), :(scaled(StatsBase.skewness(x[:]))))
+fgen(:f_kurtosis, 1, :(x), :(scaled(StatsBase.kurtosis(x[:]))))
+fgen(:f_mean, 1, :(x), :(Statistics.mean(x)))
+fgen(:f_median, 1, :(x), :(Statistics.median(x)))
+fgen(:f_range, 1, :(x), :(maximum(x)-minimum(x)-1.0))
+fgen(:f_round, 1, :(round(x)), :(round.(x)))
+fgen(:f_ceil, 1, :(ceil(x)), :(ceil.(x)))
+fgen(:f_floor, 1, :(floor(x)), :(floor.(x)))
+fgen(:f_maximum, 1, :(x), :(maximum(x)))
+fgen(:f_max, 2, :(max(x, y)), :(max.(x, y)), :(max.(eqsize(x, y)...)))
+fgen(:f_minimum, 1, :(x), :(minimum(x)))
+fgen(:f_min, 2, :(min(x, y)), :(min.(x, y)), :(min.(eqsize(x, y)...)))
 
-function com(x::Array{Float64})
-    # TODO: speed up
-    com = Tuple(zeros(ndims(x)))
-    sx = sum(x.+1)
-    if sx > 0
-        for i in eachindex(x)
-            com = com .+ ((x[i]+1) .* (ind2sub(x, i) .- 1 .- ((size(x) .- 1)./2)))
-        end
-        com = com ./ sx
-    end
-    scaled(collect((com .+ (size(x) .- 1) ./ 2) ./ (size(x) .- 1)))
-end
+# Logical
+fgen(:f_and, 2, :(Float64((&)(Int(round(x)), Int(round(y))))),
+     :(Float64.((&).(Int(round(x)), Int.(round.(y))))),
+     :(Float64.((&).(Int.(round.(x)), Int(round(y))))),
+     :(Float64.((&).(eqsize(Int.(round.(x)), Int.(round.(y)))...))))
+fgen(:f_or, 2, :(Float64((|)(Int(round(x)), Int(round(y))))),
+     :(Float64.((|).(Int(round(x)), Int.(round.(y))))),
+     :(Float64.((|).(Int.(round.(x)), Int(round(y))))),
+     :(Float64.((|).(eqsize(Int.(round.(x)), Int.(round.(y)))...))))
+fgen(:f_xor, 2, :(Float64(xor(Int(abs(round(x))), Int(abs(round(y)))))),
+     :(Float64.(xor.(Int(abs(round(x))), Int.(abs.(round.(y)))))),
+     :(Float64.(xor.(Int.(abs.(round.(x))), Int(abs(round(y)))))),
+     :(Float64.(xor.(eqsize(Int.(abs.(round.(x))), Int.(abs.(round.(y))))...))))
+fgen(:f_not, 1, :(1 - abs(round(x))), :(1 .- abs.(round.(x))))
 
-function minsize(x::Array{Float64}, y::Array{Float64})
-    dims = min(ndims(x), ndims(y))
-    shape = [min(size(x, i), size(y, i)) for i in 1:dims]
-    (x[[1:i for i in shape]...], y[[1:i for i in shape]...])
-end
+# Misc
+fgen(:f_vecfromdouble, 1, :([x]), :(x))
+fgen(:f_nop, 1, :(x))
+fgen(:f_zeros, 1, :(zeros(1)[1]), :(zeros(size(x))))
+fgen(:f_ones, 1, :(ones(1)[1]), :(ones(size(x))))
+fgen(:f_normalize, 1, :(x), :(normalized(x)))
 
-function fillsize(x::Array{Float64}, y::Array{Float64}, c::Float64)
-    if ndims(x) == ndims(y)
-        return paddedviews(c, x, y)
-    elseif ndims(x) > ndims(y)
-        mindim = ndims(y)+1
-        return paddedviews(c, x, repeat(y, inner=tuple(
-            ones(Int64, ndims(y))..., size(x)[mindim:end]...)))
-    else
-        mindim = ndims(x)+1
-        return paddedviews(c, repeat(x, inner=tuple(
-            ones(Int64, ndims(x))..., size(y)[mindim:end]...)), y)
-    end
-end
-
-function eqsize(x::Array{Float64}, y::Array{Float64}, c::Float64)
-    minsize(x, y)
-end
-
-function sgen(name::String, s1::String, s2::String, s3::String, s4::String)
-    eval(parse(string(name,
-                      "(x::Float64, y::Float64, c::Float64=0.0)=",
-                      s1, ";", name,
-                      "(x::Float64, y::Array{Float64}, c::Float64=0.0)=",
-                      s2, ";", name,
-                      "(x::Array{Float64}, y::Float64, c::Float64=0.0)=",
-                      s3, ";", name,
-                      "(x::Array{Float64}, y::Array{Float64}, c::Float64=0.0)=",
-                      s4)))
-end
-
-function load_functions(funs::Dict)
-    newfuns = []
-    for k in keys(funs)
-        if isdefined(Config, parse(k))
-            debug("Loading functions: $k is already defined, skipping")
-        else
-            if length(funs[k])==1
-                sgen(k, funs[k][1], funs[k][1], funs[k][1], funs[k][1])
-            elseif length(funs[k])==2
-                sgen(k, funs[k][1], funs[k][1], funs[k][2], funs[k][2])
-            else
-                sgen(k, funs[k][1], funs[k][2], funs[k][3], funs[k][4])
-            end
-            append!(newfuns, [k])
-        end
-    end
-    [eval(parse(k)) for k in newfuns]
-end
+# Image Processing
+fgen(:f_corners, 1, :(x),
+     :(Float64.(Images.fastcorners(x))); safe=true)
+fgen(:f_filter, 2, :(x), :(x),
+     :(ndims(y) == 2 ?
+       scaled(ImageFiltering.imfilter(x, Images.centered(y))) : x);
+     safe=true)
+fgen(:f_gaussian, 1, :(x),
+     :(scaled(ImageFiltering.imfilter(x, Images.Kernel.gaussian(0.1))));
+     safe=true)
+fgen(:f_laplacian, 1, :(x),
+     :(scaled(ImageFiltering.imfilter(x, Images.Kernel.Laplacian())));
+     safe=true)
+fgen(:f_sobelx, 1, :(x),
+     :(scaled(ImageFiltering.imfilter(x, Images.Kernel.sobel()[2])));
+     safe=true)
+fgen(:f_sobely, 1, :(x),
+     :(scaled(ImageFiltering.imfilter(x, Images.Kernel.sobel()[1])));
+     safe=true)
+fgen(:f_canny, 1, :(x),
+     :(Float64.(Images.canny(x, (Images.Percentile(80),
+                                 Images.Percentile(20)))));
+     safe=true)
+fgen(:f_edge, 1, :(x), :(ndims(x) > 1 ? scaled(Images.imedge(x)[3]) : x))
+fgen(:f_histogram, 1, :(x), :(normalized(Float64.(Images.imhist(x, 10)[2])));
+     safe=true)
+fgen(:f_dilate, 1, :(x), :(ImageMorphology.dilate(x)))
+fgen(:f_erode, 1, :(x), :(scaled(ImageMorphology.erode(x))))
+fgen(:f_opening, 1, :(x), :(scaled(ImageMorphology.opening(x))))
+fgen(:f_closing, 1, :(x), :(scaled(ImageMorphology.closing(x))))
+fgen(:f_tophat, 1, :(x), :(scaled(ImageMorphology.tophat(x))))
+fgen(:f_bothat, 1, :(x), :(scaled(ImageMorphology.bothat(x))))
+fgen(:f_morphogradient, 1, :(x), :(scaled(ImageMorphology.morphogradient(x))))
+fgen(:f_morpholaplace, 1, :(x), :(scaled(ImageMorphology.morpholaplace(x))))
+fgen(:f_rotate_right, 1, :(x), :(rotr90(x)); safe=true)
+fgen(:f_rotate_left, 1, :(x), :(rotl90(x)); safe=true)
+fgen(:f_shift_up, 1, :(x), :(circshift(x, (-1, zeros(ndims(x)-1)...))))
+fgen(:f_shift_down, 1, :(x), :(circshift(x, (1, zeros(ndims(x)-1)...))))
+fgen(:f_shift_left, 1, :(x),
+     :(circshift(x, (0, -1, zeros(ndims(x)-2)...))), safe=true)
+fgen(:f_shift_right, 1, :(x),
+     :(circshift(x, (0, 1, zeros(ndims(x)-2)...))), safe=true)
+fgen(:f_min_window, 1, :(x), :(ImageFiltering.MapWindow.mapwindow(
+    minimum, x, 3*ones(Int, ndims(x)))); safe=true)
+fgen(:f_max_window, 1, :(x), :(ImageFiltering.MapWindow.mapwindow(
+    maximum, x, 3*ones(Int, ndims(x)))); safe=true)
+fgen(:f_mean_window, 1, :(x), :(ImageFiltering.MapWindow.mapwindow(
+    Statistics.mean, x, 3*ones(Int, ndims(x)))); safe=true)
+fgen(:f_restrict, 1, :(x),
+     :(scaled(ImageTransformations.restrict(x))); safe=true)
+fgen(:f_resize, 1, :(x),
+     :(scaled(ImageTransformations.imresize(x, ratio=1/2))); safe=true)
