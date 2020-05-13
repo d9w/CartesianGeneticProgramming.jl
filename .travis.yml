@@ -10,9 +10,12 @@ os:
   # - osx
 notifications:
   email: false
+stages:
+  - deps
+  - test
 jobs:
   include:
-    - stage: "Deps"
+    - stage: "deps"
       julia: 1.0
       os: linux
       script:
