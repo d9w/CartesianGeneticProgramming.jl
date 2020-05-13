@@ -10,13 +10,5 @@ os:
   # - osx
 notifications:
   email: false
-stages:
-  - deps
-  - test
-jobs:
-  include:
-    - stage: "deps"
-      julia: 1.0
-      os: linux
-      script:
-        - julia -e 'using Pkg; pkg"add https://github.com/d9w/Cambrian.jl"; Pkg.build(); Pkg.test(coverage=true);'
+install:
+  - julia -e 'using Pkg; pkg"add https://github.com/d9w/Cambrian.jl"; Pkg.build(); Pkg.test(coverage=true);'
