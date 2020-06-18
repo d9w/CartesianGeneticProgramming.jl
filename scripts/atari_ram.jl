@@ -60,11 +60,11 @@ end
 
 function populate(evo::Cambrian.Evolution)
     mutation = i::CGPInd->goldman_mutate(cfg, i)
-    Cambrian.oneplus_populate!(evo; mutation=mutation, reset_expert=false) # true
+    Cambrian.oneplus_populate!(evo; mutation=mutation, reset_expert=false)
 end
 
 function evaluate(evo::Cambrian.Evolution)
-    fit = i::CGPInd->play_atari(i; max_frames=min(10*evo.gen, 18000)) #seed=evo.gen,
+    fit = i::CGPInd->play_atari(i; seed=0) # max_frames=min(10*evo.gen, 18000)) #seed=evo.gen,
     Cambrian.fitness_evaluate!(evo; fitness=fit)
 end
 

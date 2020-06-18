@@ -7,9 +7,10 @@ n_gen: 10000
 log_gen: 10
 save_gen: 100
 m_rate: 0.1
-# MTCGP.jl settings
+# CartesianGeneticProgramming.jl settings
 rows: 1
 columns: 100
+recur: 0.2
 out_m_rate: 0.3
 env: 'HopperBulletEnv-v0'
 functions:

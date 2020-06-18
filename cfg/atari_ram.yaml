@@ -3,13 +3,14 @@ seed: 0
 d_fitness: 1
 n_population: 5
 n_elite: 1
-n_gen: 1000
-log_gen: 1
-save_gen: 10
+n_gen: 10000
+log_gen: 10
+save_gen: 100
 m_rate: 0.1
-# MTCGP.jl settings
-rows: 3
+# CartesianGeneticProgramming.jl settings
+rows: 1
 columns: 100
+recur: 0.2
 out_m_rate: 0.3
 functions:
   - f_add

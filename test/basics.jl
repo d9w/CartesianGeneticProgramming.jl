@@ -36,11 +36,22 @@ end
         end
     end
 
+    # TODO: fails sometimes?
     output = process(ind, ones(4))
     @test output[1] == 1.0
     for i in eachindex(ind.nodes)
         if ind.nodes[i].active
             @test ind.buffer[i] == 1.0
+        end
+    end
+
+    cfg["recur"] = 1.0
+    ind = CGPInd(cfg)
+    output = process(ind, rand(4))
+    @test output[1] <= 1.0 && output[1] >= -1.0
+    for i in eachindex(ind.nodes)
+        if ind.nodes[i].active
+            @test ind.buffer[i] <= 1.0 && ind.buffer[i] >= -1.0
         end
     end
 end

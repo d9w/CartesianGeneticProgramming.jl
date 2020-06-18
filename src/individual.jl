@@ -48,7 +48,11 @@ function CGPInd(cfg::Dict, chromosome::Array{Float64})::CGPInd
     R = cfg["rows"]
     C = cfg["columns"]
     genes = reshape(chromosome[1:(R*C*3)], R, C, 3)
-    maxs = repeat(collect(1:R:(R*C)) .+ cfg["n_in"] .- 1, 1, R)'
+    # TODO: recurrency is ugly and slow
+    maxs = collect(1:R:R*C)
+    maxs = round.((R*C .- maxs) .* cfg["recur"] .+ maxs)
+    maxs = min.(R*C + cfg["n_in"], maxs .+ cfg["n_in"])
+    maxs = repeat(maxs, 1, R)'
     genes[:, :, 1] .*= maxs
     genes[:, :, 2] .*= maxs
     genes[:, :, 3] .*= length(cfg["functions"])

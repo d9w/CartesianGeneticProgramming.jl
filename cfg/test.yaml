@@ -10,6 +10,7 @@ m_rate: 0.1
 # CartesianGeneticProgramming.jl settings
 rows: 3
 columns: 10
+recur: 0.0
 n_in: 4
 n_out: 1
 out_m_rate: 0.3
