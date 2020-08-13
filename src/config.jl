@@ -1,4 +1,3 @@
-export get_config
 
 function get_config(config::Dict)
     two_arity = falses(length(config["functions"]))
@@ -12,9 +11,17 @@ function get_config(config::Dict)
     end
     config["two_arity"] = two_arity
     config["functions"] = functions
-    config
+    cfg = (; (k=>v for (k, v) in config)...)
+    if ~(:id in keys(cfg))
+        cfg = merge(cfg, (; id = string(UUIDs.uuid4())))
+    end
+    cfg
 end
 
-function get_config(file::String)
-    get_config(YAML.load_file(file))
+function get_config(cfg_file::String; kwargs...)
+    cfg = YAML.load_file(cfg_file)
+    for (k, v) in cfg
+        cfg[Symbol(k)] = v
+    end
+    get_config(cfg)
 end

@@ -3,7 +3,7 @@ using CartesianGeneticProgramming
 import YAML
 
 @testset "CGPInd construction" begin
-    cfg = get_config("../cfg/test.yaml")
+    cfg = CartesianGeneticProgramming.get_config("test.yaml")
     ind = CGPInd(cfg)
 
     @test length(ind.nodes) == 3 * 10 + 4
@@ -17,10 +17,29 @@ import YAML
     end
 end
 
+"""
+using random values, sort individuals that are different
+"""
+function select_random(pop::Array{CGPInd}, elite::Int; n_in=113, n_sample=100)
+    actions = zeros(Int, length(pop))
+    dists = zeros(n_sample, length(pop))
+    inputs = rand(n_in, n_sample)
+
+    for i in 1:n_sample
+        for j in eachindex(pop)
+            actions[j] = argmax(process(pop[j], inputs[:, i]))
+        end
+        for j in eachindex(pop)
+            dists[i, j] = sum(actions[j] .!= actions)
+        end
+    end
+    d = sum(dists, dims=1)[:]
+    ds = sortperm(d)[1:elite]
+    pop[ds]
+end
+
 @testset "Processing" begin
-    cfg = YAML.load_file("../cfg/test.yaml")
-    cfg["functions"] = ["f_abs", "f_add", "f_mult"]
-    cfg = get_config(cfg)
+    cfg = CartesianGeneticProgramming.get_config("test.yaml"; functions=["f_abs", "f_add", "f_mult"])
     ind = CGPInd(cfg)
 
     inputs = zeros(4)
@@ -36,7 +55,6 @@ end
         end
     end
 
-    # TODO: fails sometimes?
     output = process(ind, ones(4))
     @test output[1] == 1.0
     for i in eachindex(ind.nodes)
@@ -45,7 +63,7 @@ end
         end
     end
 
-    cfg["recur"] = 1.0
+    cfg = get_config("test.yaml"; functions=["f_abs", "f_add", "f_mult"], recur=1.0)
     ind = CGPInd(cfg)
     output = process(ind, rand(4))
     @test output[1] <= 1.0 && output[1] >= -1.0
@@ -54,4 +72,9 @@ end
             @test ind.buffer[i] <= 1.0 && ind.buffer[i] >= -1.0
         end
     end
+
+    pop = [CGPInd(cfg) for i in 1:10]
+    sp = select_random(pop, 2; n_in=cfg["n_in"], n_sample=5)
+    @test length(sp) == 2
+    @test sp[1].buffer[1] != 0.0
 end
