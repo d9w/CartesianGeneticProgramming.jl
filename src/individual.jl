@@ -1,7 +1,9 @@
 export Node, CGPInd
 import Base.copy, Base.String, Base.show, Base.summary
+import Cambrian.print
 
-function null(args...)::Nothing
+"default function for nodes, will cause error if used as a function node"
+function f_null(args...)::Nothing
     nothing
 end
 
@@ -35,17 +37,17 @@ function recur_active!(active::BitArray, ind::Int16, xs::Array{Int16},
     end
 end
 
-function find_active(cfg::Dict, genes::Array{Int16},
+function find_active(cfg::NamedTuple, genes::Array{Int16},
                      outputs::Array{Int16})::BitArray
-    R = cfg["rows"]
-    C = cfg["columns"]
+    R = cfg.rows
+    C = cfg.columns
     active = falses(R, C)
-    xs = genes[:, :, 1] .- Int16(cfg["n_in"])
-    ys = genes[:, :, 2] .- Int16(cfg["n_in"])
+    xs = genes[:, :, 1] .- Int16(cfg.n_in)
+    ys = genes[:, :, 2] .- Int16(cfg.n_in)
     fs = genes[:, :, 3]
     for i in eachindex(outputs)
-        recur_active!(active, outputs[i] - Int16(cfg["n_in"]), xs, ys, fs,
-                      cfg["two_arity"])
+        recur_active!(active, outputs[i] - Int16(cfg.n_in), xs, ys, fs,
+                      cfg.two_arity)
     end
     active
 end
@@ -56,7 +58,7 @@ function CGPInd(cfg::NamedTuple, chromosome::Array{Float64}, genes::Array{Int16}
     C = cfg.columns
     nodes = Array{Node}(undef, R * C + cfg.n_in)
     for i in 1:cfg.n_in
-        nodes[i] = Node(0, 0, null, false)
+        nodes[i] = Node(0, 0, f_null, false)
     end
     i = cfg.n_in
     active = find_active(cfg, genes, outputs)
@@ -70,10 +72,10 @@ function CGPInd(cfg::NamedTuple, chromosome::Array{Float64}, genes::Array{Int16}
     end
     buffer = zeros(R * C + cfg.n_in)
     fitness = -Inf .* ones(cfg.d_fitness)
-    CGPInd(n_in, n_out, chromosome, genes, outputs, nodes, buffer, fitness)
+    CGPInd(cfg.n_in, cfg.n_out, chromosome, genes, outputs, nodes, buffer, fitness)
 end
 
-function CGPInd(cfg::Dict, chromosome::Array{Float64})::CGPInd
+function CGPInd(cfg::NamedTuple, chromosome::Array{Float64})::CGPInd
     R = cfg.rows
     C = cfg.columns
     genes = reshape(chromosome[1:(R*C*3)], R, C, 3)
@@ -90,12 +92,12 @@ function CGPInd(cfg::Dict, chromosome::Array{Float64})::CGPInd
     CGPInd(cfg, chromosome, genes, outputs)
 end
 
-function CGPInd(cfg::Dict)::CGPInd
+function CGPInd(cfg::NamedTuple)::CGPInd
     chromosome = rand(cfg.rows * cfg.columns * 3 + cfg.n_out)
     CGPInd(cfg, chromosome)
 end
 
-function CGPInd(cfg::Dict, ind::String)::CGPInd
+function CGPInd(cfg::NamedTuple, ind::String)::CGPInd
     dict = JSON.parse(ind)
     CGPInd(cfg, Array{Float64}(dict["chromosome"]))
 end
@@ -115,19 +117,23 @@ function copy(ind::CGPInd)
 end
 
 function String(n::Node)
-    JSON.json(n)
+    JSON.json(Dict(:x=>n.x, :y=>n.y, :f=>string(n.f), :active=>n.active))
+end
+
+function show(io::IO, n::Node)
+    print(io, String(n))
 end
 
 function String(ind::CGPInd)
     JSON.json(Dict("chromosome"=>ind.chromosome, "fitness"=>ind.fitness))
 end
 
-function get_active_nodes(ind::CGPInd)
-    ind.nodes[[n.active for n in ind.nodes]]
-end
-
 function show(io::IO, ind::CGPInd)
     print(io, String(ind))
+end
+
+function get_active_nodes(ind::CGPInd)
+    ind.nodes[[n.active for n in ind.nodes]]
 end
 
 function summary(io::IO, ind::CGPInd)

@@ -3,7 +3,7 @@ using CartesianGeneticProgramming
 import YAML
 
 @testset "CGPInd construction" begin
-    cfg = CartesianGeneticProgramming.get_config("test.yaml")
+    cfg = get_config("test.yaml")
     ind = CGPInd(cfg)
 
     @test length(ind.nodes) == 3 * 10 + 4
@@ -14,6 +14,8 @@ import YAML
             @test node.y >= 1
             @test node.y <= length(ind.nodes)
         end
+        # test that stringifying works
+        @test typeof(string(node)) == String
     end
 end
 
@@ -39,9 +41,10 @@ function select_random(pop::Array{CGPInd}, elite::Int; n_in=113, n_sample=100)
 end
 
 @testset "Processing" begin
-    cfg = CartesianGeneticProgramming.get_config("test.yaml"; functions=["f_abs", "f_add", "f_mult"])
+    cfg = get_config("test.yaml"; functions=["f_abs", "f_add", "f_mult"])
     ind = CGPInd(cfg)
 
+    # test that f(0, 0, 0, 0) = 0
     inputs = zeros(4)
     set_inputs(ind, inputs)
     for i in 1:4
@@ -55,6 +58,10 @@ end
         end
     end
 
+    # test that f(1, 1, 1, 1) = 1
+    for i in eachindex(ind.nodes)
+        ind.buffer[i] = 1.0 # requires that buffer is 1
+    end
     output = process(ind, ones(4))
     @test output[1] == 1.0
     for i in eachindex(ind.nodes)
@@ -74,7 +81,7 @@ end
     end
 
     pop = [CGPInd(cfg) for i in 1:10]
-    sp = select_random(pop, 2; n_in=cfg["n_in"], n_sample=5)
+    sp = select_random(pop, 2; n_in=cfg.n_in, n_sample=5)
     @test length(sp) == 2
     @test sp[1].buffer[1] != 0.0
 end

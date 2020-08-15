@@ -1,5 +1,9 @@
+export get_config
+import Cambrian.get_config
 
+"overrides Cambrian.get_config(::Dict), converts function names to functions and tracks arity"
 function get_config(config::Dict)
+    # parse all function names, assign to function value
     two_arity = falses(length(config["functions"]))
     functions = Array{Function}(undef, length(config["functions"]))
     for i in eachindex(config["functions"])
@@ -11,17 +15,5 @@ function get_config(config::Dict)
     end
     config["two_arity"] = two_arity
     config["functions"] = functions
-    cfg = (; (k=>v for (k, v) in config)...)
-    if ~(:id in keys(cfg))
-        cfg = merge(cfg, (; id = string(UUIDs.uuid4())))
-    end
-    cfg
-end
-
-function get_config(cfg_file::String; kwargs...)
-    cfg = YAML.load_file(cfg_file)
-    for (k, v) in cfg
-        cfg[Symbol(k)] = v
-    end
-    get_config(cfg)
+    (; (Symbol(k)=>v for (k, v) in config)...)
 end
