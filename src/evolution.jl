@@ -1,18 +1,21 @@
+export CGPEvolution
 
+import Cambrian.populate, Cambrian.evaluate
 
+mutable struct CGPEvolution{T} <: Cambrian.AbstractEvolution
+    config::NamedTuple
+    logger::CambrianLogger
+    population::Array{T}
+    fitness::Function
+    gen::Int
+end
 
+populate(e::CGPEvolution) = Cambrian.oneplus_populate(e)
+evaluate(e::CGPEvolution) = Cambrian.fitness_evaluate(e, e.fitness)
 
-function evolution(cfg::Dict, fitness::Function; kwargs...)
-    function evaluate!(evo::Cambrian.Evolution)
-        fit = i::CGPInd->fitness(i; seed=evo.gen)
-        Cambrian.fitness_evaluate!(evo; fitness=fit)
-    end
-    function populate!(evo::Cambrian.Evolution)
-        mutation = i::CGPInd->goldman_mutate(cfg, i)
-        Cambrian.oneplus_populate!(evo; mutation=mutation)
-    end
-
-    Cambrian.Evolution(CGPInd, cfg; evaluate=evaluate!,
-                     populate=populate!,
-                     kwargs...)
+function CGPEvolution(cfg::NamedTuple, fitness::Function;
+                      logfile=string("logs/", cfg.id, ".csv"))
+    logger = CambrianLogger(logfile)
+    population = Cambrian.initialize(CGPInd, cfg)
+    CGPEvolution(cfg, logger, population, fitness, 0)
 end

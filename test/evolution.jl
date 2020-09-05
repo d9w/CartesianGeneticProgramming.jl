@@ -1,11 +1,11 @@
 using Test
 using CartesianGeneticProgramming
-import Cambrian
+using Cambrian
 import Cambrian.mutate
 import Random
 
 cfg = get_config("test.yaml")
-mutate(i::CGPInd) = uniform_mutate(i, m_rate=cfg.m_rate, out_m_rate=cfg.out_m_rate)
+mutate(i::CGPInd) = uniform_mutate(cfg, i)
 
 function rosenbrock(x::Array{Float64})
     sum([(1.0 - x[i])^2 + 100.0 * (x[i+1] - x[i]^2)^2

@@ -1,7 +1,7 @@
 module CartesianGeneticProgramming
 
 import YAML
-import Cambrian
+using Cambrian
 import JSON
 
 include("functions.jl")
