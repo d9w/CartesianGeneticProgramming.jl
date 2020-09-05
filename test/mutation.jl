@@ -10,18 +10,18 @@ cfg = get_config("test.yaml")
     parent = CGPInd(cfg)
 
     # Uniform mutation
-    child = uniform_mutate(parent; m_rate=cfg.m_rate, out_m_rate=cfg.out_m_rate)
+    child = uniform_mutate(cfg, parent)
     @test any(parent.chromosome .!= child.chromosome)
     @test any(parent.genes .!= child.genes)
 
     # Goldman mutation : ensure structural difference
-    child = goldman_mutate(parent; m_rate=cfg.m_rate, out_m_rate=cfg.out_m_rate)
+    child = goldman_mutate(cfg, parent)
     @test any(parent.chromosome .!= child.chromosome)
     @test any(parent.genes .!= child.genes)
 
     # Profiling mutation: ensure output different for provided inputs
     inputs = rand(cfg.n_in, 10)
-    child = profiling_mutate(parent, inputs; m_rate=cfg.m_rate, out_m_rate=cfg.out_m_rate)
+    child = profiling_mutate(cfg, parent, inputs)
     @test any(parent.chromosome .!= child.chromosome)
     @test any(parent.genes .!= child.genes)
 

@@ -1,24 +1,22 @@
-export uniform_mutate, goldman_mutate
+export uniform_mutate, goldman_mutate, profiling_mutate
 
 "create a child by randomly mutating genes"
-function uniform_mutate(ind::CGPInd; m_rate=0.1, out_m_rate=0.1)::CGPInd
+function uniform_mutate(cfg::NamedTuple, ind::CGPInd)::CGPInd
     chromosome = copy(ind.chromosome)
-    chance = rand(length(chromosome))
-    non_output = length(chromosome) - length(outputs)
-    change = [chance[1:non_output] .<= cfg["m_rate"];
-              chance[(non_output+1):end] .<= cfg["out_m_rate"]]
+    chance = rand(length(ind.chromosome))
+    non_output = length(ind.chromosome) - length(ind.outputs)
+    change = [chance[1:non_output] .<= cfg.m_rate;
+              chance[(non_output+1):end] .<= cfg.out_m_rate]
     chromosome[change] = rand(sum(change))
-    CGPInd(chromosome)
+    CGPInd(cfg, chromosome)
 end
 
 "create a child that is structurally different from the parent"
-function goldman_mutate(ind::CGPInd; m_rate=0.1, out_m_rate=0.1)::CGPInd
-    changed = false
-    child = uniform_mutate(ind; m_rate=m_rate, out_m_rate=out_m_rate)
-    while !changed
+function goldman_mutate(cfg::NamedTuple, ind::CGPInd)::CGPInd
+    child = uniform_mutate(cfg, ind)
+    while true
         if any(ind.outputs != child.outputs)
-            global changed = true
-            break
+            return child
         else
             for i in eachindex(ind.nodes)
                 if ind.nodes[i].active
@@ -26,35 +24,31 @@ function goldman_mutate(ind::CGPInd; m_rate=0.1, out_m_rate=0.1)::CGPInd
                         if (ind.nodes[i].f != child.nodes[i].f
                             || ind.nodes[i].x != child.nodes[i].x
                             || ind.nodes[i].y != child.nodes[i].y)
-                            global changed = true
-                            break
+                            return child
                         end
                     else
-                        global changed = true
-                        break
+                        return child
                     end
                 end
             end
         end
-        global child = uniform_mutate(ind; m_rate=m_rate, out_m_rate=out_m_rate)
+        child = uniform_mutate(cfg, ind)
     end
-    child
+    nothing
 end
 
 "create a child that gives different outputs based on the provided inputs (a 2D matrix of (n_in, n_samples))"
-function profiling_mutate(ind::CGPInd, inputs::Array{Float64}; m_rate=0.1, out_m_rate=0.1)::CGPInd
-    changed = false
-    child = uniform_mutate(ind; m_rate=m_rate, out_m_rate=out_m_rate)
-    while !changed
+function profiling_mutate(cfg::NamedTuple, ind::CGPInd, inputs::Array{Float64})::CGPInd
+    child = uniform_mutate(cfg, ind)
+    while true
         for i in 1:size(inputs, 2)
             out_ind = process(ind, inputs[:, i])
             out_child = process(child, inputs[:, i])
             if any(out_ind .!= out_child)
-                global changed = true
-                break
+                return child
             end
         end
-        global child = uniform_mutate(ind; m_rate=m_rate, out_m_rate=out_m_rate)
+        child = uniform_mutate(cfg, ind)
     end
-    child
+    nothing
 end
