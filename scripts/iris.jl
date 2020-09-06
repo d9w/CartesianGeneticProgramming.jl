@@ -1,8 +1,13 @@
 using CartesianGeneticProgramming
+using Cambrian
+import Cambrian.mutate
 import RDatasets
-import Cambrian
 
-cfg = get_config("cfg/iris.yaml")
+"""
+A simple example demonstrating symbolic regression on the iris dataset. For real
+application, should be improved with a validation set, data shuffling, and
+lexicase selection.
+"""
 
 function data_setup()
     iris = RDatasets.dataset("datasets", "iris")
@@ -18,7 +23,7 @@ end
 
 X, Y = data_setup()
 
-function evaluate(ind::CartesianGeneticProgramming.CGPInd)
+function evaluate(ind::CGPInd, X::AbstractArray, Y::AbstractArray)
     accuracy = 0.0
     for i in 1:size(X, 2)
         out = process(ind, X[:, i])
@@ -29,15 +34,8 @@ function evaluate(ind::CartesianGeneticProgramming.CGPInd)
     [accuracy / size(X, 1)]
 end
 
-e = Cambrian.Evolution(CGPInd, cfg; id="iris")
-mutation = i::CGPInd->goldman_mutate(cfg, i)
-e.populate = x::Cambrian.Evolution->Cambrian.oneplus_populate!(
-    x; mutation=mutation)
-e.evaluate = x::Cambrian.Evolution->Cambrian.fitness_evaluate!(
-    x; fitness=evaluate)
-#e.evaluate = x::Cambrian.Evolution->Cambrian.lexicase_evaluate!(
-#    x, X, Y, CartesianGeneticProgramming.interpret)
-
-Cambrian.run!(e)
-best = sort(e.population)[end]
-println("Final fitness: ", best.fitness[1])
+cfg = get_config("cfg/iris.yaml")
+fit(i::CGPInd) = evaluate(i, X, Y)
+mutate(i::CGPInd) = goldman_mutate(cfg, i)
+e = CGPEvolution(cfg, fit)
+run!(e)
