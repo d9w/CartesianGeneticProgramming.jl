@@ -20,7 +20,7 @@ cfg = get_config("test.yaml")
     @test any(parent.genes .!= child.genes)
 
     # Profiling mutation: ensure output different for provided inputs
-    inputs = rand(cfg.n_in, 10)
+    inputs = rand(cfg.n_in, 1)
     child = profiling_mutate(cfg, parent, inputs)
     @test any(parent.chromosome .!= child.chromosome)
     @test any(parent.genes .!= child.genes)
