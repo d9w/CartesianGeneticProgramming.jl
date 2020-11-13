@@ -7,6 +7,7 @@ function test_inputs(f::Function, inps::AbstractArray)
     @test all(out == f(inps...)) # functions are idempotent
     @test all(out .>= -1.0)
     @test all(out .<= 1.0)
+    @test ~any(isnan.(out))
 end
 
 function test_functions(functions::Array{Function})
@@ -14,6 +15,8 @@ function test_functions(functions::Array{Function})
         # println(f)
         test_inputs(f, [-1.0, -1.0])
         test_inputs(f, [0.0, 0.0])
+        test_inputs(f, [1e-310, 1e-310])
+        test_inputs(f, [-1e-310, -2e-310])
         test_inputs(f, [1.0, 1.0])
         for i in 1:5
             test_inputs(f, [2 * rand() - 1, 2 * rand() - 1])

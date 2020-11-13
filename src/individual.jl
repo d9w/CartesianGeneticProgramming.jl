@@ -107,7 +107,7 @@ function copy(n::Node)
 end
 
 function copy(ind::CGPInd)
-    buffer = Array{Float64}(nothing, length(ind.buffer))
+    buffer = zeros(length(ind.buffer))
     nodes = Array{Node}(undef, length(ind.nodes))
     for i in eachindex(ind.nodes)
         nodes[i] = copy(ind.nodes[i])
