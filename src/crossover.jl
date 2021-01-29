@@ -6,7 +6,7 @@ export single_point_crossover,
     subgraph_crossover,
     crossover
 
-function single_point_crossover(c1::Chromosome, c2::Chromosome)
+function single_point_crossover(c1::CGPInd, c2::CGPInd)
     # single point crossover
     cpoint = c1.nin + c1.nout + node_genes(c1) * rand(0:min(length(c1.nodes)-c1.nin,
                                                             length(c2.nodes)-c2.nin))
@@ -19,7 +19,7 @@ function single_point_crossover(c1::Chromosome, c2::Chromosome)
     end
 end
 
-function random_inputs(c1::Chromosome, c2::Chromosome)
+function random_inputs(c1::CGPInd, c2::CGPInd)
     # returns random input genes from c1 and c2 equally
     # not a full crossover operator
     child_inputs = zeros(c1.nin)
@@ -29,7 +29,7 @@ function random_inputs(c1::Chromosome, c2::Chromosome)
     child_inputs
 end
 
-function random_outputs(c1::Chromosome, c2::Chromosome)
+function random_outputs(c1::CGPInd, c2::CGPInd)
     # returns random input genes from c1 and c2 equally
     # not a full crossover operator
     child_outputs = zeros(c1.nout)
@@ -39,7 +39,7 @@ function random_outputs(c1::Chromosome, c2::Chromosome)
     child_outputs
 end
 
-function random_node_crossover(c1::Chromosome, c2::Chromosome)
+function random_node_crossover(c1::CGPInd, c2::CGPInd)
     # take random nodes from each parent equally, up to the size of the smaller parent
     min_nodes = min(length(c1.nodes)-c1.nin, length(c2.nodes)-c2.nin)
     p_nodes = c1.nin + (1:min_nodes)[bitrand(min_nodes)]
@@ -49,7 +49,7 @@ function random_node_crossover(c1::Chromosome, c2::Chromosome)
     typeof(c1)(genes, c1.nin, c1.nout)
 end
 
-function aligned_node_crossover(c1::Chromosome, c2::Chromosome)
+function aligned_node_crossover(c1::CGPInd, c2::CGPInd)
     # align nodes based on position, then take from each parent equally
     p1_pos = get_positions(c1)
     p2_pos = get_positions(c2)
@@ -71,7 +71,7 @@ function aligned_node_crossover(c1::Chromosome, c2::Chromosome)
     typeof(c1)(genes, c1.nin, c1.nout)
 end
 
-function proportional_crossover(c1::Chromosome, c2::Chromosome)
+function proportional_crossover(c1::CGPInd, c2::CGPInd)
     genes = Array{Float64}(0)
     if length(c1.genes) == length(c2.genes)
         r = rand(length(c1.genes))
@@ -88,7 +88,7 @@ function proportional_crossover(c1::Chromosome, c2::Chromosome)
     typeof(c1)(genes, c1.nin, c1.nout)
 end
 
-function output_graph_crossover(c1::Chromosome, c2::Chromosome)
+function output_graph_crossover(c1::CGPInd, c2::CGPInd)
     # split outputs equally between parents, then construct a child from their
     # corresponding input graphs
     p1_nodes = Array{Int64}(0)
@@ -132,7 +132,7 @@ function output_graph_crossover(c1::Chromosome, c2::Chromosome)
     typeof(c1)(genes, c1.nin, c1.nout)
 end
 
-function subgraph_crossover(c1::Chromosome, c2::Chromosome)
+function subgraph_crossover(c1::CGPInd, c2::CGPInd)
     # Take subgraphs from both parents equally, adding all nodes of the chosen
     # subgraphs to the child.
     fc1 = forward_connections(c1)
@@ -177,6 +177,6 @@ function subgraph_crossover(c1::Chromosome, c2::Chromosome)
     typeof(c1)(genes, c1.nin, c1.nout)
 end
 
-function crossover(c1::Chromosome, c2::Chromosome)
+function crossover(c1::CGPInd, c2::CGPInd)
     eval(parse(string(Config.crossover_method)))(c1, c2)
 end

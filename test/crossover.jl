@@ -1,10 +1,9 @@
-using Base.Test
-using CGP
-CGP.Config.init("cfg/test.yaml")
+using Test
+using CartesianGeneticProgramming
 
-CTYPES = [CGPChromo, PCGPChromo]
+cfg = get_config("test.yaml")
 
-function test_crossover(p1::Chromosome, p2::Chromosome, child::Chromosome)
+function test_crossover(p1::CGPInd, p2::CGPInd, child::CGPInd)
       @test child != p1
       @test child != p2
       @test child.genes != p1.genes
@@ -26,36 +25,33 @@ function test_crossover(p1::Chromosome, p2::Chromosome, child::Chromosome)
 end
 
 @testset "Crossover tests" begin
-    for ct in CTYPES
-        println(ct)
-        nin = rand(1:100); nout = rand(1:100)
-        p1 = ct(nin, nout)
-        p2 = ct(nin, nout)
-        @test p1.genes != p2.genes
-        @testset "Single point $ct" begin
-            child = single_point_crossover(p1, p2)
-            test_crossover(p1, p2, child)
-        end
-        @testset "Random node $ct" begin
-            child = random_node_crossover(p1, p2)
-            test_crossover(p1, p2, child)
-        end
-        @testset "Aligned node $ct" begin
-            child = aligned_node_crossover(p1, p2)
-            test_crossover(p1, p2, child)
-        end
-        @testset "Proportional $ct" begin
-            child = proportional_crossover(p1, p2)
-            test_crossover(p1, p2, child)
-        end
-        @testset "Output graph $ct" begin
-            child = output_graph_crossover(p1, p2)
-            test_crossover(p1, p2, child)
-        end
-        @testset "Subgraph $ct" begin
-            child = subgraph_crossover(p1, p2)
-            test_crossover(p1, p2, child)
-        end
+    nin = rand(1:100); nout = rand(1:100)
+    p1 = CGPInd(nin, nout)
+    p2 = CGPInd(nin, nout)
+    @test p1.genes != p2.genes
+    @testset "Single point" begin
+        child = single_point_crossover(p1, p2)
+        test_crossover(p1, p2, child)
+    end
+    @testset "Random node" begin
+        child = random_node_crossover(p1, p2)
+        test_crossover(p1, p2, child)
+    end
+    @testset "Aligned node" begin
+        child = aligned_node_crossover(p1, p2)
+        test_crossover(p1, p2, child)
+    end
+    @testset "Proportional" begin
+        child = proportional_crossover(p1, p2)
+        test_crossover(p1, p2, child)
+    end
+    @testset "Output graph" begin
+        child = output_graph_crossover(p1, p2)
+        test_crossover(p1, p2, child)
+    end
+    @testset "Subgraph" begin
+        child = subgraph_crossover(p1, p2)
+        test_crossover(p1, p2, child)
     end
 end
 
