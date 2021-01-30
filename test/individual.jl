@@ -6,7 +6,7 @@ import YAML
     cfg = get_config("test.yaml")
     ind = CGPInd(cfg)
 
-    @test length(ind.nodes) == 3 * 10 + 4
+    @test length(ind.nodes) == 3 * cfg.columns + cfg.n_in
     for node in ind.nodes
         if node.active
             @test node.x >= 1
@@ -40,14 +40,41 @@ function select_random(pop::Array{CGPInd}, elite::Int; n_in=113, n_sample=100)
     pop[ds]
 end
 
+@testset "Node genes" begin
+    cfg = get_config("test.yaml")
+    ind = CGPInd(cfg)
+    ind2 = CGPInd(cfg)
+    @test any(ind.chromosome .!= ind2.chromosome)
+
+    genes = get_genes(ind, 1)
+    @test all(genes .== 0)
+
+    genes = get_genes(ind, ind.n_in+1)
+    @test all(genes .>= 0.0)
+    @test all(genes .<= 1.0)
+
+    set_genes!(ind2, ind.n_in+1, genes)
+    @test all(ind.chromosome[1:3] .== ind2.chromosome[1:3])
+
+    for i in 1:length(ind.nodes)
+        genes = get_genes(ind, i)
+        set_genes!(ind2, i, genes)
+    end
+    o = length(ind.chromosome) - cfg.n_out
+    @test all(ind.chromosome[1:o] .== ind2.chromosome[1:o])
+
+    all_genes = get_genes(ind, collect((ind.n_in+1):length(ind.nodes)))
+    @test all(ind.chromosome[1:o] .== all_genes)
+end
+
 @testset "Processing" begin
     cfg = get_config("test.yaml"; functions=["f_abs", "f_add", "f_mult"])
     ind = CGPInd(cfg)
 
     # test that f(0, 0, 0, 0) = 0
-    inputs = zeros(4)
+    inputs = zeros(cfg.n_in)
     set_inputs(ind, inputs)
-    for i in 1:4
+    for i in 1:cfg.n_in
         @test ind.buffer[i] == 0.0
     end
     output = process(ind)
@@ -62,7 +89,7 @@ end
     for i in eachindex(ind.nodes)
         ind.buffer[i] = 1.0 # requires that buffer is 1
     end
-    output = process(ind, ones(4))
+    output = process(ind, ones(cfg.n_in))
     @test output[1] == 1.0
     for i in eachindex(ind.nodes)
         if ind.nodes[i].active
@@ -72,7 +99,7 @@ end
 
     cfg = get_config("test.yaml"; functions=["f_abs", "f_add", "f_mult"], recur=1.0)
     ind = CGPInd(cfg)
-    output = process(ind, rand(4))
+    output = process(ind, rand(cfg.n_in))
     @test output[1] <= 1.0 && output[1] >= -1.0
     for i in eachindex(ind.nodes)
         if ind.nodes[i].active
@@ -84,4 +111,10 @@ end
     sp = select_random(pop, 2; n_in=cfg.n_in, n_sample=5)
     @test length(sp) == 2
     @test sp[1].buffer[1] != 0.0
+
+    reset!(ind)
+    @test all(ind.buffer .== 0.0)
+
+    f_conns = CartesianGeneticProgramming.forward_connections(ind)
+    @test any(map(x->length(x)>1, f_conns))
 end

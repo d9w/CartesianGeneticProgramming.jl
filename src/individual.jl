@@ -1,4 +1,4 @@
-export Node, CGPInd
+export Node, CGPInd, get_genes, set_genes!, reset!
 import Base.copy, Base.String, Base.show, Base.summary
 import Cambrian.print
 
@@ -78,6 +78,7 @@ end
 function CGPInd(cfg::NamedTuple, chromosome::Array{Float64})::CGPInd
     R = cfg.rows
     C = cfg.columns
+    # chromosome: node genes, output genes
     genes = reshape(chromosome[1:(R*C*3)], R, C, 3)
     # TODO: recurrency is ugly and slow
     maxs = collect(1:R:R*C)
@@ -145,4 +146,46 @@ end
 
 function interpret(i::CGPInd)
     x::AbstractArray->process(i, x)
+end
+
+function reset!(c::CGPInd)
+    c.buffer .= 0.0
+end
+
+function get_genes(c::CGPInd, node_id::Int64)::Array{Float64}
+    if node_id > c.n_in
+        return c.chromosome[(node_id-c.n_in-1)*3 .+ (1:3)]
+    else
+        return zeros(3)
+    end
+end
+
+function get_genes(c::CGPInd, nodes::Array{Int64})::Array{Float64}
+    if length(nodes) > 0
+        return reduce(vcat, map(x->get_genes(c, x), nodes))
+    else
+        return Array{Float64}(0)
+    end
+end
+
+function set_genes!(c::CGPInd, node_id::Int64, genes::Array{Float64})
+    # set the genes of node_id to genes
+    if node_id > c.n_in
+        @assert length(genes) == 3
+        c.chromosome[(node_id-c.n_in-1)*3 .+ (1:3)] = genes
+    end
+end
+
+function forward_connections(c::CGPInd)
+    # a list for each node i of a list of all the nodes which have the node i as an input, and i
+    connections = [[i] for i in 1:length(c.nodes)]
+    for ci in eachindex(c.nodes)
+        conns = [c.nodes[ci].x, c.nodes[ci].y]
+        for conn in conns
+            if conn > 0
+                push!(connections[conn], ci)
+            end
+        end
+    end
+    map(unique, connections)
 end
