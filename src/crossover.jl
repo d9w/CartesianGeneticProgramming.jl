@@ -8,56 +8,56 @@ export single_point_crossover,
 
 function single_point_crossover(c1::CGPInd, c2::CGPInd)
     # single point crossover
-    cpoint = c1.nin + c1.nout + node_genes(c1) * rand(0:min(length(c1.nodes)-c1.nin,
-                                                            length(c2.nodes)-c2.nin))
+    cpoint = c1.n_in + c1.n_out + node_genes(c1) * rand(0:min(length(c1.nodes)-c1.n_in,
+                                                            length(c2.nodes)-c2.n_in))
     if rand(Bool)
         ngenes = deepcopy([c1.genes[1:cpoint]; c2.genes[(cpoint+1):end]])
-        return typeof(c1)(ngenes, c1.nin, c1.nout)
+        return typeof(c1)(ngenes, c1.n_in, c1.n_out)
     else
         ngenes = deepcopy([c2.genes[1:cpoint]; c1.genes[(cpoint+1):end]])
-        return typeof(c2)(ngenes, c2.nin, c2.nout)
+        return typeof(c2)(ngenes, c2.n_in, c2.n_out)
     end
 end
 
 function random_inputs(c1::CGPInd, c2::CGPInd)
     # returns random input genes from c1 and c2 equally
     # not a full crossover operator
-    child_inputs = zeros(c1.nin)
-    parent = bitrand(c1.nin)
-    child_inputs[parent] = c1.genes[1:c1.nin][parent]
-    child_inputs[~parent] = c2.genes[1:c1.nin][~parent]
+    child_inputs = zeros(c1.n_in)
+    parent = bitrand(c1.n_in)
+    child_inputs[parent] = c1.genes[1:c1.n_in][parent]
+    child_inputs[~parent] = c2.genes[1:c1.n_in][~parent]
     child_inputs
 end
 
 function random_outputs(c1::CGPInd, c2::CGPInd)
     # returns random input genes from c1 and c2 equally
     # not a full crossover operator
-    child_outputs = zeros(c1.nout)
-    parent = bitrand(c1.nout)
-    child_outputs[parent] = c1.genes[c1.nin+(1:c1.nout)][parent]
-    child_outputs[~parent] = c2.genes[c1.nin+(1:c1.nout)][~parent]
+    child_outputs = zeros(c1.n_out)
+    parent = bitrand(c1.n_out)
+    child_outputs[parent] = c1.genes[c1.n_in+(1:c1.n_out)][parent]
+    child_outputs[~parent] = c2.genes[c1.n_in+(1:c1.n_out)][~parent]
     child_outputs
 end
 
 function random_node_crossover(c1::CGPInd, c2::CGPInd)
     # take random nodes from each parent equally, up to the size of the smaller parent
-    min_nodes = min(length(c1.nodes)-c1.nin, length(c2.nodes)-c2.nin)
-    p_nodes = c1.nin + (1:min_nodes)[bitrand(min_nodes)]
+    min_nodes = min(length(c1.nodes)-c1.n_in, length(c2.nodes)-c2.n_in)
+    p_nodes = c1.n_in + (1:min_nodes)[bitrand(min_nodes)]
     p1_node_genes = get_genes(c1, (1:length(c1.nodes))[p_nodes])
     p2_node_genes = get_genes(c2, (1:length(c2.nodes))[p_nodes])
     genes = [random_inputs(c1, c2); random_outputs(c1, c2); p1_node_genes; p2_node_genes]
-    typeof(c1)(genes, c1.nin, c1.nout)
+    typeof(c1)(genes, c1.n_in, c1.n_out)
 end
 
 function aligned_node_crossover(c1::CGPInd, c2::CGPInd)
     # align nodes based on position, then take from each parent equally
     p1_pos = get_positions(c1)
     p2_pos = get_positions(c2)
-    min_nodes = min(length(c1.nodes)-c1.nin, length(c2.nodes)-c2.nin)
-    p1_inds = c1.nin + collect(1:min_nodes)
+    min_nodes = min(length(c1.nodes)-c1.n_in, length(c2.nodes)-c2.n_in)
+    p1_inds = c1.n_in + collect(1:min_nodes)
     p1_nodes = Array{Int64}(0)
     p2_nodes = Array{Int64}(0)
-    for node in c1.nin+(1:min_nodes)
+    for node in c1.n_in+(1:min_nodes)
         if rand() < 0.5
             i = indmin(abs.(p1_pos[p1_inds] - p2_pos[node]))
             append!(p1_nodes, [p1_inds[i]])
@@ -68,7 +68,7 @@ function aligned_node_crossover(c1::CGPInd, c2::CGPInd)
     end
     genes = [random_inputs(c1, c2); random_outputs(c1, c2); get_genes(
         c1, p1_nodes); get_genes(c2, p2_nodes)]
-    typeof(c1)(genes, c1.nin, c1.nout)
+    typeof(c1)(genes, c1.n_in, c1.n_out)
 end
 
 function proportional_crossover(c1::CGPInd, c2::CGPInd)
@@ -85,7 +85,7 @@ function proportional_crossover(c1::CGPInd, c2::CGPInd)
         genes = ((1 .- r) .* c1.genes) .+ (r .* c2.genes[1:length(c1.genes)])
         genes = [genes; c2.genes[(length(c1.genes)+1):end]]
     end
-    typeof(c1)(genes, c1.nin, c1.nout)
+    typeof(c1)(genes, c1.n_in, c1.n_out)
 end
 
 function output_graph_crossover(c1::CGPInd, c2::CGPInd)
@@ -94,20 +94,20 @@ function output_graph_crossover(c1::CGPInd, c2::CGPInd)
     p1_nodes = Array{Int64}(0)
     p2_nodes = Array{Int64}(0)
     output_genes = Array{Float64}(0)
-    for output in 1:c1.nout
+    for output in 1:c1.n_out
         if rand() < 0.5
             append!(p1_nodes, get_output_trace(c1, output))
-            append!(output_genes, [c1.genes[c1.nin+output]])
+            append!(output_genes, [c1.genes[c1.n_in+output]])
         else
             append!(p2_nodes, get_output_trace(c2, output))
-            append!(output_genes, [c2.genes[c2.nin+output]])
+            append!(output_genes, [c2.genes[c2.n_in+output]])
         end
     end
     p1_nodes = sort!(unique(p1_nodes))
     p2_nodes = sort!(unique(p2_nodes))
     input_genes = Array{Float64}(0)
     # take inputs from either parent trace, if they are in the parent traces
-    for input in 1:c1.nin
+    for input in 1:c1.n_in
         gene = c1.genes[input]
         if contains(==, p1_nodes, input)
             if contains(==, p2_nodes, input)
@@ -126,10 +126,10 @@ function output_graph_crossover(c1::CGPInd, c2::CGPInd)
         end
         append!(input_genes, [gene])
     end
-    p1_nodes = p1_nodes[p1_nodes .> c1.nin]
-    p2_nodes = p2_nodes[p2_nodes .> c1.nin]
+    p1_nodes = p1_nodes[p1_nodes .> c1.n_in]
+    p2_nodes = p2_nodes[p2_nodes .> c1.n_in]
     genes = [input_genes; output_genes; get_genes(c1, p1_nodes); get_genes(c2, p2_nodes)]
-    typeof(c1)(genes, c1.nin, c1.nout)
+    typeof(c1)(genes, c1.n_in, c1.n_out)
 end
 
 function subgraph_crossover(c1::CGPInd, c2::CGPInd)
@@ -138,7 +138,7 @@ function subgraph_crossover(c1::CGPInd, c2::CGPInd)
     fc1 = forward_connections(c1)
     fc2 = forward_connections(c2)
     c1_nodes = []; c2_nodes = []
-    for i in (c1.nin+1):min(length(c1.nodes), length(c2.nodes))
+    for i in (c1.n_in+1):min(length(c1.nodes), length(c2.nodes))
         if rand(Bool)
             append!(c1_nodes, fc1[i])
         else
@@ -158,10 +158,10 @@ function subgraph_crossover(c1::CGPInd, c2::CGPInd)
             end
         end
     end
-    c1_nodes = Array{Int64}(unique(intersect(collect((c1.nin+1):length(c1.nodes)), c1_nodes)))
-    c2_nodes = Array{Int64}(unique(intersect(collect((c2.nin+1):length(c2.nodes)), c2_nodes)))
-    genes = zeros(c1.nin+c1.nout)
-    for i in 1:(c1.nin+c1.nout)
+    c1_nodes = Array{Int64}(unique(intersect(collect((c1.n_in+1):length(c1.nodes)), c1_nodes)))
+    c2_nodes = Array{Int64}(unique(intersect(collect((c2.n_in+1):length(c2.nodes)), c2_nodes)))
+    genes = zeros(c1.n_in+c1.n_out)
+    for i in 1:(c1.n_in+c1.n_out)
         if rand(Bool)
             genes[i] = c1.genes[i]
         else
@@ -174,7 +174,7 @@ function subgraph_crossover(c1::CGPInd, c2::CGPInd)
     if length(c2_nodes) > 0
         genes = [genes; get_genes(c2, c2_nodes)]
     end
-    typeof(c1)(genes, c1.nin, c1.nout)
+    typeof(c1)(genes, c1.n_in, c1.n_out)
 end
 
 function crossover(c1::CGPInd, c2::CGPInd)

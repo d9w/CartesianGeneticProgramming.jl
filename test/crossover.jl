@@ -25,9 +25,8 @@ function test_crossover(p1::CGPInd, p2::CGPInd, child::CGPInd)
 end
 
 @testset "Crossover tests" begin
-    nin = rand(1:100); nout = rand(1:100)
-    p1 = CGPInd(nin, nout)
-    p2 = CGPInd(nin, nout)
+    p1 = CGPInd(cfg)
+    p2 = CGPInd(cfg)
     @test p1.genes != p2.genes
     @testset "Single point" begin
         child = single_point_crossover(p1, p2)
