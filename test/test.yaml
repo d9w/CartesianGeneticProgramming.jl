@@ -14,6 +14,7 @@ recur: 0.0
 n_in: 10
 n_out: 3
 out_m_rate: 0.3
+i_start: -0.5
 functions:
   - f_add
   - f_subtract

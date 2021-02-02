@@ -77,26 +77,32 @@ function CGPInd(cfg::NamedTuple, chromosome::Array{Float64}, genes::Array{Int16}
     CGPInd(cfg.n_in, cfg.n_out, chromosome, genes, outputs, nodes, buffer, fitness)
 end
 
+snap(x) = map(x->argmin(abs.(p .- x)), fc)
+
 function CGPInd(cfg::NamedTuple, chromosome::Array{Float64})::CGPInd
     R = cfg.rows
     C = cfg.columns
     # chromosome: node genes, output genes
-    genes = reshape(chromosome[1:(R*C*3)], R, C, 3)
-    # TODO: recurrency is ugly and slow
-    maxs = collect(1:R:R*C)
-    maxs = round.((R*C .- maxs) .* cfg.recur .+ maxs)
-    maxs = min.(R*C + cfg.n_in, maxs .+ cfg.n_in)
-    maxs = repeat(maxs, 1, R)'
-    genes[:, :, 1] .*= maxs
-    genes[:, :, 2] .*= maxs
-    genes[:, :, 3] .*= length(cfg.functions)
-    genes = Int16.(ceil.(genes))
-    outputs = Int16.(ceil.(chromosome[(R*C*3+1):end] .* (R * C + cfg.n_in)))
+    ps = chromosome[cfg.n_out+1:4:end]
+    ps_sort = sortperm(ps)
+    xs = chromosome[cfg.n_out+2:4:end][ps_sort]
+    ys = chromosome[cfg.n_out+3:4:end][ps_sort]
+    fs = chromosome[cfg.n_out+4:4:end][ps_sort]
+    sort!(ps)
+    xgenes = xs .* ((cfg.recur * (1.0 .- ps) .+ ps) .- cfg.i_start ) .+ cfg.i_start
+    ygenes = ys .* ((cfg.recur * (1.0 .- ps) .+ ps) .- cfg.i_start ) .- cfg.i_start
+    positions = collect(LinRange(cfg.i_start, 0.0, cfg.n_in+1))
+    positions = [positions[1:cfg.n_in]; ps]
+    genes = Array{Int16}(undef, R, C, 3)
+    genes[:, :, 1] = Int16.(map(x->argmin(abs.(positions .- x)), xgenes))
+    genes[:, :, 2] = Int16.(map(x->argmin(abs.(positions .- x)), ygenes))
+    genes[:, :, 3] = Int16.(ceil.(fs .* length(cfg.functions)))
+    outputs = Int16.(ceil.(chromosome[(R*C*4+1):end] .* (R * C + cfg.n_in)))
     CGPInd(cfg, chromosome, genes, outputs)
 end
 
 function CGPInd(cfg::NamedTuple)::CGPInd
-    chromosome = rand(cfg.rows * cfg.columns * 3 + cfg.n_out)
+    chromosome = rand(cfg.n_out + cfg.rows * cfg.columns * 4)
     CGPInd(cfg, chromosome)
 end
 
@@ -156,9 +162,9 @@ end
 
 function get_genes(c::CGPInd, node_id::Integer)::Array{Float64}
     if node_id > c.n_in
-        return c.chromosome[(node_id-c.n_in-1)*3 .+ (1:3)]
+        return c.chromosome[(node_id-c.n_in-1)*4 .+ (1:4)]
     else
-        return zeros(3)
+        return zeros(4)
     end
 end
 
@@ -173,8 +179,8 @@ end
 "set the genes of node_id to genes"
 function set_genes!(c::CGPInd, node_id::Integer, genes::Array{Float64})
     if node_id > c.n_in
-        @assert length(genes) == 3
-        c.chromosome[(node_id-c.n_in-1)*3 .+ (1:3)] = genes
+        @assert length(genes) == 4
+        c.chromosome[(node_id-c.n_in-1)*4 .+ (1:4)] = genes
     end
 end
 

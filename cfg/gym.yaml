@@ -13,6 +13,7 @@ columns: 100
 recur: 0.2
 out_m_rate: 0.3
 env: 'HopperBulletEnv-v0'
+i_start: -0.5
 functions:
   - f_add
   - f_subtract

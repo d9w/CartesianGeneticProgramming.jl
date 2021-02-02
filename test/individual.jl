@@ -6,7 +6,7 @@ import YAML
     cfg = get_config("test.yaml")
     ind = CGPInd(cfg)
 
-    @test length(ind.nodes) == 3 * cfg.columns + cfg.n_in
+    @test length(ind.nodes) == cfg.rows * cfg.columns + cfg.n_in
     for node in ind.nodes
         if node.active
             @test node.x >= 1
@@ -56,7 +56,7 @@ end
     @test all(genes .<= 1.0)
 
     set_genes!(ind2, ind.n_in+1, genes)
-    @test all(ind.chromosome[1:3] .== ind2.chromosome[1:3])
+    @test all(ind.chromosome[1:4] .== ind2.chromosome[1:4])
 
     for i in 1:length(ind.nodes)
         genes = get_genes(ind, i)

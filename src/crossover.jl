@@ -8,7 +8,7 @@ export single_point_crossover,
 
 "single point crossover, genes from p1 up to a random point, then genes from p2"
 function single_point_crossover(cfg::NamedTuple, c1::CGPInd, c2::CGPInd)
-    cpoint = c1.n_in + c1.n_out + 3 * rand(2:(min(length(c1.nodes)-c1.n_in,
+    cpoint = c1.n_in + c1.n_out + 4 * rand(2:(min(length(c1.nodes)-c1.n_in,
                                                  length(c2.nodes)-c2.n_in)-2))
     if rand(Bool)
         ngenes = deepcopy([c1.chromosome[1:cpoint]; c2.chromosome[(cpoint+1):end]])
@@ -41,8 +41,8 @@ end
 "take random nodes from each parent equally, up to the size of the smaller parent"
 function random_node_crossover(cfg::NamedTuple, c1::CGPInd, c2::CGPInd)
     l = min(length(c1.chromosome), length(c2.chromosome)) - max(c1.n_out, c2.n_out)
-    p = rand(Bool, Int64(round(l / 3)))
-    p_nodes = repeat(p, inner=3)
+    p = rand(Bool, Int64(round(l / 4)))
+    p_nodes = repeat(p, inner=4)
     append!(p_nodes, rand(Bool, c1.n_out))
     genes = rand(length(c1.chromosome))
     genes[p_nodes] = c1.chromosome[p_nodes]
@@ -114,7 +114,7 @@ function node_crossover(cfg::NamedTuple, c1::CGPInd, c2::CGPInd,
             if i in c2_nodes
                 append!(genes, get_genes(c2, i))
             else
-                append!(genes, rand(3))
+                append!(genes, rand(4))
             end
         end
     end
