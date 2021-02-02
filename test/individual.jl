@@ -17,6 +17,8 @@ import YAML
         # test that stringifying works
         @test typeof(string(node)) == String
     end
+
+    @test size(ind.genes) == (cfg.rows, cfg.columns, 3)
 end
 
 """
@@ -115,6 +117,12 @@ end
     reset!(ind)
     @test all(ind.buffer .== 0.0)
 
-    f_conns = CartesianGeneticProgramming.forward_connections(ind)
+    f_conns = forward_connections(ind)
     @test any(map(x->length(x)>1, f_conns))
+
+    ot = get_output_trace(ind, 1)
+    @test length(ot) > 0
+
+    all_traces = get_output_trace(ind)
+    @test issubset(ot, all_traces)
 end
