@@ -5,13 +5,14 @@ n_population: 5
 n_elite: 1
 n_gen: 10000
 log_gen: 1
-save_gen: 100
+save_gen: 10
 m_rate: 0.1
 # CartesianGeneticProgramming.jl settings
 rows: 1
-columns: 100
+columns: 400
 recur: 0.2
 out_m_rate: 0.3
+i_start: -1.0
 functions:
   - f_add
   - f_subtract
