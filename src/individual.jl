@@ -90,7 +90,7 @@ function CGPInd(cfg::NamedTuple, chromosome::Array{Float64})::CGPInd
     fs = chromosome[cfg.n_out+4:4:end][ps_sort]
     sort!(ps)
     xgenes = xs .* ((cfg.recur * (1.0 .- ps) .+ ps) .- cfg.i_start ) .+ cfg.i_start
-    ygenes = ys .* ((cfg.recur * (1.0 .- ps) .+ ps) .- cfg.i_start ) .- cfg.i_start
+    ygenes = ys .* ((cfg.recur * (1.0 .- ps) .+ ps) .- cfg.i_start ) .+ cfg.i_start
     positions = collect(LinRange(cfg.i_start, 0.0, cfg.n_in+1))
     positions = [positions[1:cfg.n_in]; ps]
     genes = Array{Int16}(undef, R, C, 3)
