@@ -134,7 +134,7 @@ function show(io::IO, n::Node)
 end
 
 function String(ind::CGPInd)
-    JSON.json(Dict("chromosome"=>ind.chromosome, "fitness"=>ind.fitness))
+    JSON.json(Dict("chromosome"=>ind.chromosome, "fitness"=>ind.fitness, "genes"=>ind.genes))
 end
 
 function show(io::IO, ind::CGPInd)
