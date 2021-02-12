@@ -8,8 +8,7 @@ export single_point_crossover,
 
 "single point crossover, genes from p1 up to a random point, then genes from p2"
 function single_point_crossover(cfg::NamedTuple, c1::CGPInd, c2::CGPInd)
-    cpoint = c1.n_in + c1.n_out + 3 * rand(2:(min(length(c1.nodes)-c1.n_in,
-                                                 length(c2.nodes)-c2.n_in)-2))
+    cpoint = rand(2:(min(length(c1.chromosome), length(c2.chromosome))-2))
     if rand(Bool)
         ngenes = deepcopy([c1.chromosome[1:cpoint]; c2.chromosome[(cpoint+1):end]])
         return CGPInd(cfg, ngenes)
