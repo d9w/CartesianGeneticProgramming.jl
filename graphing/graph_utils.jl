@@ -1,10 +1,11 @@
-using CGP
+using CartesianGeneticProgramming
 using LightGraphs
 using MetaGraphs
 using TikzGraphs
 using TikzPictures
 using LaTeXStrings
-using Base.Test
+using Printf
+#using Base.Test
 
 function to_graph(c::Chromosome; active_outputs=trues(c.nout))
     actives = [n.active for n in c.nodes]
