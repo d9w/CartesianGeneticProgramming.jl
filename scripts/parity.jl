@@ -3,27 +3,11 @@ using Cambrian
 import Cambrian.mutate
 using StatsBase
 using Base.Iterators: repeated
+include("../graphing/to_dot.jl")
 """
 A simple example  for calculating parity
 """
-function rand_bitarray(len)
-    rand(len) .< 0.5
- end
  
- function make_rand_array(num_ones, len)
-    ary = zeros(len)
-    rnd_idxs = sample(1:len, num_ones, replace=false)
-    for idx in rnd_idxs
-       ary[idx] = 1
-    end
-    BitArray(ary)
- end
- 
- function bitarray_2_num(arr)
-    arr = reverse(arr)
-    sum(((i, x),) -> Int(x) << ((i-1) * sizeof(x)), enumerate(arr.chunks))
- end
-
  #bitArray parity
  parity(x) = isodd(sum(x))
  
@@ -77,6 +61,18 @@ e = CGPEvolution(cfg, fit)
 println("run!")
 run!(e)
 
-@show e.population[5].nodes
+@show e.population[end].nodes
 errors = error_count(e,X,Y )
-println("$errors out of $(size(X,2)) entries")
+println("$errors errors out of $(size(X,2)) entries")
+
+#generate dot file
+dot_array = walk_nodes(e.population[5])
+dot_file  = "parity_graph.dot"
+open(dot_file, "w") do f
+   for i in dot_array
+      println(f, i)
+   end
+end
+#from commandline:
+# $ dot -Tpng parity_graph.dot -o parity_graph.png
+# $ display

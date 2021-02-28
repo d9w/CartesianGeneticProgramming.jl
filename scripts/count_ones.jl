@@ -79,9 +79,24 @@ function evaluate(ind::CGPInd, X::AbstractArray, Y::AbstractArray)
     [accuracy / size(X, 1)]
 end
 
+function error_count(e, X::AbstractArray, Y::AbstractArray)
+    failed = 0
+    for i in 1:size(X,2)
+       y_hat = process(e.population[5], float(X[:,i]))
+       if y_hat[1] != float(digits(Int(Y[i]), base=2, pad=4)) 
+            failed += 1
+       end
+    end
+    failed
+end
+
 cfg = get_config("cfg/count_ones.yaml")
 fit(i::CGPInd) = evaluate(i, X, Y)
 mutate(i::CGPInd) = goldman_mutate(cfg, i)
 e = CGPEvolution(cfg, fit)
 println("run!")
 run!(e)
+
+@show e.population[5].nodes
+errors = error_count(e,X,Y )
+println("$errors out of $(size(X,2)) entries")
