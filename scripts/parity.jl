@@ -73,6 +73,6 @@ open(dot_file, "w") do f
       println(f, i)
    end
 end
-#from commandline:
+# to view from commandline:
 # $ dot -Tpng parity_graph.dot -o parity_graph.png
-# $ display
+# $ display parity_graph.png
