@@ -21,7 +21,7 @@ struct CGPInd <: Cambrian.Individual
     genes::Array{Int16}
     outputs::Array{Int16}
     nodes::Array{Node}
-    buffer::Array{Float64}
+    buffer::AbstractArray
     fitness::Array{Float64}
 end
 

@@ -1,6 +1,6 @@
 export get_outputs, set_inputs, process
 
-function get_outputs(ind::CGPInd)::Array{Float64}
+function get_outputs(ind::CGPInd)
     # doesn't re-process, just gives outputs
     outputs = Array{Float64}(undef, length(ind.outputs))
     for i in eachindex(outputs)
@@ -9,13 +9,13 @@ function get_outputs(ind::CGPInd)::Array{Float64}
     outputs
 end
 
-function set_inputs(ind::CGPInd, inputs::Array{Float64})::Nothing
+function set_inputs(ind::CGPInd, inputs::AbstractArray)
     for i in eachindex(inputs)
         ind.buffer[i] = inputs[i]
     end
 end
 
-function process(ind::CGPInd)::Array{Float64}
+function process(ind::CGPInd)
     for i in eachindex(ind.nodes)
         n = ind.nodes[i]
         if n.active
@@ -25,7 +25,7 @@ function process(ind::CGPInd)::Array{Float64}
     get_outputs(ind)
 end
 
-function process(ind::CGPInd, inputs::Array{Float64})::Array{Float64}
+function process(ind::CGPInd, inputs::AbstractArray)
     set_inputs(ind, inputs)
     process(ind)
 end
