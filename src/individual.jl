@@ -55,7 +55,7 @@ function find_active(cfg::NamedTuple, genes::Array{Int16},
 end
 
 function CGPInd(cfg::NamedTuple, chromosome::Array{Float64}, genes::Array{Int16},
-                outputs::Array{Int16})::CGPInd
+                outputs::Array{Int16}; kwargs...)::CGPInd
     R = cfg.rows
     C = cfg.columns
     nodes = Array{Node}(undef, R * C + cfg.n_in)
@@ -72,12 +72,18 @@ function CGPInd(cfg::NamedTuple, chromosome::Array{Float64}, genes::Array{Int16}
                             active[x, y])
         end
     end
-    buffer = zeros(R * C + cfg.n_in)
+    kwargs_dict = Dict(kwargs)
+    # Use given input buffer or default to Array{Float64, 1} type
+    if haskey(kwargs_dict, :buffer)
+        buffer = kwargs_dict[:buffer]
+    else
+        buffer = zeros(R * C + cfg.n_in)
+    end
     fitness = -Inf .* ones(cfg.d_fitness)
     CGPInd(cfg.n_in, cfg.n_out, chromosome, genes, outputs, nodes, buffer, fitness)
 end
 
-function CGPInd(cfg::NamedTuple, chromosome::Array{Float64})::CGPInd
+function CGPInd(cfg::NamedTuple, chromosome::Array{Float64}; kwargs...)::CGPInd
     R = cfg.rows
     C = cfg.columns
     # chromosome: node genes, output genes
@@ -92,12 +98,12 @@ function CGPInd(cfg::NamedTuple, chromosome::Array{Float64})::CGPInd
     genes[:, :, 3] .*= length(cfg.functions)
     genes = Int16.(ceil.(genes))
     outputs = Int16.(ceil.(chromosome[(R*C*3+1):end] .* (R * C + cfg.n_in)))
-    CGPInd(cfg, chromosome, genes, outputs)
+    CGPInd(cfg, chromosome, genes, outputs; kwargs...)
 end
 
-function CGPInd(cfg::NamedTuple)::CGPInd
+function CGPInd(cfg::NamedTuple; kwargs...)::CGPInd
     chromosome = rand(cfg.rows * cfg.columns * 3 + cfg.n_out)
-    CGPInd(cfg, chromosome)
+    CGPInd(cfg, chromosome; kwargs...)
 end
 
 function CGPInd(cfg::NamedTuple, ind::String)::CGPInd
