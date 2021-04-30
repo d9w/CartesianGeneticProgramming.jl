@@ -14,8 +14,13 @@ populate(e::CGPEvolution) = Cambrian.oneplus_populate(e)
 evaluate(e::CGPEvolution) = Cambrian.fitness_evaluate(e, e.fitness)
 
 function CGPEvolution(cfg::NamedTuple, fitness::Function;
-                      logfile=string("logs/", cfg.id, ".csv"))
+                      logfile=string("logs/", cfg.id, ".csv"), kwargs...)
     logger = CambrianLogger(logfile)
-    population = Cambrian.initialize(CGPInd, cfg)
+    kwargs_dict = Dict(kwargs)
+    if haskey(kwargs_dict, :init_function)
+        population = Cambrian.initialize(CGPInd, cfg, init_function=kwargs_dict[:init_function])
+    else
+        population = Cambrian.initialize(CGPInd, cfg)
+    end
     CGPEvolution(cfg, logger, population, fitness, 0)
 end
