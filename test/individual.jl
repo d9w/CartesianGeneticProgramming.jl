@@ -16,6 +16,14 @@ function test_ind(ind::CGPInd, cfg::NamedTuple)
         # test that stringifying works
         @test typeof(string(node)) == String
     end
+    @test typeof(genes) == Array{Float64,3}
+    # assert that genes encoding function, x and y are integers
+    @test genes[:, :, 1:3] == Int16.(genes[:, :, 1:3])
+    # assert that genes encoding parameters are floating numbers in [0, 1]
+    if cfg.n_parameters > 0
+        @test all(genes[:, :, 4:end] .<= 1.0)
+        @test all(genes[:, :, 4:end] .>= 0.0)
+    end
 end
 
 @testset "CGPInd construction" begin
