@@ -63,8 +63,9 @@ Similar to CGPInd construction but uses a custom buffer
     test_filename = string(@__DIR__, "/test.yaml")
     cfg = get_config(test_filename)
     my_buffer = zeros(Int64, cfg.rows * cfg.columns + cfg.n_in)
-    ind = CGPInd(cfg; buffer=buffer)
+    ind = CGPInd(cfg; buffer=my_buffer)
     test_ind(ind)
+    @test typeof(ind.buffer) == Array{Int64,1}
 end
 
 """
