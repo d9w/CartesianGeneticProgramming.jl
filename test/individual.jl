@@ -2,10 +2,7 @@ using Test
 using CartesianGeneticProgramming
 import YAML
 
-@testset "CGPInd construction" begin
-    cfg = get_config("test.yaml")
-    ind = CGPInd(cfg)
-
+function test_ind(ind::CGPInd)
     @test length(ind.nodes) == 3 * cfg.columns + cfg.n_in
     for node in ind.nodes
         if node.active
@@ -19,6 +16,44 @@ import YAML
     end
 
     @test size(ind.genes) == (cfg.rows, cfg.columns, 3)
+end
+
+@testset "CGPInd construction" begin
+    test_filename = string(@__DIR__, "/test.yaml")
+    cfg = get_config(test_filename)
+    ind = CGPInd(cfg)
+    test_ind(ind)
+end
+
+"""
+A minimal function module example.
+Note that one can provide any function names, these are just to keep consistency
+with the `test.yaml` configuration file.
+The `arity` dictionary is necessary though.
+"""
+module MinimalFunctionModuleExample
+    global arity = Dict()
+    function fgen(name::Symbol, ar::Int, s1::Union{Symbol, Expr})
+        @eval function $name(x::Float64, y::Float64)::Float64
+            $s1
+        end
+        arity[String(name)] = ar
+    end
+    fgen(:f_add, 2, :(x + y))
+    fgen(:f_subtract, 2, :(x - y))
+    fgen(:f_mult, 2, :(x * y))
+    fgen(:f_div, 2, :(x / y))
+    fgen(:f_abs, 2, :(abs(x)))
+end
+
+"""
+Similar to CGPInd construction but uses custom set of CGP functions
+"""
+@testset "Custom CGPInd construction" begin
+    test_filename = string(@__DIR__, "/test.yaml")
+    cfg = get_config(test_filename, function_module=MinimalFunctionModuleExample)
+    ind = CGPInd(cfg)
+    test_ind(ind)
 end
 
 """
