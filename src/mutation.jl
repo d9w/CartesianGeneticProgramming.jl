@@ -43,8 +43,8 @@ function goldman_mutate(cfg::NamedTuple, ind::CGPInd; kwargs...)::CGPInd
 end
 
 "create a child that gives different outputs based on the provided inputs (a 2D matrix of (n_in, n_samples))"
-function profiling_mutate(cfg::NamedTuple, ind::CGPInd, inputs::Array{Float64})::CGPInd
-    child = uniform_mutate(cfg, ind)
+function profiling_mutate(cfg::NamedTuple, ind::CGPInd, inputs::AbstractArray; kwargs...)::CGPInd
+    child = uniform_mutate(cfg, ind; kwargs...)
     while true
         for i in 1:size(inputs, 2)
             out_ind = process(ind, inputs[:, i])
@@ -53,7 +53,7 @@ function profiling_mutate(cfg::NamedTuple, ind::CGPInd, inputs::Array{Float64}):
                 return child
             end
         end
-        child = uniform_mutate(cfg, ind)
+        child = uniform_mutate(cfg, ind; kwargs...)
     end
     nothing
 end
