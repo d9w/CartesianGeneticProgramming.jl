@@ -49,10 +49,21 @@ end
 """
 Similar to CGPInd construction but uses custom set of CGP functions
 """
-@testset "Custom CGPInd construction" begin
+@testset "CGPInd construction with custom functions" begin
     test_filename = string(@__DIR__, "/test.yaml")
     cfg = get_config(test_filename, function_module=MinimalFunctionModuleExample)
     ind = CGPInd(cfg)
+    test_ind(ind)
+end
+
+"""
+Similar to CGPInd construction but uses a custom buffer
+"""
+@testset "CGPInd construction with custom buffer" begin
+    test_filename = string(@__DIR__, "/test.yaml")
+    cfg = get_config(test_filename)
+    my_buffer = zeros(Int64, cfg.rows * cfg.columns + cfg.n_in)
+    ind = CGPInd(cfg; buffer=buffer)
     test_ind(ind)
 end
 
