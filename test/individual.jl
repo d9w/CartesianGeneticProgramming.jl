@@ -3,7 +3,9 @@ using CartesianGeneticProgramming
 import YAML
 
 function test_ind(ind::CGPInd, cfg::NamedTuple)
-    @test length(ind.nodes) == 3 * cfg.columns + cfg.n_in
+    @test length(ind.nodes) == cfg.rows * cfg.columns + cfg.n_in
+    @test length(ind.chromosome) == cfg.rows * cfg.columns * (3 + cfg.n_parameters) + cfg.n_out
+    @test size(ind.genes) == (cfg.rows, cfg.columns, 3)
     for node in ind.nodes
         if node.active
             @test node.x >= 1
@@ -14,8 +16,6 @@ function test_ind(ind::CGPInd, cfg::NamedTuple)
         # test that stringifying works
         @test typeof(string(node)) == String
     end
-
-    @test size(ind.genes) == (cfg.rows, cfg.columns, 3)
 end
 
 @testset "CGPInd construction" begin

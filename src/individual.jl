@@ -86,8 +86,9 @@ end
 function CGPInd(cfg::NamedTuple, chromosome::Array{Float64}; kwargs...)::CGPInd
     R = cfg.rows
     C = cfg.columns
+    P = cfg.n_parameters
     # chromosome: node genes, output genes
-    genes = reshape(chromosome[1:(R*C*3)], R, C, 3)
+    genes = reshape(chromosome[1:(R*C*(3+P))], R, C, 3+P)
     # TODO: recurrency is ugly and slow
     maxs = collect(1:R:R*C)
     maxs = round.((R*C .- maxs) .* cfg.recur .+ maxs)
@@ -96,13 +97,13 @@ function CGPInd(cfg::NamedTuple, chromosome::Array{Float64}; kwargs...)::CGPInd
     genes[:, :, 1] .*= maxs
     genes[:, :, 2] .*= maxs
     genes[:, :, 3] .*= length(cfg.functions)
-    genes = Int16.(ceil.(genes))
-    outputs = Int16.(ceil.(chromosome[(R*C*3+1):end] .* (R * C + cfg.n_in)))
+    genes[:, :, 1:3] = Int16.(ceil.(genes[:, :, 1:3])) # ceil all genes except parameters that stay in [0,1]
+    outputs = Int16.(ceil.(chromosome[(R*C*(3+P)+1):end] .* (R * C + cfg.n_in)))
     CGPInd(cfg, chromosome, genes, outputs; kwargs...)
 end
 
 function CGPInd(cfg::NamedTuple; kwargs...)::CGPInd
-    chromosome = rand(cfg.rows * cfg.columns * 3 + cfg.n_out)
+    chromosome = rand(cfg.rows * cfg.columns * (3 + cfg.n_parameters) + cfg.n_out)
     CGPInd(cfg, chromosome; kwargs...)
 end
 
