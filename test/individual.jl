@@ -98,39 +98,6 @@ function select_random(pop::Array{CGPInd}, elite::Int; n_in=113, n_sample=100)
     pop[ds]
 end
 
-
-
-cfg = get_config(test_filename)
-ind = CGPInd(cfg)
-ind2 = CGPInd(cfg)
-@test any(ind.chromosome .!= ind2.chromosome)
-
-for i in 1:ind.n_in
-    genes = get_genes(ind, 1)
-    @test all(genes .== 0)
-end
-
-for i in 1:(length(ind.nodes)-ind.n_in)
-    genes = get_genes(ind, ind.n_in+1)
-    @test all(0.0 .<= genes .<= 1.0)
-end
-
-# TODO here
-set_genes!(ind2, ind.n_in+1, genes)
-@test all(ind.chromosome[1:3] .== ind2.chromosome[1:3])
-
-for i in 1:length(ind.nodes)
-    genes = get_genes(ind, i)
-    set_genes!(ind2, i, genes)
-end
-o = length(ind.chromosome) - cfg.n_out
-@test all(ind.chromosome[1:o] .== ind2.chromosome[1:o])  # TODO here
-
-all_genes = get_genes(ind, collect((ind.n_in+1):length(ind.nodes)))
-@test all(ind.chromosome[1:o] .== all_genes)
-
-
-
 @testset "Node genes" begin
     cfg = get_config(test_filename)
     ind = CGPInd(cfg)
@@ -138,27 +105,34 @@ all_genes = get_genes(ind, collect((ind.n_in+1):length(ind.nodes)))
     @test any(ind.chromosome .!= ind2.chromosome)
 
     for i in 1:ind.n_in
-        genes = get_genes(ind, 1)
+        genes = get_genes(ind, i)
         @test all(genes .== 0)
     end
 
     for i in 1:(length(ind.nodes)-ind.n_in)
-        genes = get_genes(ind, ind.n_in+1)
+        genes = get_genes(ind, ind.n_in+i)
         @test all(0.0 .<= genes .<= 1.0)
     end
 
-    set_genes!(ind2, ind.n_in+1, genes)
-    @test all(ind.chromosome[1:3] .== ind2.chromosome[1:3])
+    for i in 1:(length(ind.nodes)-ind.n_in)
+        ind2 = CGPInd(cfg)  # re-init
+        genes = get_genes(ind, ind.n_in+i)
+        set_genes!(ind2, ind.n_in+i, genes)
+        @test any(ind.chromosome .== ind2.chromosome)
+    end
 
     for i in 1:length(ind.nodes)
         genes = get_genes(ind, i)
         set_genes!(ind2, i, genes)
     end
     o = length(ind.chromosome) - cfg.n_out
-    @test all(ind.chromosome[1:o] .== ind2.chromosome[1:o])  # TODO here
+    @test all(ind.chromosome[1:o] .== ind2.chromosome[1:o])
 
     all_genes = get_genes(ind, collect((ind.n_in+1):length(ind.nodes)))
-    @test all(ind.chromosome[1:o] .== all_genes)
+    # @test all(ind.chromosome[1:o] .== all_genes)
+    for g in all_genes
+        @test g in ind.chromosome
+    end
 end
 
 @testset "Processing" begin

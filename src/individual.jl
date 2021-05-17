@@ -172,22 +172,32 @@ function reset!(c::CGPInd)
 end
 
 """
+    function get_gene_indexes(ind::CGPInd, node_id::Integer)
+
+Given an individual and the index of one of its nodes, return the indexes of the
+chromosome used to encode this particular node.
+"""
+function get_gene_indexes(c::CGPInd, node_id::Integer)
+    index_start = node_id - c.n_in
+    step = length(c.nodes) - c.n_in
+    index_end = (2 + c.n_parameters) * (length(c.nodes) - c.n_in) + node_id - c.n_in
+    return index_start:step:index_end
+end
+
+"""
     function get_genes(ind::CGPInd, node_id::Integer)::Array{Float64}
 
 Given an individual and the index of one of its nodes, return the chromosome
-encoding (floating numbers) used to create this particular node.
+used to encode this particular node.
 
 Example:
     get_genes(ind, 42)
 """
-function get_genes(ind::CGPInd, node_id::Integer)::Array{Float64}
-    if node_id > ind.n_in
-        index_start = node_id - ind.n_in
-        step = length(ind.nodes) - ind.n_in
-        index_end = (2 + ind.n_parameters) * (length(ind.nodes) - ind.n_in) + node_id - ind.n_in
-        return ind.chromosome[index_start:step:index_end]
+function get_genes(c::CGPInd, node_id::Integer)::Array{Float64}
+    if node_id > c.n_in
+        return c.chromosome[get_gene_indexes(c, node_id)]
     else
-        return zeros(3 + ind.n_parameters)
+        return zeros(3 + c.n_parameters)
     end
 end
 
@@ -195,7 +205,7 @@ end
     function get_genes(c::CGPInd, nodes::Array{<:Integer})::Array{Float64}
 
 Given an individual and an array of indexes of one of its nodes, return the
-chromosomes encoding (floating numbers) used to create these particular nodes.
+chromosomes used to encode these particular nodes.
 
 Example:
     get_genes(ind, [7, 42])
@@ -211,8 +221,8 @@ end
 "set the genes of node_id to genes"
 function set_genes!(c::CGPInd, node_id::Integer, genes::Array{Float64})
     if node_id > c.n_in
-        @assert length(genes) == 3
-        c.chromosome[(node_id-c.n_in-1)*3 .+ (1:3)] = genes
+        @assert length(genes) == 3 + c.n_parameters
+        c.chromosome[get_gene_indexes(c, node_id)] = genes
     end
 end
 
