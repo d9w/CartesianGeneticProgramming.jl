@@ -2,10 +2,13 @@ using Test
 using CartesianGeneticProgramming
 import YAML
 
+# Cnofiguration file used for all tests
+test_filename = string(@__DIR__, "/test.yaml")
+
 function test_ind(ind::CGPInd, cfg::NamedTuple)
     @test length(ind.nodes) == cfg.rows * cfg.columns + cfg.n_in
     @test length(ind.chromosome) == cfg.rows * cfg.columns * (3 + cfg.n_parameters) + cfg.n_out
-    @test size(ind.genes) == (cfg.rows, cfg.columns, 3)
+    @test size(ind.genes) == (cfg.rows, cfg.columns, 3 + cfg.n_parameters)
     for node in ind.nodes
         if node.active
             @test node.x >= 1
@@ -13,21 +16,25 @@ function test_ind(ind::CGPInd, cfg::NamedTuple)
             @test node.y >= 1
             @test node.y <= length(ind.nodes)
         end
+        if node.x == 0 && node.y == 0 # input node, no parameters
+            @test length(node.p) == 0
+        else # non-input node, test parameters
+            @test length(node.p) == cfg.n_parameters
+            @test all(0.0 .<= node.p .<= 1.0)
+        end
         # test that stringifying works
         @test typeof(string(node)) == String
     end
-    @test typeof(genes) == Array{Float64,3}
+    @test typeof(ind.genes) == Array{Float64,3}
     # assert that genes encoding function, x and y are integers
-    @test genes[:, :, 1:3] == Int16.(genes[:, :, 1:3])
+    @test ind.genes[:, :, 1:3] == Int16.(ind.genes[:, :, 1:3])
     # assert that genes encoding parameters are floating numbers in [0, 1]
     if cfg.n_parameters > 0
-        @test all(genes[:, :, 4:end] .<= 1.0)
-        @test all(genes[:, :, 4:end] .>= 0.0)
+        @test all(0.0 .<= ind.genes[:, :, 4:end] .<= 1.0)
     end
 end
 
 @testset "CGPInd construction" begin
-    test_filename = string(@__DIR__, "/test.yaml")
     cfg = get_config(test_filename)
     ind = CGPInd(cfg)
     test_ind(ind, cfg)
@@ -54,25 +61,19 @@ module MinimalFunctionModuleExample
     fgen(:f_abs, 2, :(abs(x)))
 end
 
-"""
-Similar to CGPInd construction but uses custom set of CGP functions
-"""
+# Similar to CGPInd construction but uses custom set of CGP functions
 @testset "CGPInd construction with custom functions" begin
-    test_filename = string(@__DIR__, "/test.yaml")
     cfg = get_config(test_filename, function_module=MinimalFunctionModuleExample)
     ind = CGPInd(cfg)
     test_ind(ind, cfg)
 end
 
-"""
-Similar to CGPInd construction but uses a custom buffer
-"""
+# Similar to CGPInd construction but uses a custom buffer
 @testset "CGPInd construction with custom buffer" begin
-    test_filename = string(@__DIR__, "/test.yaml")
     cfg = get_config(test_filename)
     my_buffer = zeros(Int64, cfg.rows * cfg.columns + cfg.n_in)
     ind = CGPInd(cfg; buffer=my_buffer)
-    test_ind(ind)
+    test_ind(ind, cfg)
     @test typeof(ind.buffer) == Array{Int64,1}
 end
 
@@ -97,18 +98,54 @@ function select_random(pop::Array{CGPInd}, elite::Int; n_in=113, n_sample=100)
     pop[ds]
 end
 
+
+
+cfg = get_config(test_filename)
+ind = CGPInd(cfg)
+ind2 = CGPInd(cfg)
+@test any(ind.chromosome .!= ind2.chromosome)
+
+for i in 1:ind.n_in
+    genes = get_genes(ind, 1)
+    @test all(genes .== 0)
+end
+
+for i in 1:(length(ind.nodes)-ind.n_in)
+    genes = get_genes(ind, ind.n_in+1)
+    @test all(0.0 .<= genes .<= 1.0)
+end
+
+# TODO here
+set_genes!(ind2, ind.n_in+1, genes)
+@test all(ind.chromosome[1:3] .== ind2.chromosome[1:3])
+
+for i in 1:length(ind.nodes)
+    genes = get_genes(ind, i)
+    set_genes!(ind2, i, genes)
+end
+o = length(ind.chromosome) - cfg.n_out
+@test all(ind.chromosome[1:o] .== ind2.chromosome[1:o])  # TODO here
+
+all_genes = get_genes(ind, collect((ind.n_in+1):length(ind.nodes)))
+@test all(ind.chromosome[1:o] .== all_genes)
+
+
+
 @testset "Node genes" begin
-    cfg = get_config("test.yaml")
+    cfg = get_config(test_filename)
     ind = CGPInd(cfg)
     ind2 = CGPInd(cfg)
     @test any(ind.chromosome .!= ind2.chromosome)
 
-    genes = get_genes(ind, 1)
-    @test all(genes .== 0)
+    for i in 1:ind.n_in
+        genes = get_genes(ind, 1)
+        @test all(genes .== 0)
+    end
 
-    genes = get_genes(ind, ind.n_in+1)
-    @test all(genes .>= 0.0)
-    @test all(genes .<= 1.0)
+    for i in 1:(length(ind.nodes)-ind.n_in)
+        genes = get_genes(ind, ind.n_in+1)
+        @test all(0.0 .<= genes .<= 1.0)
+    end
 
     set_genes!(ind2, ind.n_in+1, genes)
     @test all(ind.chromosome[1:3] .== ind2.chromosome[1:3])
@@ -118,14 +155,14 @@ end
         set_genes!(ind2, i, genes)
     end
     o = length(ind.chromosome) - cfg.n_out
-    @test all(ind.chromosome[1:o] .== ind2.chromosome[1:o])
+    @test all(ind.chromosome[1:o] .== ind2.chromosome[1:o])  # TODO here
 
     all_genes = get_genes(ind, collect((ind.n_in+1):length(ind.nodes)))
     @test all(ind.chromosome[1:o] .== all_genes)
 end
 
 @testset "Processing" begin
-    cfg = get_config("test.yaml"; functions=["f_abs", "f_add", "f_mult"])
+    cfg = get_config(test_filename; functions=["f_abs", "f_add", "f_mult"])
     ind = CGPInd(cfg)
 
     # test that f(0, 0, 0, 0) = 0
@@ -154,7 +191,7 @@ end
         end
     end
 
-    cfg = get_config("test.yaml"; functions=["f_abs", "f_add", "f_mult"], recur=1.0)
+    cfg = get_config(test_filename; functions=["f_abs", "f_add", "f_mult"], recur=1.0)
     ind = CGPInd(cfg)
     output = process(ind, rand(cfg.n_in))
     @test output[1] <= 1.0 && output[1] >= -1.0

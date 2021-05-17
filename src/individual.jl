@@ -11,23 +11,25 @@ struct Node
     x::Int16
     y::Int16
     f::Function
+    p::Array{Float64,1}
     active::Bool
 end
 
 struct CGPInd <: Cambrian.Individual
     n_in::Int16
     n_out::Int16
+    n_parameters::Int16
     chromosome::Array{Float64}
-    genes::Array{Int16}
+    genes::Array{Float64}
     outputs::Array{Int16}
     nodes::Array{Node}
     buffer::AbstractArray
     fitness::Array{Float64}
 end
 
-function recur_active(active::BitArray, n_in::Integer, ind::Int16, xs::Array{Int16},
-                       ys::Array{Int16}, fs::Array{Int16},
-                       two_arity::BitArray)::BitArray
+function recur_active(active::BitArray, n_in::Integer, ind::Int16,
+                      xs::Array{Int16}, ys::Array{Int16}, fs::Array{Int16},
+                      two_arity::BitArray)::BitArray
     if ind > 0 && ~active[ind]
         active[ind] = true
         active = recur_active(active, n_in, xs[ind], xs, ys, fs, two_arity)
@@ -38,15 +40,15 @@ function recur_active(active::BitArray, n_in::Integer, ind::Int16, xs::Array{Int
     active
 end
 
-function find_active(cfg::NamedTuple, genes::Array{Int16},
+function find_active(cfg::NamedTuple, genes::Array{Float64},
                      outputs::Array{Int16})::BitArray
     R = cfg.rows
     C = cfg.columns
     n = Int16(cfg.n_in)
     active = falses(R, C)
-    xs = genes[:, :, 1] .- n
-    ys = genes[:, :, 2] .- n
-    fs = genes[:, :, 3]
+    xs = Int16.(genes[:, :, 1] .- n)
+    ys = Int16.(genes[:, :, 2] .- n)
+    fs = Int16.(genes[:, :, 3])
     for i in eachindex(outputs)
         active = recur_active(active, cfg.n_in, outputs[i] - n, xs, ys, fs,
                               cfg.two_arity)
@@ -54,21 +56,25 @@ function find_active(cfg::NamedTuple, genes::Array{Int16},
     active
 end
 
-function CGPInd(cfg::NamedTuple, chromosome::Array{Float64}, genes::Array{Int16},
-                outputs::Array{Int16}; kwargs...)::CGPInd
+function CGPInd(cfg::NamedTuple, chromosome::Array{Float64},
+                genes::Array{Float64}, outputs::Array{Int16}; kwargs...)::CGPInd
     R = cfg.rows
     C = cfg.columns
     nodes = Array{Node}(undef, R * C + cfg.n_in)
+    p = Float64[]
     for i in 1:cfg.n_in
-        nodes[i] = Node(0, 0, f_null, false)
+        nodes[i] = Node(0, 0, f_null, p, false)
     end
     i = cfg.n_in
     active = find_active(cfg, genes, outputs)
     for y in 1:C
         for x in 1:R
             i += 1
-            nodes[i] = Node(genes[x, y, 1], genes[x, y, 2],
-                            cfg.functions[genes[x, y, 3]],
+            if cfg.n_parameters > 0
+                p = genes[x, y, 4:end]
+            end
+            nodes[i] = Node(Int16(genes[x, y, 1]), Int16(genes[x, y, 2]),
+                            cfg.functions[Int16(genes[x, y, 3])], p,
                             active[x, y])
         end
     end
@@ -80,7 +86,8 @@ function CGPInd(cfg::NamedTuple, chromosome::Array{Float64}, genes::Array{Int16}
         buffer = zeros(R * C + cfg.n_in)
     end
     fitness = -Inf .* ones(cfg.d_fitness)
-    CGPInd(cfg.n_in, cfg.n_out, chromosome, genes, outputs, nodes, buffer, fitness)
+    CGPInd(cfg.n_in, cfg.n_out, cfg.n_parameters, chromosome, genes, outputs,
+           nodes, buffer, fitness)
 end
 
 function CGPInd(cfg::NamedTuple, chromosome::Array{Float64}; kwargs...)::CGPInd
@@ -127,7 +134,8 @@ function copy(ind::CGPInd)
 end
 
 function String(n::Node)
-    JSON.json(Dict(:x=>n.x, :y=>n.y, :f=>string(n.f), :active=>n.active))
+    JSON.json(Dict(:x=>n.x, :y=>n.y, :f=>string(n.f),  :p=>string(n.p),
+              :active=>n.active))
 end
 
 function show(io::IO, n::Node)
@@ -163,14 +171,35 @@ function reset!(c::CGPInd)
     c.buffer .= 0.0
 end
 
-function get_genes(c::CGPInd, node_id::Integer)::Array{Float64}
-    if node_id > c.n_in
-        return c.chromosome[(node_id-c.n_in-1)*3 .+ (1:3)]
+"""
+    function get_genes(ind::CGPInd, node_id::Integer)::Array{Float64}
+
+Given an individual and the index of one of its nodes, return the chromosome
+encoding (floating numbers) used to create this particular node.
+
+Example:
+    get_genes(ind, 42)
+"""
+function get_genes(ind::CGPInd, node_id::Integer)::Array{Float64}
+    if node_id > ind.n_in
+        index_start = node_id - ind.n_in
+        step = length(ind.nodes) - ind.n_in
+        index_end = (2 + ind.n_parameters) * (length(ind.nodes) - ind.n_in) + node_id - ind.n_in
+        return ind.chromosome[index_start:step:index_end]
     else
-        return zeros(3)
+        return zeros(3 + ind.n_parameters)
     end
 end
 
+"""
+    function get_genes(c::CGPInd, nodes::Array{<:Integer})::Array{Float64}
+
+Given an individual and an array of indexes of one of its nodes, return the
+chromosomes encoding (floating numbers) used to create these particular nodes.
+
+Example:
+    get_genes(ind, [7, 42])
+"""
 function get_genes(c::CGPInd, nodes::Array{<:Integer})::Array{Float64}
     if length(nodes) > 0
         return reduce(vcat, map(x->get_genes(c, x), nodes))
