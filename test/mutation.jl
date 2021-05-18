@@ -3,10 +3,10 @@ using CartesianGeneticProgramming
 import Cambrian
 import Random
 
-@testset "Mutation" begin
-    test_filename = string(@__DIR__, "/test.yaml")
-    cfg = get_config(test_filename)
+test_filename = string(@__DIR__, "/test.yaml")
 
+@testset "Mutation" begin
+    cfg = get_config(test_filename)
     parent = CGPInd(cfg)
 
     # Uniform mutation
@@ -36,7 +36,7 @@ A simple function module handling integers.
 module IntFunctions
     global arity = Dict()
     function fgen(name::Symbol, ar::Int, s1::Union{Symbol, Expr})
-        @eval function $name(x::Int64, y::Int64)::Int64
+        @eval function $name(x::Int64, y::Int64, p::Array{Float64}=Float64[])::Int64
             $s1
         end
         arity[String(name)] = ar
@@ -44,7 +44,7 @@ module IntFunctions
     fgen(:f_add, 2, :(x + y))
     fgen(:f_subtract, 2, :(x - y))
     fgen(:f_mult, 2, :(x * y))
-    fgen(:f_div, 2, :(convert(Int64, floor(x / y))))
+    fgen(:f_div, 1, :(convert(Int64, floor(x / 2))))
     fgen(:f_abs, 2, :(abs(x)))
 end
 
@@ -65,7 +65,6 @@ function CustomCGPInd(cfg::NamedTuple, chromosome::Array{Float64})
 end
 
 @testset "Mutation with custom CGPInd" begin
-    test_filename = string(@__DIR__, "/test.yaml")
     cfg = get_config(test_filename, function_module=IntFunctions)
     parent = CustomCGPInd(cfg)
 
