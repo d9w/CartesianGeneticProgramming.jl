@@ -1,7 +1,8 @@
 using Test
 using CartesianGeneticProgramming
 
-cfg = get_config("test.yaml")
+test_filename = string(@__DIR__, "/test.yaml")
+cfg = get_config(test_filename)
 
 function test_crossover(p1::CGPInd, p2::CGPInd, child::CGPInd)
       @test child != p1
