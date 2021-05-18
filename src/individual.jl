@@ -11,7 +11,7 @@ struct Node
     x::Int16
     y::Int16
     f::Function
-    p::Array{Float64,1}
+    p::Array{Float64}
     active::Bool
 end
 

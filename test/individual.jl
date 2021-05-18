@@ -135,22 +135,6 @@ end
     end
 end
 
-# test parametric functions
-cfg = get_config(test_filename, function_module=MinimalFunctionModuleExample, n_parameters=1)
-ind = CGPInd(cfg)
-inputs = rand(cfg.n_in)
-set_inputs(ind, inputs)
-for i in 1:cfg.n_in
-    @test ind.buffer[i] == 0.0
-end
-output = process(ind)
-@test typeof(output[1]) == Float64
-for i in eachindex(ind.nodes)
-    if ind.nodes[i].active
-        @test typeof(ind.buffer[i]) == Float64
-    end
-end
-
 @testset "Processing" begin
     cfg = get_config(test_filename; functions=["f_abs", "f_add", "f_mult"])
     ind = CGPInd(cfg)
@@ -188,6 +172,17 @@ end
     for i in eachindex(ind.nodes)
         if ind.nodes[i].active
             @test ind.buffer[i] <= 1.0 && ind.buffer[i] >= -1.0
+        end
+    end
+
+    # test parametric functions
+    cfg = get_config(test_filename, function_module=MinimalFunctionModuleExample, n_parameters=1)
+    ind = CGPInd(cfg)
+    output = process(ind, rand(cfg.n_in))
+    @test typeof(output[1]) == Float64
+    for i in eachindex(ind.nodes)
+        if ind.nodes[i].active
+            @test typeof(ind.buffer[i]) == Float64
         end
     end
 
