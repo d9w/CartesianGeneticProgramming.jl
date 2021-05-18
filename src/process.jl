@@ -19,7 +19,7 @@ function process(ind::CGPInd)
     for i in eachindex(ind.nodes)
         n = ind.nodes[i]
         if n.active
-            ind.buffer[i] = n.f(ind.buffer[n.x], ind.buffer[n.y])
+            ind.buffer[i] = n.f(ind.buffer[n.x], ind.buffer[n.y], n.p)
         end
     end
     get_outputs(ind)

@@ -2,7 +2,7 @@ using Test
 using CartesianGeneticProgramming
 import YAML
 
-# Cnofiguration file used for all tests
+# Configuration file used for all tests
 test_filename = string(@__DIR__, "/test.yaml")
 
 function test_ind(ind::CGPInd, cfg::NamedTuple)
@@ -49,16 +49,16 @@ The `arity` dictionary is necessary though.
 module MinimalFunctionModuleExample
     global arity = Dict()
     function fgen(name::Symbol, ar::Int, s1::Union{Symbol, Expr})
-        @eval function $name(x::Float64, y::Float64)::Float64
+        @eval function $name(x::Float64, y::Float64, p::Array{Float64})::Float64
             $s1
         end
         arity[String(name)] = ar
     end
-    fgen(:f_add, 2, :(x + y))
-    fgen(:f_subtract, 2, :(x - y))
-    fgen(:f_mult, 2, :(x * y))
-    fgen(:f_div, 2, :(x / y))
-    fgen(:f_abs, 2, :(abs(x)))
+    fgen(:f_add, 2, :(p[1] * 0.5 * (x + y)))
+    fgen(:f_subtract, 2, :(p[1] * (x - y)))
+    fgen(:f_mult, 2, :(p[1] * x * y))
+    fgen(:f_div, 1, :(p[1] * x / 2))
+    fgen(:f_abs, 2, :(p[1] * abs(x)))
 end
 
 # Similar to CGPInd construction but uses custom set of CGP functions
@@ -132,6 +132,22 @@ end
     # @test all(ind.chromosome[1:o] .== all_genes)
     for g in all_genes
         @test g in ind.chromosome
+    end
+end
+
+# test parametric functions
+cfg = get_config(test_filename, function_module=MinimalFunctionModuleExample, n_parameters=1)
+ind = CGPInd(cfg)
+inputs = rand(cfg.n_in)
+set_inputs(ind, inputs)
+for i in 1:cfg.n_in
+    @test ind.buffer[i] == 0.0
+end
+output = process(ind)
+@test typeof(output[1]) == Float64
+for i in eachindex(ind.nodes)
+    if ind.nodes[i].active
+        @test typeof(ind.buffer[i]) == Float64
     end
 end
 
