@@ -172,7 +172,7 @@ function reset!(c::CGPInd)
 end
 
 """
-    function get_gene_indexes(ind::CGPInd, node_id::Integer)
+    get_gene_indexes(ind::CGPInd, node_id::Integer)
 
 Given an individual and the index of one of its nodes, return the indexes of the
 chromosome used to encode this particular node.
@@ -185,7 +185,7 @@ function get_gene_indexes(c::CGPInd, node_id::Integer)
 end
 
 """
-    function get_genes(ind::CGPInd, node_id::Integer)::Array{Float64}
+    get_genes(ind::CGPInd, node_id::Integer)::Array{Float64}
 
 Given an individual and the index of one of its nodes, return the chromosome
 used to encode this particular node.
@@ -202,7 +202,7 @@ function get_genes(c::CGPInd, node_id::Integer)::Array{Float64}
 end
 
 """
-    function get_genes(c::CGPInd, nodes::Array{<:Integer})::Array{Float64}
+    get_genes(c::CGPInd, nodes::Array{<:Integer})::Array{Float64}
 
 Given an individual and an array of indexes of one of its nodes, return the
 chromosomes used to encode these particular nodes.
