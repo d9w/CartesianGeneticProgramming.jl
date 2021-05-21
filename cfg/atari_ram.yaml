@@ -12,6 +12,7 @@ rows: 1
 columns: 400
 recur: 0.0
 out_m_rate: 0.3
+n_parameters: 0
 functions:
   - f_add
   - f_subtract
