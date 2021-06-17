@@ -12,14 +12,13 @@ end
 
 function test_functions(functions::Array{Function})
     for f in functions
-        # println(f)
-        test_inputs(f, [-1.0, -1.0])
-        test_inputs(f, [0.0, 0.0])
-        test_inputs(f, [1e-310, 1e-310])
-        test_inputs(f, [-1e-310, -2e-310])
-        test_inputs(f, [1.0, 1.0])
+        test_inputs(f, [[-1.0, -1.0], 1, 2])
+        test_inputs(f, [[0.0, 0.0], 1, 2])
+        test_inputs(f, [[1e-310, 1e-310], 1, 2])
+        test_inputs(f, [[-1e-310, -2e-310], 1, 2])
+        test_inputs(f, [[1.0, 1.0], 1, 2])
         for i in 1:5
-            test_inputs(f, [2 * rand() - 1, 2 * rand() - 1])
+            test_inputs(f, [[2 * rand() - 1, 2 * rand() - 1], 1, 2])
         end
     end
 end
@@ -50,6 +49,15 @@ end
         CGPFunctions.f_or,
         CGPFunctions.f_xor,
         CGPFunctions.f_not
+    ]
+    test_functions(functions)
+end
+
+@testset "Range functions" begin
+    functions = [
+        CGPFunctions.f_avg,
+        CGPFunctions.f_max,
+        CGPFunctions.f_min
     ]
     test_functions(functions)
 end
