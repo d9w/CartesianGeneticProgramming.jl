@@ -15,7 +15,7 @@ end
 
 function fgen(name::Symbol, ar::Int, s1::SorX; safe::Bool=false)
     if safe
-        @eval function $name(arr::Array{Float64,1}, x::Int64, y::Int64)::Float64
+        @eval function $name(arr::Array{Float64,1}, x::Int16, y::Int16)::Float64
             try
                 return $s1
             catch
@@ -23,7 +23,7 @@ function fgen(name::Symbol, ar::Int, s1::SorX; safe::Bool=false)
             end
         end
     else
-        @eval function $name(arr::Array{Float64,1}, x::Int64, y::Int64)::Float64
+        @eval function $name(arr::Array{Float64,1}, x::Int16, y::Int16)::Float64
             $s1
         end
     end

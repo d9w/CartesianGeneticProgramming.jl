@@ -12,13 +12,15 @@ end
 
 function test_functions(functions::Array{Function})
     for f in functions
-        test_inputs(f, [[-1.0, -1.0], 1, 2])
-        test_inputs(f, [[0.0, 0.0], 1, 2])
-        test_inputs(f, [[1e-310, 1e-310], 1, 2])
-        test_inputs(f, [[-1e-310, -2e-310], 1, 2])
-        test_inputs(f, [[1.0, 1.0], 1, 2])
+        i1 = convert(Int16, 1)
+        i2 = convert(Int16, 2)
+        test_inputs(f, [[-1.0, -1.0], i1, i2])
+        test_inputs(f, [[0.0, 0.0], i1, i2])
+        test_inputs(f, [[1e-310, 1e-310], i1, i2])
+        test_inputs(f, [[-1e-310, -2e-310], i1, i2])
+        test_inputs(f, [[1.0, 1.0], i1, i2])
         for i in 1:5
-            test_inputs(f, [[2 * rand() - 1, 2 * rand() - 1], 1, 2])
+            test_inputs(f, [[2 * rand() - 1, 2 * rand() - 1], i1, i2])
         end
     end
 end
