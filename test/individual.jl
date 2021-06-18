@@ -203,3 +203,47 @@ end
     all_traces = get_output_trace(ind)
     @test issubset(ot, all_traces)
 end
+
+@testset "Custom CGP individual" begin
+    my_nodes = [
+        Node(1, 2, CGPFunctions.f_subtract, [0.5], false),
+        Node(1, 2, CGPFunctions.f_add, [0.5], false),
+        Node(3, 3, CGPFunctions.f_cos, [0.6], false)
+    ]
+    n_in = 3
+    outputs = Int16[1, 4]
+    d_fitness = 1
+
+    cfg = cfg_from_info(my_nodes, n_in, outputs, CGPFunctions, d_fitness)
+    @test cfg.n_in == n_in
+    @test cfg.rows == 1  # default
+    @test cfg.recur == 0.0  # default
+    @test cfg.columns == length(my_nodes)
+    @test cfg.two_arity == Bool[1, 1, 0]
+    @test cfg.functions == Function[
+        CartesianGeneticProgramming.CGPFunctions.f_subtract,
+        CartesianGeneticProgramming.CGPFunctions.f_add,
+        CartesianGeneticProgramming.CGPFunctions.f_cos
+    ]
+    @test cfg.d_fitness == d_fitness
+    @test cfg.n_parameters == length(my_nodes[1].p)
+
+    ind = CGPInd(my_nodes, cfg, outputs)
+    @test ind.n_in == n_in
+    @test ind.n_out == length(outputs)
+    @test ind.n_parameters == length(my_nodes[1].p)
+    @test length(ind.nodes) == 6
+    for i in 1:3
+        @test ind.nodes[i+3].f == my_nodes[i].f
+        @test ind.nodes[i+3].p == my_nodes[i].p
+        @test ind.nodes[i+3].x == my_nodes[i].x
+        @test ind.nodes[i+3].y == my_nodes[i].y
+        @test ind.nodes[i+3].active == [true, false, false][i]
+    end
+    @test length(ind.fitness) == d_fitness
+    @test length(ind.chromosome) == (1 * length(my_nodes) * (3 + length(my_nodes[1].p)) + length(outputs))
+    @test size(ind.genes) == (1, length(my_nodes), 3 + length(my_nodes[1].p))
+    @test length(ind.buffer) == n_in + length(my_nodes)
+    @test typeof(ind.buffer) == Array{Float64,1}
+    @test ind.outputs == outputs
+end
