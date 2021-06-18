@@ -1,19 +1,24 @@
 export uniform_mutate, goldman_mutate, profiling_mutate
 
 "create a child by randomly mutating genes"
-function uniform_mutate(cfg::NamedTuple, ind::CGPInd)::CGPInd
+function uniform_mutate(cfg::NamedTuple, ind::CGPInd; kwargs...)::CGPInd
     chromosome = copy(ind.chromosome)
     chance = rand(length(ind.chromosome))
     non_output = length(ind.chromosome) - length(ind.outputs)
     change = [chance[1:non_output] .<= cfg.m_rate;
               chance[(non_output+1):end] .<= cfg.out_m_rate]
     chromosome[change] = rand(sum(change))
-    CGPInd(cfg, chromosome)
+    kwargs_dict = Dict(kwargs)
+    if haskey(kwargs_dict, :init_function)
+        return kwargs_dict[:init_function](cfg, chromosome)
+    else
+        return CGPInd(cfg, chromosome)
+    end
 end
 
 "create a child that is structurally different from the parent"
-function goldman_mutate(cfg::NamedTuple, ind::CGPInd)::CGPInd
-    child = uniform_mutate(cfg, ind)
+function goldman_mutate(cfg::NamedTuple, ind::CGPInd; kwargs...)::CGPInd
+    child = uniform_mutate(cfg, ind; kwargs...)
     while true
         if any(ind.outputs != child.outputs)
             return child
@@ -32,14 +37,14 @@ function goldman_mutate(cfg::NamedTuple, ind::CGPInd)::CGPInd
                 end
             end
         end
-        child = uniform_mutate(cfg, ind)
+        child = uniform_mutate(cfg, ind; kwargs...)
     end
     nothing
 end
 
 "create a child that gives different outputs based on the provided inputs (a 2D matrix of (n_in, n_samples))"
-function profiling_mutate(cfg::NamedTuple, ind::CGPInd, inputs::Array{Float64})::CGPInd
-    child = uniform_mutate(cfg, ind)
+function profiling_mutate(cfg::NamedTuple, ind::CGPInd, inputs::AbstractArray; kwargs...)::CGPInd
+    child = uniform_mutate(cfg, ind; kwargs...)
     while true
         for i in 1:size(inputs, 2)
             out_ind = process(ind, inputs[:, i])
@@ -48,7 +53,7 @@ function profiling_mutate(cfg::NamedTuple, ind::CGPInd, inputs::Array{Float64}):
                 return child
             end
         end
-        child = uniform_mutate(cfg, ind)
+        child = uniform_mutate(cfg, ind; kwargs...)
     end
     nothing
 end

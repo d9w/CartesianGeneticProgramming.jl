@@ -8,11 +8,12 @@ log_gen: 10
 save_gen: 0
 m_rate: 0.1
 # CartesianGeneticProgramming.jl settings
-rows: 3
+rows: 2
 columns: 30
 recur: 0.0
-n_in: 10
-n_out: 3
+n_in: 3
+n_out: 2
+n_parameters: 1
 out_m_rate: 0.3
 functions:
   - f_add

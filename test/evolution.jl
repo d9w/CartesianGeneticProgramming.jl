@@ -4,7 +4,8 @@ using Cambrian
 import Cambrian.mutate
 import Random
 
-cfg = get_config("test.yaml", nin=4, nout=1)
+test_filename = string(@__DIR__, "/test.yaml")
+cfg = get_config(test_filename, nin=4, nout=1)
 mutate(i::CGPInd) = uniform_mutate(cfg, i)
 
 function rosenbrock(x::Array{Float64})

@@ -113,7 +113,7 @@ function node_crossover(cfg::NamedTuple, c1::CGPInd, c2::CGPInd,
             if i in c2_nodes
                 append!(genes, get_genes(c2, i))
             else
-                append!(genes, rand(3))
+                append!(genes, rand(3 + cfg.n_parameters))
             end
         end
     end
