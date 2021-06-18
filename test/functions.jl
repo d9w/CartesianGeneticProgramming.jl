@@ -59,7 +59,8 @@ end
     functions = [
         CGPFunctions.f_avg,
         CGPFunctions.f_max,
-        CGPFunctions.f_min
+        CGPFunctions.f_min, 
+        CGPFunctions.f_med
     ]
     test_functions(functions)
 end

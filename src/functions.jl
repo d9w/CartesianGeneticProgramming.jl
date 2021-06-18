@@ -1,6 +1,7 @@
 export CGPFunctions
 
 module CGPFunctions
+using Statistics
 
 global arity = Dict()
 
@@ -53,7 +54,9 @@ fgen(:f_xor, 2, :(Float64(xor(Int(abs(round(arr[x]))), Int(abs(round(arr[y])))))
 fgen(:f_not, 1, :(1 - abs(round(arr[x]))))
 
 # Range functions
-fgen(:f_avg, 3, :(sum(filter(!isnan, arr[min(x, y):max(x, y)]))/length(filter(!isnan, arr[min(x, y):max(x, y)]))))
+fgen(:f_avg, 3, :(mean(arr[min(x, y):max(x, y)])))
 fgen(:f_max, 3, :(maximum(filter(!isnan, arr[min(x, y):max(x, y)]))))
 fgen(:f_min, 3, :(minimum(filter(!isnan, arr[min(x, y):max(x, y)]))))
+fgen(:f_med, 3, :(median(filter(!isnan, arr[min(x, y):max(x, y)]))))
+
 end
