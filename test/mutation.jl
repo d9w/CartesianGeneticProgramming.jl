@@ -30,6 +30,7 @@ test_filename = string(@__DIR__, "/test.yaml")
     @test any(out_parent .!= out_child)
 end
 
+# TODO: convert or remove
 """
 A simple function module handling integers.
 """
@@ -64,8 +65,10 @@ function CustomCGPInd(cfg::NamedTuple, chromosome::Array{Float64})
     CartesianGeneticProgramming.CGPInd(cfg, chromosome; buffer=buffer)
 end
 
+# TODO: randomly fails
+#
 @testset "Mutation with custom CGPInd" begin
-    cfg = get_config(test_filename, function_module=IntFunctions)
+    cfg = get_config(test_filename; functions=["f_add", "f_subtract", "f_mult", "f_div", "f_abs"])
     parent = CustomCGPInd(cfg)
 
     # Uniform mutation

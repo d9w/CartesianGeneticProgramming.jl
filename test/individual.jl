@@ -40,6 +40,7 @@ end
     test_ind(ind, cfg)
 end
 
+# TODO: remove or convert to new fgen
 """
 A minimal function module example.
 Note that one can provide any function names, these are just to keep consistency
@@ -176,7 +177,7 @@ end
     end
 
     # test parametric functions
-    cfg = get_config(test_filename, function_module=MinimalFunctionModuleExample, n_parameters=1)
+    cfg = get_config(test_filename; functions=["f_add"], n_parameters=1)
     ind = CGPInd(cfg)
     output = process(ind, rand(cfg.n_in))
     @test typeof(output[1]) == Float64
