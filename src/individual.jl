@@ -63,7 +63,7 @@ cfg_from_info(nodes::Array{Node}, n_in::Int64, outputs::Array{Int16},
 Deduce config from given information.
 """
 function cfg_from_info(nodes::Array{Node}, n_in::Int64, outputs::Array{Int16},
-                       function_module::Module, d_fitness::Int64; kwargs...)
+                       function_module::Module, d_fitness::Int64)
     # Create the appropriate cfg
     functions = Function[]
     two_arity = BitVector()
@@ -78,7 +78,7 @@ function cfg_from_info(nodes::Array{Node}, n_in::Int64, outputs::Array{Int16},
     n_out = length(outputs)
     R = 1
     C = length(nodes)
-    cfg = (
+    (
         two_arity=two_arity,
         n_in=n_in,
         #m_rate=0,  # Not used in handcrafter CGP
@@ -90,7 +90,6 @@ function cfg_from_info(nodes::Array{Node}, n_in::Int64, outputs::Array{Int16},
         rows=R,
         columns=C
     )
-    cfg
 end
 
 """
@@ -142,13 +141,6 @@ function CGPInd(nodes::Array{Node}, cfg::NamedTuple, outputs::Array{Int16};
     chromosome = vcat(xs, ys, fs, ps, outs)
     # Create individual
     CGPInd(cfg, chromosome; kwargs...)
-    #=
-    if img_proc
-        CartesianGeneticProgramming.CGPInd(cfg, chromosome; buffer=buffer)
-    else
-        CGPInd(cfg, chromosome; kwargs...)
-    end
-    =#
 end
 
 function CGPInd(cfg::NamedTuple, chromosome::Array{Float64},

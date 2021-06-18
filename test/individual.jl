@@ -232,13 +232,13 @@ end
     @test ind.n_in == n_in
     @test ind.n_out == length(outputs)
     @test ind.n_parameters == length(my_nodes[1].p)
-    @test length(ind.nodes) == 6
-    for i in 1:3
-        @test ind.nodes[i+3].f == my_nodes[i].f
-        @test ind.nodes[i+3].p == my_nodes[i].p
-        @test ind.nodes[i+3].x == my_nodes[i].x
-        @test ind.nodes[i+3].y == my_nodes[i].y
-        @test ind.nodes[i+3].active == [true, false, false][i]
+    @test length(ind.nodes) == n_in + length(my_nodes)
+    for i in eachindex(my_nodes)
+        @test ind.nodes[i+n_in].f == my_nodes[i].f
+        @test ind.nodes[i+n_in].p == my_nodes[i].p
+        @test ind.nodes[i+n_in].x == my_nodes[i].x
+        @test ind.nodes[i+n_in].y == my_nodes[i].y
+        @test ind.nodes[i+n_in].active == [true, false, false][i]
     end
     @test length(ind.fitness) == d_fitness
     @test length(ind.chromosome) == (1 * length(my_nodes) * (3 + length(my_nodes[1].p)) + length(outputs))
