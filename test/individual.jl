@@ -40,6 +40,26 @@ end
     test_ind(ind, cfg)
 end
 
+@testset "CGPInd copy" begin
+    cfg = get_config(test_filename)
+    ind = CGPInd(cfg)
+    ind_cp = copy(ind)
+    test_ind(ind, cfg)
+    @test ind.buffer == ind_cp.buffer
+    @test ind.chromosome == ind_cp.chromosome
+    @test ind.fitness == ind_cp.fitness
+    @test ind.genes == ind_cp.genes
+    @test ind.n_in == ind_cp.n_in
+    @test ind.n_out == ind_cp.n_out
+    @test ind.n_parameters == ind_cp.n_parameters
+    @test ind.outputs == ind_cp.outputs
+    for i in eachindex(ind.nodes)
+        @test ind.nodes[i] == ind_cp.nodes[i]
+    end
+    ind.fitness[1] = 1.0
+    @test ind.fitness != ind_cp.fitness
+end
+
 """
 A minimal function module example.
 Note that one can provide any function names, these are just to keep consistency

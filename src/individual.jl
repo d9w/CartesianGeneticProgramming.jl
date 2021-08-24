@@ -207,7 +207,7 @@ function CGPInd(cfg::NamedTuple, ind::String)::CGPInd
 end
 
 function copy(n::Node)
-    Node(n.x, n.y, n.f, n.active)
+    Node(n.x, n.y, n.f, n.p, n.active)
 end
 
 function copy(ind::CGPInd)
@@ -216,8 +216,8 @@ function copy(ind::CGPInd)
     for i in eachindex(ind.nodes)
         nodes[i] = copy(ind.nodes[i])
     end
-    CGPInd(ind.n_in, ind.n_out, copy(ind.chromosome), copy(ind.genes),
-           copy(ind.outputs), nodes, buffer, copy(ind.fitness))
+    CGPInd(ind.n_in, ind.n_out, ind.n_parameters, copy(ind.chromosome),
+           copy(ind.genes), copy(ind.outputs), nodes, buffer, copy(ind.fitness))
 end
 
 function String(n::Node)
