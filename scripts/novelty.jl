@@ -5,6 +5,7 @@ import Cambrian.mutate
 import Random
 using ReinforcementLearning
 using UnicodePlots
+using Statistics
 
 """
 Demonstrates CGP on ReinforcementLearning.jl problems like MountainCar, CartPole
@@ -30,7 +31,7 @@ s = ArgParseSettings()
 end
 args = parse_args(ARGS, s)
 
-function play_env(ind::CGPInd, env_name::String, archive::AbstractArray;
+function play_env(ind::CGPInd, env_name::String, archive::AbstractArray, rewards::AbstractArray;
                   seed::Int=0, render::Bool=false)
     env = MountainCarEnv() # TODO: parse env_name
     Random.seed!(env, seed)
@@ -46,19 +47,28 @@ function play_env(ind::CGPInd, env_name::String, archive::AbstractArray;
         env(action)
         total_reward += reward(env)
     end
+    if length(archive) > 0
+        fitness = minimum((s[1] .- archive).^2)
+    else
+        fitness = 0
+    end
     push!(archive, s[1])
-    println(total_reward)
-    [total_reward]
+    push!(rewards, total_reward)
+    [fitness]
 end
 
 env = MountainCarEnv() # TODO: parse env_name
-n_in = length(state_space(env))
+ss = state_space(env)
+n_in = length(ss)
 n_out = length(action_space(env))
+maxs = [maximum(i) for i in ss]
+mins = [minimum(i) for i in ss]
 
 cfg = get_config(args["cfg"]; n_in=n_in, n_out=n_out)
 Random.seed!(args["seed"])
 
 archive = Vector{Float64}()
+rewards = Vector{Float64}()
 
 if length(args["ind"]) > 0
     ind = CGPInd(cfg, read(args["ind"], String))
@@ -66,9 +76,11 @@ if length(args["ind"]) > 0
     println(reward)
 else
     mutate(i::CGPInd) = goldman_mutate(cfg, i)
-    fit(i::CGPInd) = play_env(i, args["env"], archive)
+    fit(i::CGPInd) = play_env(i, args["env"], archive, rewards)
     e = CGPEvolution(cfg, fit)
     run!(e)
 end
 
-histogram(archive, nbins = 15, closed = :left)
+fitprog = accumulate(max, rewards)
+lineplot(fitprog, title = "Fitness") # TODO: not showing?
+histogram(archive, nbins = 15, closed = :left, title = "Behavior");

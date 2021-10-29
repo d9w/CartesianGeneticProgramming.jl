@@ -47,7 +47,6 @@ function play_env(ind::CGPInd, env_name::String, archive::AbstractArray;
         total_reward += reward(env)
     end
     push!(archive, s[1])
-    println(total_reward)
     [total_reward]
 end
 
