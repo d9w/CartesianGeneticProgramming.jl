@@ -107,9 +107,37 @@ function CGPInd(cfg::NamedTuple, chromosome::Array{Float64}; kwargs...)::CGPInd
     genes[:, :, 1] .*= maxs
     genes[:, :, 2] .*= maxs
     genes[:, :, 3] .*= length(cfg.functions)
+    genes[:, :, 4:3+P] .*= cfg.param_max
     genes[:, :, 1:3] = Int16.(ceil.(genes[:, :, 1:3])) # ceil all genes except parameters that stay in [0,1]
     outputs = Int16.(ceil.(chromosome[(R*C*(3+P)+1):end] .* (R * C + cfg.n_in)))
     CGPInd(cfg, chromosome, genes, outputs; kwargs...)
+end
+
+function get_chromosome(cfg:: ind::CGPInd)
+    R = cfg.rows
+    C = cfg.columns
+    P = cfg.n_parameters
+    maxs = collect(1:R:R*C)
+    maxs = round.((R*C .- maxs) .* cfg.recur .+ maxs)
+    maxs = min.(R*C + cfg.n_in, maxs .+ cfg.n_in)
+    maxs = repeat(maxs, 1, R)'
+    # genes to chromo
+    x_chromo = genes[:, :, 1] ./ maxs
+    y_chromo = genes[:, :, 2] ./ maxs
+    f_chromo = genes[:, :, 3] ./ length(cfg.functions)
+    p_chromo = genes[:, :, 4:3+P] ./cfg.param_max
+    # outputs
+    o_chromo = outputs ./ (R * C + cfg.n_in)
+    # order
+    chromosome = -Inf * ones(cfg.rows * cfg.columns * (3 + cfg.n_parameters) + cfg.n_out)
+    chromosome[1:(3+P):end] .= x_chromo
+    chromosome[2:(3+P):end] .= y_chromo
+    chromosome[3:(3+P):end] .= f_chromo
+    for i in 1:P
+        chromosome[3+i:(3+P):end] .= p_chromo
+    end
+    chromosome[(R*C*(3+P)+1):end] .= o_chromo
+    chromosome
 end
 
 function CGPInd(cfg::NamedTuple; kwargs...)::CGPInd

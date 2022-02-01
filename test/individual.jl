@@ -134,6 +134,14 @@ end
     for g in all_genes
         @test g in ind.chromosome
     end
+
+    # modify ind genes
+    # ind.genes[1] =
+    # chromo = get_chromosome(ind)
+    # new_ind = CGPInd(cfg, chromo)
+    # for g in eachindex(ind.genes):
+    #     new_ind.genes[g] == ind.genes[g]
+    # end
 end
 
 @testset "Processing" begin
