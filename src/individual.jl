@@ -2,6 +2,8 @@ export Node, CGPInd, get_genes, set_genes!, reset!, forward_connections, get_out
 import Base.copy, Base.String, Base.show, Base.summary
 import Cambrian.print
 
+MType = Union{Nothing, Float64, Array{Float64}}
+
 "default function for nodes, will cause error if used as a function node"
 function f_null(args...)::Nothing
     nothing
@@ -83,7 +85,8 @@ function CGPInd(cfg::NamedTuple, chromosome::Array{Float64},
     if haskey(kwargs_dict, :buffer)
         buffer = kwargs_dict[:buffer]
     else
-        buffer = zeros(R * C + cfg.n_in)
+	buffer = Array{MType}(nothing, R * C + cfg.n_in)
+	buffer .= 0.0
     end
     fitness = -Inf .* ones(cfg.d_fitness)
     CGPInd(cfg.n_in, cfg.n_out, cfg.n_parameters, chromosome, genes, outputs,
